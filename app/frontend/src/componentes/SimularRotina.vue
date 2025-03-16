@@ -1,50 +1,113 @@
 <script setup>
-import { ref } from 'vue'
-import { SimularRotina } from '../../wailsjs/go/main/App'
+import { ref, nextTick } from "vue";
+import Plotly from "plotly.js-dist-min"; // Certifique-se de ter instalado via npm (npm install plotly.js-dist-min)
+import { SimularRotina } from "../../wailsjs/go/main/App";
 
-const means = ref(Array(4).fill(0))      // 4 campos para means
-const stds = ref(Array(4).fill(0))       // 4 campos para stds
-const tamanho = ref(0)                   // campo para o tamanho
-const resultados = ref([])               // armazena os resultados da simulação
-const loading = ref(false)               // indicador de carregamento
-const erro = ref("")                     // mensagem de erro
+// Estados reativos
+const means = ref([0, 0, 0, 0]);  // 4 campos para means
+const stds = ref([0, 0, 0, 0]);   // 4 campos para stds
+const tamanho = ref(10);          // Tamanho padrão para evitar NaN
+const resultados = ref([]);       // Armazena os resultados retornados
+const loading = ref(false);       // Indicador de carregamento
+const erro = ref("");             // Mensagem de erro
 
+// Função para plotar o histograma usando Plotly.js
+function plotHistogram() {
+  // Como as amostras são intercaladas (0: acordar, 1: sair, 2: voltar, 3: dormir), separamos cada uma:
+  const samplesAcordar = resultados.value.filter((_, i) => i % 4 === 0);
+  const samplesSair = resultados.value.filter((_, i) => i % 4 === 1);
+  const samplesVoltar = resultados.value.filter((_, i) => i % 4 === 2);
+  const samplesDormir = resultados.value.filter((_, i) => i % 4 === 3);
+
+  // Definindo os traços para o histograma
+  const traceAcordar = {
+    x: samplesAcordar,
+    type: "histogram",
+    opacity: 0.5,
+    name: "Acordar",
+    marker: { color: "blue" }
+  };
+  
+  const traceSair = {
+    x: samplesSair,
+    type: "histogram",
+    opacity: 0.5,
+    name: "Sair",
+    marker: { color: "green" }
+  };
+
+  const traceVoltar = {
+    x: samplesVoltar,
+    type: "histogram",
+    opacity: 0.5,
+    name: "Voltar",
+    marker: { color: "red" }
+  };
+
+  const traceDormir = {
+    x: samplesDormir,
+    type: "histogram",
+    opacity: 0.5,
+    name: "Dormir",
+    marker: { color: "purple" }
+  };
+
+  // Conjunto de dados para o gráfico
+  const data = [traceAcordar, traceSair, traceVoltar, traceDormir];
+
+  // Configurações do layout
+  const layout = {
+    title: "Histograma de Amostras",
+    barmode: "overlay", // Exibe os histogramas sobrepostos para facilitar a comparação
+    xaxis: { title: "Valores" },
+    yaxis: { title: "Frequência" }
+  };
+
+  // Renderiza o gráfico no elemento com id "histogram"
+  Plotly.newPlot("histogram", data, layout);
+}
+
+// Função que chama o backend e executa a simulação
 async function executarSimulacao() {
-  erro.value = ""
-  resultados.value = []
+  erro.value = "";
+  resultados.value = [];
 
   // Validação dos campos
-  if (means.value.some(isNaN) || stds.value.some(isNaN) || isNaN(tamanho.value)) {
-    erro.value = "Por favor, preencha todos os campos com valores válidos."
-    return
+  if (means.value.some((x) => isNaN(x)) || stds.value.some((x) => isNaN(x)) || isNaN(tamanho.value)) {
+    erro.value = "Por favor, preencha todos os campos corretamente.";
+    return;
   }
   if (tamanho.value <= 0) {
-    erro.value = "O tamanho deve ser maior que zero."
-    return
+    erro.value = "O tamanho da amostra deve ser maior que zero.";
+    return;
   }
 
-  loading.value = true
+  loading.value = true;
 
   try {
-    console.log("Dados enviados ao backend:", {
+    console.log("Enviando para o backend:", {
       means: means.value,
       stds: stds.value,
       tamanho: tamanho.value,
-    })
+    });
 
-    // Chama a função SimularRotina exposta no backend (o binding é feito na struct App)
+    // Chama a função do backend via Wails
     resultados.value = await SimularRotina(
       means.value.map(Number),
       stds.value.map(Number),
       Number(tamanho.value)
-    )
+    );
 
-    console.log("Resultados recebidos:", resultados.value)
+    console.log("Resultados recebidos:", resultados.value);
+
+    // Aguarda o DOM atualizar e, em seguida, plota o histograma
+    await nextTick();
+    plotHistogram();
   } catch (e) {
-    console.error("Erro:", e)
-    erro.value = "Falha na simulação. Verifique o console para mais detalhes."
+    console.error("Erro ao executar SimularRotina:", e);
+    erro.value = "Falha na simulação. Verifique o console para mais detalhes.";
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -52,15 +115,14 @@ async function executarSimulacao() {
 <template>
   <div class="container">
     <h1>Simulação Estocástica</h1>
-    
     <form @submit.prevent="executarSimulacao">
       <!-- Inputs para os Means -->
       <div class="form-group">
         <label>Means:</label>
-        <div v-for="(_, index) in 4" :key="'mean' + index">
+        <div v-for="(mean, index) in means" :key="'mean' + index">
           <input
             type="number"
-            v-model="means[index]"
+            v-model.number="means[index]"
             :placeholder="'Mean ' + (index + 1)"
             step="0.01"
             required
@@ -68,13 +130,13 @@ async function executarSimulacao() {
         </div>
       </div>
 
-      <!-- Inputs para os Desvios Padrão -->
+      <!-- Inputs para os Desvios Padrão (Stds) -->
       <div class="form-group">
         <label>Desvios Padrão (Stds):</label>
-        <div v-for="(_, index) in 4" :key="'std' + index">
+        <div v-for="(std, index) in stds" :key="'std' + index">
           <input
             type="number"
-            v-model="stds[index]"
+            v-model.number="stds[index]"
             :placeholder="'Std ' + (index + 1)"
             step="0.01"
             required
@@ -85,22 +147,19 @@ async function executarSimulacao() {
       <!-- Input para o Tamanho -->
       <div class="form-group">
         <label>Tamanho:</label>
-        <input type="number" v-model="tamanho" required />
+        <input type="number" v-model.number="tamanho" required />
       </div>
 
       <!-- Botão de Submissão -->
       <button type="submit" :disabled="loading">
-        {{ loading ? 'Simulando...' : 'Rodar Simulação' }}
+        {{ loading ? "Simulando..." : "Rodar Simulação" }}
       </button>
     </form>
 
-    <!-- Exibição dos Resultados -->
-    <div v-if="resultados.length > 0">
-      <h2>Resultados ({{ resultados.length }} amostras):</h2>
-      <pre>{{ resultados }}</pre>
-    </div>
+    <!-- Container para o histograma (substituindo o print das amostras) -->
+    <div id="histogram"></div>
 
-    <!-- Exibição de Mensagem de Erro -->
+    <!-- Exibição de mensagem de erro -->
     <div v-if="erro" class="erro">
       <p>{{ erro }}</p>
     </div>
@@ -146,11 +205,5 @@ button:hover:not(:disabled) {
   border: 1px solid #ffcdd2;
   border-radius: 4px;
   color: #c62828;
-}
-pre {
-  background-color: #f5f5f5;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
 }
 </style>

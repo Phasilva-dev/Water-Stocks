@@ -3,8 +3,8 @@ package dists
 import (
 	"errors"
   "gonum.org/v1/gonum/stat/distuv"
-  "golang.org/x/exp/rand"
 	"fmt"
+	"math/rand/v2"
 
 )
 
@@ -23,7 +23,7 @@ func (n *NormalDist) StdDev() float64 {
 
 func NewNormalDist (mean, stdDev float64) (*NormalDist, error) {
 
-	if stdDev <= 0 {
+	if stdDev < 0 {
 		return nil, errors.New("stdDev must be greater than 0")
 	}
 	return &NormalDist{
@@ -33,8 +33,8 @@ func NewNormalDist (mean, stdDev float64) (*NormalDist, error) {
 
 }
 
-func (n *NormalDist) Sample(src rand.Source) float64 {
-	dist := distuv.Normal{Mu: n.mean, Sigma: n.stdDev, Src: src}
+func (n *NormalDist) Sample(rng *rand.Rand) float64 {
+	dist := distuv.Normal{Mu: n.mean, Sigma: n.stdDev, Src: rng}
 	return dist.Rand()
 }
 

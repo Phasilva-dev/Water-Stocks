@@ -1,10 +1,10 @@
 package profiles
 
 import(
-	"golang.org/x/exp/rand"
+	"math/rand/v2"
 
 )
 
 type Profile interface {
-	GenerateData(rng rand.Source, constante int32, tipo string)
+	GenerateData(rng *rand.Rand, constante int32, tipo string)
 }

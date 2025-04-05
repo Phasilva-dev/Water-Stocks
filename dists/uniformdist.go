@@ -3,7 +3,7 @@ package dists
 import (
 	"errors"
   "gonum.org/v1/gonum/stat/distuv"
-  "golang.org/x/exp/rand"
+  "math/rand/v2"
 	"fmt"
 
 )
@@ -32,8 +32,8 @@ func NewUniformDist (min, max float64) (*UniformDist, error) {
 	}, nil
 }
 
-func (n *UniformDist) Sample(src rand.Source) float64 {
-	dist := distuv.Uniform{Min: n.min, Max: n.max, Src: src}
+func (n *UniformDist) Sample(rng *rand.Rand) float64 {
+	dist := distuv.Uniform{Min: n.min, Max: n.max, Src: rng}
 	return dist.Rand()
 }
 

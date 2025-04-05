@@ -1,20 +1,20 @@
 package datastruct
 
 import (
-	"unique"
-	
 )
 
 type Routine struct {
-	symbol unique.Handle[string]
 	times []int32
 }
 
 func NewRoutine(symbol string, times []int32) *Routine {
 	return &Routine{
-		symbol: unique.Make(symbol), // Cria um handle único para o símbolo
 		times:  times,               // Inicializa o slice de ProfileTuple
 	}
+}
+
+func (r *Routine) Times() []int32 {
+	return r.times
 }
 
 func (r *Routine) SleepTime() int32 {
@@ -23,6 +23,14 @@ func (r *Routine) SleepTime() int32 {
 
 func (r *Routine) WakeupTime() int32 {
 	return r.times[0]
+}
+
+func (r *Routine) EntryHomeTime(index uint8) int32{
+	return r.times[index]
+}
+
+func (r *Routine) ExitHomeTime(index uint8) int32{
+	return r.times[index]
 }
 
 

@@ -2,7 +2,7 @@ package devtest
 
 import (
 	"dists"
-	"golang.org/x/exp/rand"
+	"math/rand/v2"
 	"log"
 	//"time"
 )
@@ -17,7 +17,8 @@ func SimularRotina(means []float64, stds []float64, tamanho int64) []float64 {
 	}
 
 	// Fonte de aleatoriedade
-	src := rand.NewSource(42)
+	src1 := rand.NewPCG(42,1)
+	src := rand.New(src1)
 
 	// Cria distribuições
 	dist0, err := dists.NewNormalDist(means[0], stds[0])

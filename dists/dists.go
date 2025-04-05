@@ -2,12 +2,11 @@ package dists
 
 import (
 	"errors"
-	"golang.org/x/exp/rand"
-	
+	"math/rand/v2"
 )
 
 type Distribution interface {
-	Sample(rng rand.Source) float64
+	Sample(rng *rand.Rand) float64
 	String() string
 }
 

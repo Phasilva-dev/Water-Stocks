@@ -3,7 +3,7 @@ package dists
 import (
 	"errors"
   "gonum.org/v1/gonum/stat/distuv"
-  "golang.org/x/exp/rand"
+  "math/rand/v2"
 	"fmt"
 )
 
@@ -25,8 +25,8 @@ func NewPoissonDist (lambda float64) (*PoissonDist, error) {
 	}, nil
 }
 
-func (n *PoissonDist) Sample(src rand.Source) float64 {
-	dist := distuv.Poisson{Lambda: n.lambda, Src: src}
+func (n *PoissonDist) Sample(rng *rand.Rand) float64 {
+	dist := distuv.Poisson{Lambda: n.lambda, Src: rng}
 	return dist.Rand()
 }
 

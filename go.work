@@ -6,4 +6,5 @@ use (
 	./devtest
 	./dists
 	./profiles
+	./misc
 )

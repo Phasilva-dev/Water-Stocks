@@ -1,4 +1,4 @@
-package datastruct
+package residentdata
 
 import (
 )
@@ -7,7 +7,7 @@ type Routine struct {
 	times []int32
 }
 
-func NewRoutine(symbol string, times []int32) *Routine {
+func NewRoutine(times []int32) *Routine {
 	return &Routine{
 		times:  times,               // Inicializa o slice de ProfileTuple
 	}
@@ -32,5 +32,3 @@ func (r *Routine) EntryHomeTime(index uint8) int32{
 func (r *Routine) ExitHomeTime(index uint8) int32{
 	return r.times[index]
 }
-
-

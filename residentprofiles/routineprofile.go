@@ -1,9 +1,8 @@
-package profiles
+package residentprofiles
 
 import (
 	"dists"
-	"unique"
-	"datastruct"
+	"residentdata"
 	"errors"
 
 	"math/rand/v2"
@@ -11,15 +10,11 @@ import (
 
 // RoutineProfileDist contém uma lista de ProfileTupleDist
 type RoutineProfileDist struct {
-	symbol unique.Handle[string]
 	events []dists.Distribution
 	shift int32
 	
 }
 
-func (p *RoutineProfileDist) Symbol() string {
-	return p.symbol.Value()
-}
 
 /*Esse getter é fere o encapsulamento, porém, devido ao fato que esse código vai rodar milhares ou sentenas de vezes
 permancerá assim, para não gerar um overhead desnecessario copiando o slice inteiro todas as vezes. */
@@ -31,18 +26,16 @@ func (p *RoutineProfileDist) Shift() int32 {
 	return p.shift
 }
 
-func NewRoutineProfileDist(symbol string, shift int32, events []dists.Distribution) (*RoutineProfileDist, error) {
-	if symbol == "" {
-		return nil, errors.New("símbolo não pode estar vazio")
-	}
+func NewRoutineProfileDist(shift int32, events []dists.Distribution) (*RoutineProfileDist, error) {
+
 	if len(events) == 0 {
-		return nil, errors.New("events não pode estar vazio")
+		return nil, errors.New("events cannot be empty")
 	}
 	if len(events)%2 != 0 {
-		return nil, errors.New("número de elementos em events deve ser par")
+		return nil, errors.New("number of elements in events must be even")
 	}
 	if shift < 0 {
-		return nil, errors.New("constante deve ser positiva")
+		return nil, errors.New("shift must be positive")
 	}
 
 	// Criar uma cópia para garantir imutabilidade
@@ -51,13 +44,12 @@ func NewRoutineProfileDist(symbol string, shift int32, events []dists.Distributi
 
 	for _, dist := range eventsCopy {
 		if dist == nil {
-			return nil, errors.New("Nenhuma distribuição pode estar vazia")
+			return nil, errors.New("no distribution can be empty")
 		}
 	}
 
 	return &RoutineProfileDist{
-		symbol: unique.Make(symbol),
-		events: eventsCopy, // Usando a cópia
+		events: eventsCopy,
 		shift:  shift,
 	}, nil
 }
@@ -76,7 +68,7 @@ func (p *RoutineProfileDist) enforceMinimunGap(entryTime, exitTime int32) (int32
 	return exitTime
 }
 
-func (p *RoutineProfileDist) GenerateData(rng *rand.Rand) *datastruct.Routine {
+func (p *RoutineProfileDist) GenerateData(rng *rand.Rand) *residentdata.Routine {
 	times := make([]int32, len(p.events)) //aloca diretamente o slice
 	for i, dist := range p.events {
     times[i] = generateTime(dist, rng)
@@ -92,5 +84,5 @@ func (p *RoutineProfileDist) GenerateData(rng *rand.Rand) *datastruct.Routine {
 	for i := 1; i < len(p.events); i = i+2 {
 		times[i] = p.enforceMinimunGap(times[i-1],times[i])
 	}
-	return datastruct.NewRoutine(p.symbol.Value(),times)
+	return residentdata.NewRoutine(times)
 }

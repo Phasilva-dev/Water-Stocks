@@ -1,7 +1,7 @@
-package profiles
+package residentprofiles
 
 import (
-	"datastruct"
+	"residentdata"
 	"dists"
 	"errors"
 	"math/rand/v2"
@@ -22,17 +22,12 @@ func (f *FrequencyProfile) StatDist() dists.Distribution {
 	return f.statDist
 }
 
-func (f *FrequencyProfile) NewFrequencyProfile(symbol string,shift uint8, dist dists.Distribution) (*FrequencyProfile, error){
+func (f *FrequencyProfile) NewFrequencyProfile(shift uint8, dist dists.Distribution) (*FrequencyProfile, error){
 
-	if symbol == "" {
-		return nil, errors.New("Simbolo nao pode estar vazio")
-	}
 	if dist == nil {
-		return nil, errors.New("Distribuicao esta vazia")
+		return nil, errors.New("distribution is null")
 	}
-	if shift < 0{
-		return nil, errors.New("Constante deve ser positiva")
-	}
+
 	return &FrequencyProfile {
 		statDist: dist,
 		shift: shift,
@@ -56,8 +51,7 @@ func (f *FrequencyProfile) generateFrequency(rng *rand.Rand) uint8 {
 	return roundedFreq
 }
 
-func (f *FrequencyProfile) GenerateData(rng *rand.Rand) *datastruct.Frequency{
+func (f *FrequencyProfile) GenerateData(rng *rand.Rand) *residentdata.Frequency{
 	freq := f.generateFrequency(rng)
-	return datastruct.NewFrequency(freq)
+	return residentdata.NewFrequency(freq)
 }
-

@@ -1,15 +1,15 @@
-package profiles
+package residentprofiles
 
 import (
 	"testing"
 	"dists"
-	"datastruct"
-	"image/color"
-	"fmt"
+	"residentdata"
+	//"image/color"
+	//"fmt"
 	"math/rand/v2"
-	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
+	//"gonum.org/v1/plot"
+	//"gonum.org/v1/plot/plotter"
+	//"gonum.org/v1/plot/vg"
 )
 
 const (
@@ -37,20 +37,12 @@ func TestNewRoutineProfileDist(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:      "Símbolo vazio",
-			symbol:    "",
-			shift: 5,
-			events:    []dists.Distribution{mockDist, mockDist},
-			wantErr:   true,
-			errMsg:    "símbolo não pode estar vazio",
-		},
-		{
 			name:      "Número ímpar de eventos",
 			symbol:    "work",
 			shift: 5,
 			events:    []dists.Distribution{mockDist},
 			wantErr:   true,
-			errMsg:    "número de elementos em events deve ser par",
+			errMsg:    "number of elements in events must be even",
 		},
 		{
 			name:      "shift negativa",
@@ -58,7 +50,7 @@ func TestNewRoutineProfileDist(t *testing.T) {
 			shift: -1,
 			events:    []dists.Distribution{mockDist, mockDist},
 			wantErr:   true,
-			errMsg:    "shift deve ser positiva",
+			errMsg:    "shift must be positive",
 		},
 		{
 			name:      "Distribuição nil",
@@ -66,14 +58,14 @@ func TestNewRoutineProfileDist(t *testing.T) {
 			shift: 5,
 			events:    []dists.Distribution{mockDist, nil},
 			wantErr:   true,
-			errMsg:    "distribuição está nil",
+			errMsg:    "no distribution can be empty",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Executa a função
-			got, err := NewRoutineProfileDist(tt.symbol, tt.shift, tt.events)
+			got, err := NewRoutineProfileDist(tt.shift, tt.events)
 
 			// Verifica se o erro é o esperado
 			if tt.wantErr {
@@ -89,11 +81,6 @@ func TestNewRoutineProfileDist(t *testing.T) {
 			// Se não espera erro
 			if err != nil {
 				t.Fatalf("Erro inesperado: %v", err)
-			}
-
-			// Verifica os valores do objeto retornado
-			if got.Symbol() != tt.symbol {
-				t.Errorf("Símbolo incorreto\nEsperado: %s\nObtido: %s", tt.symbol, got.Symbol())
 			}
 
 			if got.shift != tt.shift {
@@ -122,7 +109,6 @@ func TestGenerateData(t *testing.T) {
 
 	// 2. Cria o perfil
 	profile, err := NewRoutineProfileDist(
-		symbol,
 		shift,
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},
 	)
@@ -133,7 +119,7 @@ func TestGenerateData(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*datastruct.Routine, 0, numRoutines)
+	routines := make([]*residentdata.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)
@@ -144,11 +130,7 @@ func TestGenerateData(t *testing.T) {
 	expectedTimes := []int32{5 * 60 * 60, 7 * 60 * 60, 18 * 60 * 60, 23 * 60 * 60}
 
 	for i, routine := range routines {
-		// Verifica símbolo
-		if routine.Symbol() != symbol {
-			t.Errorf("[Rotina %d] Símbolo incorreto. Esperado: %s, Obtido: %s",
-				i, symbol, routine.Symbol())
-		}
+
 
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != len(expectedTimes) {
@@ -199,7 +181,6 @@ func TestGenerateDataBatch(t *testing.T) {
 
 	// 2. Cria o perfil com 2 eventos (entrada e saída)
 	profile, err := NewRoutineProfileDist(
-		symbol,
 		shift,
 		[]dists.Distribution{mockDist, mockDist},
 	)
@@ -210,7 +191,7 @@ func TestGenerateDataBatch(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*datastruct.Routine, 0, numRoutines)
+	routines := make([]*residentdata.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)
@@ -221,11 +202,6 @@ func TestGenerateDataBatch(t *testing.T) {
 	expectedTimes := []int32{10, 15} // Entrada: 10, Saída: 10 + shift = 15
 
 	for i, routine := range routines {
-		// Verifica símbolo
-		if routine.Symbol() != symbol {
-			t.Errorf("[Rotina %d] Símbolo incorreto. Esperado: %s, Obtido: %s",
-				i, symbol, routine.Symbol())
-		}
 
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != len(expectedTimes) {
@@ -276,7 +252,6 @@ func TestGenerateDataReal(t *testing.T) {
 
 	// 2. Cria o perfil
 	profile, err := NewRoutineProfileDist(
-		symbol,
 		shift,
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},
 	)
@@ -287,7 +262,7 @@ func TestGenerateDataReal(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*datastruct.Routine, 0, numRoutines)
+	routines := make([]*residentdata.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)
@@ -298,11 +273,7 @@ func TestGenerateDataReal(t *testing.T) {
 	var length int = 4
 
 	for i, routine := range routines {
-		// Verifica símbolo
-		if routine.Symbol() != symbol {
-			t.Errorf("[Rotina %d] Símbolo incorreto. Esperado: %s, Obtido: %s",
-				i, symbol, routine.Symbol())
-		}
+
 
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != length {
@@ -333,7 +304,7 @@ func TestGenerateDataReal(t *testing.T) {
 	println(routines[0].Times()[2])
 	println(routines[0].Times()[3])
 	
-
+	/*
 	// 5. Criação dos histogramas
 	p := plot.New()
 	p.Title.Text = "Distribuição de Atividades"
@@ -421,5 +392,5 @@ func TestGenerateDataReal(t *testing.T) {
 			t.Fatal(err)
 	}
 
-	t.Logf("Geradas %d rotinas consistentes", numRoutines)
+	t.Logf("Geradas %d rotinas consistentes", numRoutines)*/
 }

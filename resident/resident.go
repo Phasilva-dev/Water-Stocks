@@ -1,5 +1,6 @@
 package resident
 
+/*
 import()
 
 type resident struct {
@@ -11,4 +12,4 @@ type resident struct {
 	rotina rotina
 	frequencia frequencia
 	hora_uso hora_uso
-}
+}*/

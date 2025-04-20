@@ -7,18 +7,18 @@ import(
 	"sort"
 )
 
-type PercentSelector struct {
-	values []Tuple
+type PercentSelector[K comparable] struct {
+	values []*Tuple[K, float64]
 }
 
 // validateValues verifica se a soma dos valores excede 100%.
-func validateValues(entries map[string]float64) error {
+func validateValues[K comparable](entries []Tuple[K, float64]) error {
 	total := float64(0)
-	for _, val := range entries {
-		if val < 0 { // Validação de valores negativos
-			return errors.New("values cannot be negative")
+	for _, entry := range entries {
+		if entry.Value() <= 0 { // Validação de valores negativos ou nulos
+			return errors.New("values cannot be negative or zero")
 		}
-		total += val
+		total += entry.Value()
 	}
 	if total > 100 {
 		return errors.New("the sum of the chances exceeds 100%")
@@ -26,56 +26,59 @@ func validateValues(entries map[string]float64) error {
 	return nil
 }
 
-func sortedSlice(values map[string]float64) []Tuple {
-	tuples := make([]Tuple, 0, len(values))
+func sortedSlice[K comparable](entries []Tuple[K, float64]) []Tuple[K, float64] {
+	tuples := make([]Tuple[K, float64], len(entries))
+	copy(tuples, entries)
 
-	for k, v := range values {
-		tuples = append(tuples, Tuple{key: k, value: v})
-	}
 	sort.Slice(tuples, func(i, j int) bool {
 		return tuples[i].Value() < tuples[j].Value()
 	})
+
 	return tuples
 }
 
-func NewPercentSelector(values map[string]float64) (*PercentSelector, error) {
-	if err := validateValues(values); err != nil {
+func NewPercentSelector[K comparable](entries []Tuple[K, float64]) (*PercentSelector[K], error) {
+	// Valida se as chances são válidas (não negativas e somam até 100%)
+	if err := validateValues(entries); err != nil {
 		return nil, err
 	}
 
-	// Criar o map com somas cumulativas
-	cumullativeMap := make(map[string]float64, len(values))
+	// Ordenar os Tuples do menor para o maior (para criar o cumulativo)
+	sortedEntries := sortedSlice(entries)
+
+	cumulative := make([]*Tuple[K, float64], len(sortedEntries))
 	sum := float64(0)
 
-	for k, v := range values {
-		sum += v
-		cumullativeMap[k] = sum
+	// Percorre a sortedEntries de trás para frente
+	for i := len(sortedEntries) - 1; i >= 0; i-- {
+		// Atualiza o valor acumulado e coloca no novo slice
+		sum += sortedEntries[i].Value()
+		cumulative[len(sortedEntries)-1-i] = NewTuple(sortedEntries[i].Key(), sum)
 	}
-	slice := sortedSlice(cumullativeMap)
-
-	return &PercentSelector{
-		values: slice,
+	
+	return &PercentSelector[K]{
+		values: cumulative,
 	}, nil
 }
 
 
-func (p *PercentSelector) Sample(rng *rand.Rand) (string, error) {
+func (p *PercentSelector[K]) Sample(rng *rand.Rand) (K, error) {
 
 	dist, err := dists.NewUniformDist(0.0, 100.0)
-	if err != nil {
-		return "" ,err
-	}
+    if err != nil {
+        var zero K
+        return zero, err
+    }
 	
 	rngValue := dist.Sample(rng)
 
-	// Percorre os valores ordenados e retorna a chave correspondente ao intervalo
+	// Percorre os valores cumulativos e retorna a chave correspondente
 	for _, tuple := range p.values {
 		if rngValue <= tuple.Value() {
 				return tuple.Key(), nil
 		}
-}
+	}
 
-// Caso algo dê errado (o que não deve acontecer se validateValues foi chamado)
-return "", errors.New("no value selected")
-
+	var zero K
+	return zero, errors.New("no value selected")
 }

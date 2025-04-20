@@ -1,23 +1,21 @@
 package misc
 
-import()
-
-type Tuple struct {
-	key   string
-	value float64
+type Tuple[K comparable, V any] struct {
+    key   K
+    value V
 }
 
-func NewTuple(k string, v float64) *Tuple{
-	return &Tuple{
-		key: k,
-		value: v,
-	}
+func NewTuple[K comparable, V any](k K, v V) *Tuple[K, V] {
+    return &Tuple[K, V]{
+        key:   k,
+        value: v,
+    }
 }
 
-func (t *Tuple) Key() string{
-	return t.key
+func (t *Tuple[K, V]) Key() K {
+    return t.key
 }
 
-func (t *Tuple) Value() float64{
-	return t.value
+func (t *Tuple[K, V]) Value() V {
+    return t.value
 }

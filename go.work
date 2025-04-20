@@ -5,7 +5,7 @@ use (
 	./devtest
 	./dists
 	./misc
-	./resident
-	./residentdata
-	./residentprofiles
+	./residentpackage/resident
+	./residentpackage/residentdata
+	./residentpackage/residentprofiles
 )

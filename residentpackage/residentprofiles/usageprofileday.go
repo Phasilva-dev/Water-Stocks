@@ -49,23 +49,60 @@ func (f *UsageProfileDay) UsageTanque() *UsageProfile {
 	return f.usageTanque
 }
 
-func validateUsageProfile(profile *UsageProfile, rng *rand.Rand) int32 {
-	if profile == nil {
-		return 0
-	}
-	val, err := profile.GenerateData(rng)
-	if err != nil {
-		return 0
-	}
-	return val
-}
+func (f *UsageProfileDay) GenerateData(rng *rand.Rand, freq *residentdata.Frequency) *residentdata.Usage {
+	// Armazena as frequências em variáveis locais
+	freqToilet := freq.FreqToilet()
+	freqShower := freq.FreqShower()
+	freqWashBassin := freq.FreqWashBassin()
+	freqWashMachine := freq.FreqWashMachine()
+	freqDishWasher := freq.FreqDishWasher()
+	freqTanque := freq.FreqTanque()
 
-func (f *UsageProfileDay) GenerateData(rng *rand.Rand) *residentdata.Usage {
-		usageToilet :=      validateUsageProfile(f.usageToilet, rng)
-		usageShower :=      validateUsageProfile(f.usageShower, rng)
-		usageWashBassin :=  validateUsageProfile(f.usageWashBassin, rng)
-		usageWashMachine := validateUsageProfile(f.usageWashMachine, rng)
-		usageDishWasher :=  validateUsageProfile(f.usageDishWasher, rng)
-		usageTanque :=      validateUsageProfile(f.usageTanque, rng)
-		return residentdata.NewUsage(usageToilet, usageShower, usageWashBassin, usageWashMachine, usageDishWasher, usageTanque)
+	// Inicializa slices com capacidade baseada na frequência
+	usageToilet := make([]int32, 0, freqToilet)
+	usageShower := make([]int32, 0, freqShower)
+	usageWashBassin := make([]int32, 0, freqWashBassin)
+	usageWashMachine := make([]int32, 0, freqWashMachine)
+	usageDishWasher := make([]int32, 0, freqDishWasher)
+	usageTanque := make([]int32, 0, freqTanque)
+
+	// Usa loops com uint8
+	for i := uint8(0); i < freqToilet; i++ {
+		if val, err := f.usageToilet.GenerateData(rng); err == nil {
+			usageToilet = append(usageToilet, val)
+		}
+	}
+	for i := uint8(0); i < freqShower; i++ {
+		if val, err := f.usageShower.GenerateData(rng); err == nil {
+			usageShower = append(usageShower, val)
+		}
+	}
+	for i := uint8(0); i < freqWashBassin; i++ {
+		if val, err := f.usageWashBassin.GenerateData(rng); err == nil {
+			usageWashBassin = append(usageWashBassin, val)
+		}
+	}
+	for i := uint8(0); i < freqWashMachine; i++ {
+		if val, err := f.usageWashMachine.GenerateData(rng); err == nil {
+			usageWashMachine = append(usageWashMachine, val)
+		}
+	}
+	for i := uint8(0); i < freqDishWasher; i++ {
+		if val, err := f.usageDishWasher.GenerateData(rng); err == nil {
+			usageDishWasher = append(usageDishWasher, val)
+		}
+	}
+	for i := uint8(0); i < freqTanque; i++ {
+		if val, err := f.usageTanque.GenerateData(rng); err == nil {
+			usageTanque = append(usageTanque, val)
+		}
+	}
+
+	return residentdata.NewUsage(usageToilet,
+		usageShower,
+		usageWashBassin,
+		usageWashMachine,
+		usageDishWasher,
+		usageTanque,)
+	
 }

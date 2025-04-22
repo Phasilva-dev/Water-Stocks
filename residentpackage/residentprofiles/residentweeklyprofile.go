@@ -11,15 +11,34 @@ type ResidentWeeklyProfile struct {
 }
 
 func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProfile, error) {
-	if len(values) > 7 && len(values) <= 0 {
-		return nil, errors.New("Deu erro")
-	} 
+	if len(values) > 7 || len(values) == 0 {
+		return nil, errors.New("profile list must contain between 1 and 7 entries")
+	}
 
 	return &ResidentWeeklyProfile{
 		profiles: values,
 	}, nil
 }
 
-func (r *ResidentWeeklyProfile) GenerateDailyData(day int64,rng *rand.Rand) *residentdata.DailyData{
-	return r.profiles[day].GenerateData(rng)
+func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) *residentdata.Frequency {
+	day = normalizeDay(day)
+	return r.profiles[day].GenerateFrequency(rng)
 }
+
+func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) *residentdata.Routine {
+	day = normalizeDay(day)
+	return r.profiles[day].GenerateRoutine(rng)
+}
+
+func (r *ResidentWeeklyProfile) GenerateUsage(day uint8, freq *residentdata.Frequency, rng *rand.Rand) *residentdata.Usage {
+	day = normalizeDay(day)
+	return r.profiles[day].GenerateUsage(freq, rng)
+}
+
+func normalizeDay(day uint8) uint8 {
+	return day % 7
+}
+/* Acredito que não vai ser mais util
+func (r *ResidentWeeklyProfile) GenerateDailyData(day uint16,rng *rand.Rand) *residentdata.DailyData{
+	return r.profiles[day].GenerateData(rng)
+}*/

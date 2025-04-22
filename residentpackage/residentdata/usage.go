@@ -5,14 +5,14 @@ import (
 
 type Usage struct {
 	//Uso individual
-	usageToilet int32
-	usageShower int32
-	usageWashBassin int32
+	usageToilet []int32
+	usageShower []int32
+	usageWashBassin []int32
 
 	//Uso compartilhado
-	usageWashMachine int32
-	usageDishWasher int32
-	usageTanque int32
+	usageWashMachine []int32
+	usageDishWasher []int32
+	usageTanque []int32
 
 }
 
@@ -27,34 +27,34 @@ type Usage struct {
 	}
 }*/
 
-func (f *Usage) UsageToilet() int32 {
+func (f *Usage) UsageToilet() []int32 {
 	return f.usageToilet
 }
 
-func (f *Usage) UsageShower() int32 {
+func (f *Usage) UsageShower() []int32 {
 	return f.usageShower
 }
 
-func (f *Usage) UsageWashBassin() int32 {
+func (f *Usage) UsageWashBassin() []int32 {
 	return f.usageWashBassin
 }
 
 //Compartilhado
 
-func (f *Usage) UsageWashMachine() int32 {
+func (f *Usage) UsageWashMachine() []int32 {
 	return f.usageWashMachine
 }
 
-func (f *Usage) UsageDishWasher() int32 {
+func (f *Usage) UsageDishWasher() []int32 {
 	return f.usageDishWasher
 }
 
-func (f *Usage) UsageTanque() int32 {
+func (f *Usage) UsageTanque() []int32 {
 	return f.usageTanque
 }
 
 func NewUsage(
-	toilet, shower, washBassin, washMachine, dishWasher, tanque int32,
+	toilet, shower, washBassin, washMachine, dishWasher, tanque []int32,
 ) *Usage {
 	return &Usage{
 		usageToilet:      toilet,

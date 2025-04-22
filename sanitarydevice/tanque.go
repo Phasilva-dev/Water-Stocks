@@ -6,28 +6,28 @@ import (
 	"math"
 )
 
-type DishWasher struct {
+type Tanque struct {
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
 
 }
 
-func NewDishWasher(flowLeakDist, durationDist dists.Distribution, amount uint8) *DishWasher {
-	return &DishWasher{
+func NewTanque(flowLeakDist, durationDist dists.Distribution, amount uint8) *Tanque {
+	return &Tanque{
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}
 }
 
-func (t *DishWasher) FlowLeakDist() dists.Distribution {
+func (t *Tanque) FlowLeakDist() dists.Distribution {
 	return t.flowLeakDist
 }
 
-func (t *DishWasher) DurationDist() dists.Distribution {
+func (t *Tanque) DurationDist() dists.Distribution {
 	return t.durationDist
 }
 
-func (t *DishWasher) GenerateDuration(rng *rand.Rand) int32 {
+func (t *Tanque) GenerateDuration(rng *rand.Rand) int32 {
 	sample := t.durationDist.Sample(rng)
 	absSample := math.Abs(sample)
 
@@ -38,7 +38,7 @@ func (t *DishWasher) GenerateDuration(rng *rand.Rand) int32 {
 	return int32(absSample)
 }
 
-func (t *DishWasher) GenerateFlowLeak(rng *rand.Rand) int32 {
+func (t *Tanque) GenerateFlowLeak(rng *rand.Rand) int32 {
 	sample := t.flowLeakDist.Sample(rng)
 	absSample := math.Abs(sample)
 

@@ -41,10 +41,6 @@ func (r *ResidentDayProfile) GenerateFrequency(rng *rand.Rand) *residentdata.Fre
 	return r.frequencyProfileDay.GenerateData(rng)
 }
 
-func (r *ResidentDayProfile) GenerateUsage(rng *rand.Rand) *residentdata.Usage {
-	return r.usageProfileDay.GenerateData(rng)
-}
-
-func (r *ResidentDayProfile) GenerateData(rng *rand.Rand) *residentdata.DailyData {
-	return residentdata.NewDailyData(r.GenerateRoutine(rng),r.GenerateFrequency(rng), r.GenerateUsage(rng))
+func (r *ResidentDayProfile) GenerateUsage(freq *residentdata.Frequency,rng *rand.Rand) *residentdata.Usage {
+	return r.usageProfileDay.GenerateData(rng, freq)
 }

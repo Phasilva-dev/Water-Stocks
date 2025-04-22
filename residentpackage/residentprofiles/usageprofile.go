@@ -22,6 +22,9 @@ func NewUsageProfile(usagesSlice []misc.Tuple[dists.Distribution, float64]) (*Us
 }
 
 func (u *UsageProfile) GenerateData(rng *rand.Rand) (int32, error) {
+	if u == nil {
+		return 0,nil
+	}
 	dist, err := u.usagesSelector.Sample(rng)
 	if err != nil {
 		return 0, err

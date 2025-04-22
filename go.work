@@ -8,4 +8,8 @@ use (
 	./residentpackage/resident
 	./residentpackage/residentdata
 	./residentpackage/residentprofiles
+	./sanitarydevice
+	./housepackage/house
+	./housepackage/housedata
+	./housepackage/houseprofiles
 )

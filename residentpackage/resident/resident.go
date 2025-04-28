@@ -51,8 +51,15 @@ func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
 	r.dayData.SetRoutine(r.residentProfile.GenerateRoutine(day,rng))
 }
 
-func (r *Resident) GenerateUsage(day uint8, rng *rand.Rand) {
-	r.dayData.SetUsage(r.residentProfile.GenerateUsage(day,r.dayData.Frequency(), rng))
+func (r *Resident) GenerateUsage(day uint8, rng *rand.Rand) error {
+	usage, err := r.residentProfile.GenerateUsage(day,r.dayData.Frequency(), rng)
+	if err != nil {
+		// Propaga o erro para a função chamadora
+		return err
+	}
+	// Se não houver erro, define o uso normalmente
+	r.dayData.SetUsage(usage)
+	return nil
 }
 
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {

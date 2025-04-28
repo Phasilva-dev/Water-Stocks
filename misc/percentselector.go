@@ -20,8 +20,9 @@ func validateValues[K comparable](entries []Tuple[K, float64]) error {
 		}
 		total += entry.Value()
 	}
-	if total > 100 {
-		return errors.New("the sum of the chances exceeds 100%")
+	
+	if total != 100 {
+		return errors.New("the sum of the chances needs to be 100%")
 	}
 	return nil
 }

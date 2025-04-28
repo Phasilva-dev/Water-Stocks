@@ -49,60 +49,43 @@ func (f *UsageProfileDay) UsageTanque() *UsageProfile {
 	return f.usageTanque
 }
 
-func (f *UsageProfileDay) GenerateData(rng *rand.Rand, freq *residentdata.Frequency) *residentdata.Usage {
-	// Armazena as frequências em variáveis locais
-	freqToilet := freq.FreqToilet()
-	freqShower := freq.FreqShower()
-	freqWashBassin := freq.FreqWashBassin()
-	freqWashMachine := freq.FreqWashMachine()
-	freqDishWasher := freq.FreqDishWasher()
-	freqTanque := freq.FreqTanque()
-
-	// Inicializa slices com capacidade baseada na frequência
-	usageToilet := make([]int32, 0, freqToilet)
-	usageShower := make([]int32, 0, freqShower)
-	usageWashBassin := make([]int32, 0, freqWashBassin)
-	usageWashMachine := make([]int32, 0, freqWashMachine)
-	usageDishWasher := make([]int32, 0, freqDishWasher)
-	usageTanque := make([]int32, 0, freqTanque)
-
-	// Usa loops com uint8
-	for i := uint8(0); i < freqToilet; i++ {
-		if val, err := f.usageToilet.GenerateData(rng); err == nil {
-			usageToilet = append(usageToilet, val)
-		}
-	}
-	for i := uint8(0); i < freqShower; i++ {
-		if val, err := f.usageShower.GenerateData(rng); err == nil {
-			usageShower = append(usageShower, val)
-		}
-	}
-	for i := uint8(0); i < freqWashBassin; i++ {
-		if val, err := f.usageWashBassin.GenerateData(rng); err == nil {
-			usageWashBassin = append(usageWashBassin, val)
-		}
-	}
-	for i := uint8(0); i < freqWashMachine; i++ {
-		if val, err := f.usageWashMachine.GenerateData(rng); err == nil {
-			usageWashMachine = append(usageWashMachine, val)
-		}
-	}
-	for i := uint8(0); i < freqDishWasher; i++ {
-		if val, err := f.usageDishWasher.GenerateData(rng); err == nil {
-			usageDishWasher = append(usageDishWasher, val)
-		}
-	}
-	for i := uint8(0); i < freqTanque; i++ {
-		if val, err := f.usageTanque.GenerateData(rng); err == nil {
-			usageTanque = append(usageTanque, val)
-		}
+func (f *UsageProfileDay) GenerateData(rng *rand.Rand, freq *residentdata.Frequency) (*residentdata.Usage, error) {
+	usageToilet, err := f.usageToilet.GenerateData(rng, freq.FreqToilet())
+	if err != nil {
+		return nil, err
 	}
 
-	return residentdata.NewUsage(usageToilet,
+	usageShower, err := f.usageShower.GenerateData(rng, freq.FreqShower())
+	if err != nil {
+		return nil, err
+	}
+
+	usageWashBassin, err := f.usageWashBassin.GenerateData(rng, freq.FreqWashBassin())
+	if err != nil {
+		return nil, err
+	}
+
+	usageWashMachine, err := f.usageWashMachine.GenerateData(rng, freq.FreqWashMachine())
+	if err != nil {
+		return nil, err
+	}
+
+	usageDishWasher, err := f.usageDishWasher.GenerateData(rng, freq.FreqDishWasher())
+	if err != nil {
+		return nil, err
+	}
+
+	usageTanque, err := f.usageTanque.GenerateData(rng, freq.FreqTanque())
+	if err != nil {
+		return nil, err
+	}
+
+	return residentdata.NewUsage(
+		usageToilet,
 		usageShower,
 		usageWashBassin,
 		usageWashMachine,
 		usageDishWasher,
-		usageTanque,)
-	
+		usageTanque,
+	), nil
 }

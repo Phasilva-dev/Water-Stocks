@@ -21,14 +21,31 @@ func NewUsageProfile(usagesSlice []misc.Tuple[dists.Distribution, float64]) (*Us
 	}, nil
 }
 
-func (u *UsageProfile) GenerateData(rng *rand.Rand) (int32, error) {
+// Gera uma única amostra
+func (u *UsageProfile) GenerateOne(rng *rand.Rand) (int32, error) {
 	if u == nil {
-		return 0,nil
+		return 0, nil
 	}
 	dist, err := u.usagesSelector.Sample(rng)
 	if err != nil {
 		return 0, err
 	}
-	return int32(dist.Sample(rng)),nil
+	return int32(dist.Sample(rng)), nil
+}
 
+// Gera um slice de amostras baseado na frequência passada
+func (u *UsageProfile) GenerateData(rng *rand.Rand, freq uint8) ([]int32, error) {
+	if u == nil {
+		return nil, nil
+	}
+
+	result := make([]int32, 0, freq)
+	for i := uint8(0); i < freq; i++ {
+		val, err := u.GenerateOne(rng)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, val)
+	}
+	return result, nil
 }

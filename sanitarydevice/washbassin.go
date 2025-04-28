@@ -7,14 +7,15 @@ import (
 )
 
 type WashBassin struct {
+	sanitaryDeviceID uint16
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
-	amount uint8
 
 }
 
-func NewWashBassin(flowLeakDist, durationDist dists.Distribution, amount uint8) *WashBassin {
+func NewWashBassin(flowLeakDist, durationDist dists.Distribution, id uint16) *WashBassin {
 	return &WashBassin{
+		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}
@@ -39,13 +40,9 @@ func (t *WashBassin) GenerateDuration(rng *rand.Rand) int32 {
 	return int32(absSample)
 }
 
-func (t *WashBassin) GenerateFlowLeak(rng *rand.Rand) int32 {
+func (t *WashBassin) GenerateFlowLeak(rng *rand.Rand) float64 {
 	sample := t.flowLeakDist.Sample(rng)
 	absSample := math.Abs(sample)
 
-	if absSample > math.MaxInt32 {
-		absSample = math.MaxInt32
-	}
-
-	return int32(absSample)
+	return absSample
 }

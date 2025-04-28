@@ -30,9 +30,10 @@ func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) *resi
 	return r.profiles[day].GenerateRoutine(rng)
 }
 
-func (r *ResidentWeeklyProfile) GenerateUsage(day uint8, freq *residentdata.Frequency, rng *rand.Rand) *residentdata.Usage {
+func (r *ResidentWeeklyProfile) GenerateUsage(day uint8, freq *residentdata.Frequency, rng *rand.Rand) (*residentdata.Usage, error) {
 	day = normalizeDay(day)
-	return r.profiles[day].GenerateUsage(freq, rng)
+	return r.profiles[day].GenerateUsage(rng, freq)
+
 }
 
 func normalizeDay(day uint8) uint8 {

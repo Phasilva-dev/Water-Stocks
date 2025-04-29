@@ -5,11 +5,12 @@ use (
 	./devtest
 	./dists
 	./misc
-	./residentpackage/resident
 	./residentpackage/residentdata
 	./residentpackage/residentprofiles
 	./sanitarydevice
-	./housepackage/house
 	./housepackage/housedata
 	./housepackage/houseprofiles
+	./globals
+	./entities
+	./models
 )

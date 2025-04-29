@@ -1,4 +1,4 @@
-package sanitarydevice
+package models
 
 import (
 	"math/rand/v2"
@@ -9,9 +9,3 @@ type SanitaryDevice interface {
 	GenerateDuration(rng *rand.Rand) int32
 	SanitaryDeviceID() uint32
 }
-
-
-
-
-
-

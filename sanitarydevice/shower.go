@@ -7,18 +7,22 @@ import (
 )
 
 type Shower struct {
-	sanitaryDeviceID uint16
+	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
 
 }
 
-func NewShower(flowLeakDist, durationDist dists.Distribution, id uint16) *Shower {
+func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) *Shower {
 	return &Shower{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}
+}
+
+func (t *Shower) SanitaryDeviceID() uint32 {
+	return t.sanitaryDeviceID
 }
 
 func (t *Shower) FlowLeakDist() dists.Distribution {

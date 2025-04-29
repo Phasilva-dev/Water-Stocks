@@ -5,18 +5,22 @@ import (
 )
 
 type Toilet struct {
-	sanitaryDeviceID uint16
+	sanitaryDeviceID uint32
 	flowLeak float64
 	duration int32
 
 }
 
-func NewToilet(flowLeak float64, duration int32, id uint16) *Toilet {
+func NewToilet(flowLeak float64, duration int32, id uint32) *Toilet {
 	return &Toilet{
 		sanitaryDeviceID: id,
 		flowLeak: flowLeak,
 		duration: duration,
 	}
+}
+
+func (t *Toilet) SanitaryDeviceID() uint32 {
+	return t.sanitaryDeviceID
 }
 
 func (t *Toilet) FlowLeak() float64 {

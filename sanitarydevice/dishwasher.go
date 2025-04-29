@@ -7,19 +7,23 @@ import (
 )
 
 type DishWasher struct {
-	sanitaryDeviceID uint16
+	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
 	
 
 }
 
-func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint16) *DishWasher {
+func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint32) *DishWasher {
 	return &DishWasher{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}
+}
+
+func (t *DishWasher) SanitaryDeviceID() uint32 {
+	return t.sanitaryDeviceID
 }
 
 func (t *DishWasher) FlowLeakDist() dists.Distribution {

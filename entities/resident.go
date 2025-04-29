@@ -1,25 +1,28 @@
-package resident
+package entities
 
 import (
 	"math/rand/v2"
 	"residentdata"
-	//"residentprofiles"
+	"residentprofiles"
+
 )
 
 type Resident struct {
 	age uint8
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *residentdata.DailyData
-	residentProfile *ResidentProfile
-	//Slice de Tupla para 
-	//house *house
+	residentProfile *residentprofiles.ResidentProfile
+	//residentdata.ResidentSanitaryLog
+	house *House
 }
 
-func NewResident(age uint8) *Resident { //Futuramente adicionar House e ResidentProfile
+func NewResident(age uint8, occupation uint32, profile *residentprofiles.ResidentProfile, house *House) *Resident {
 	return &Resident{
 		age: age,
-		occupationID: 0,
+		occupationID: occupation,
 		dayData: nil,
+		residentProfile: profile,
+		house: house,
 	}
 }
 
@@ -34,14 +37,10 @@ func (r *Resident) DayData() *residentdata.DailyData {
 	return r.dayData
 }
 
-func (r *Resident) ResidentProfile() *ResidentProfile {
+func (r *Resident) ResidentProfile() *residentprofiles.ResidentProfile {
 	return r.residentProfile
 }
 
-func (r *Resident) GenerateOccupationID(rng *rand.Rand) {
-	r.occupationID = r.residentProfile.GenerateOccupation(r.age,rng)
-
-}
 
 func (r *Resident) GenerateFrequency(day uint8, rng *rand.Rand) {
 	r.dayData.SetFrequency(r.residentProfile.GenerateFrequency(day,rng))
@@ -50,7 +49,7 @@ func (r *Resident) GenerateFrequency(day uint8, rng *rand.Rand) {
 func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
 	r.dayData.SetRoutine(r.residentProfile.GenerateRoutine(day,rng))
 }
-
+//Terei que trocar
 func (r *Resident) GenerateUsage(day uint8, rng *rand.Rand) error {
 	usage, err := r.residentProfile.GenerateUsage(day,r.dayData.Frequency(), rng)
 	if err != nil {
@@ -62,6 +61,7 @@ func (r *Resident) GenerateUsage(day uint8, rng *rand.Rand) error {
 	return nil
 }
 
+//Terei que trocar
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 	r.GenerateRoutine(day,rng)
 	r.GenerateFrequency(day,rng)

@@ -7,18 +7,22 @@ import (
 )
 
 type Tanque struct {
-	sanitaryDeviceID uint16
+	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
 
 }
 
-func NewTanque(flowLeakDist, durationDist dists.Distribution, id uint16) *Tanque {
+func NewTanque(flowLeakDist, durationDist dists.Distribution, id uint32) *Tanque {
 	return &Tanque{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}
+}
+
+func (t *Tanque) SanitaryDeviceID() uint32 {
+	return t.sanitaryDeviceID
 }
 
 func (t *Tanque) FlowLeakDist() dists.Distribution {

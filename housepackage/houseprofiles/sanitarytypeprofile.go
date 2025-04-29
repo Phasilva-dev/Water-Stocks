@@ -1,48 +1,47 @@
 package houseprofiles
-
+/*
 import (
 	"misc"
-	"sanitarydevice"
 	"housedata"
 	"math/rand/v2"
 )
 
 type SanitaryTypeProfile struct {
-	toilet *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
-	shower *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
-	washBassin *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
+	toilet *misc.PercentSelector[uint32]
+	shower *misc.PercentSelector[uint32]
+	washBassin *misc.PercentSelector[uint32]
 
-	washMachine *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
-	dishWasher *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
-	tanque *misc.PercentSelector[*sanitarydevice.SanitaryDevice]
+	washMachine *misc.PercentSelector[uint32]
+	dishWasher *misc.PercentSelector[uint32]
+	tanque *misc.PercentSelector[uint32]
 }
 
-func (s *SanitaryTypeProfile) Toilet() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) Toilet() *misc.PercentSelector[uint32] {
 	return s.toilet
 }
 
-func (s *SanitaryTypeProfile) Shower() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) Shower() *misc.PercentSelector[uint32] {
 	return s.shower
 }
 
-func (s *SanitaryTypeProfile) WashBassin() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) WashBassin() *misc.PercentSelector[uint32] {
 	return s.washBassin
 }
 
-func (s *SanitaryTypeProfile) WashMachine() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) WashMachine() *misc.PercentSelector[uint32] {
 	return s.washMachine
 }
 
-func (s *SanitaryTypeProfile) DishWasher() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) DishWasher() *misc.PercentSelector[uint32] {
 	return s.dishWasher
 }
 
-func (s *SanitaryTypeProfile) Tanque() *misc.PercentSelector[*sanitarydevice.SanitaryDevice] {
+func (s *SanitaryTypeProfile) Tanque() *misc.PercentSelector[uint32] {
 	return s.tanque
 }
 
 
-func NewSanitaryTypeProfile(selectors map[string]*misc.PercentSelector[*sanitarydevice.SanitaryDevice]) *SanitaryTypeProfile {
+func NewSanitaryTypeProfile(selectors map[string]*misc.PercentSelector[uint32]) *SanitaryTypeProfile {
 	return &SanitaryTypeProfile{
 		toilet:      selectors["toilet"],
 		shower:      selectors["shower"],
@@ -54,15 +53,15 @@ func NewSanitaryTypeProfile(selectors map[string]*misc.PercentSelector[*sanitary
 }
 
 func (s *SanitaryTypeProfile) generateOne(
-	selector *misc.PercentSelector[*sanitarydevice.SanitaryDevice], rng *rand.Rand,
-) (*sanitarydevice.SanitaryDevice, error) {
+	selector *misc.PercentSelector[uint32], rng *rand.Rand,
+) (uint32, error) {
 	if selector == nil {
-		return nil, nil
+		return 0, nil
 	}
 
 	device, err := selector.Sample(rng)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	return device, nil
@@ -70,7 +69,7 @@ func (s *SanitaryTypeProfile) generateOne(
 
 func (s *SanitaryTypeProfile) GenerateData(rng *rand.Rand, amount uint8) (*housedata.SanitaryHouse, error) {
 
-	devices := make(map[string]*sanitarydevice.SanitaryDevice)
+	devices := make(map[string]uint32)
 
 	var err error
 	if devices["toilet"], err = s.generateOne(s.toilet, rng); err != nil {
@@ -99,4 +98,4 @@ func (s *SanitaryTypeProfile) GenerateData(rng *rand.Rand, amount uint8) (*house
 
 	return housedata.NewSanitaryHouse(devices, amount), nil
 }
-
+*/

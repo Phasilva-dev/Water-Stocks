@@ -1,4 +1,4 @@
-package residentprofiles
+package houseprofiles
 
 import (
 	"misc"

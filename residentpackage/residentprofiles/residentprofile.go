@@ -1,25 +1,19 @@
-package resident
+package residentprofiles
 
 import (
-	"residentprofiles"
 	"math/rand/v2"
 	"residentdata"
 )
 
 type ResidentProfile struct {
 	OccupationID uint32
-	weeklyProfile *residentprofiles.ResidentWeeklyProfile
-	occupation *residentprofiles.OccupationProfile
+	weeklyProfile *ResidentWeeklyProfile
+
 }
 
-func (r *ResidentProfile) GenerateOccupation(age uint8, rng *rand.Rand) uint32 {
-	if age >= 18 && age < 65 {
-		return r.occupation.GenerateAdultSelector(rng)
-	} else if age < 18 {
-		return r.occupation.GenerateUnderSelector(rng)
-	}
-	return r.occupation.GenerateOverSelector(rng)
-}
+//func NewResidentProfile() *ResidentProfile {
+//
+//}
 
 func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) *residentdata.Frequency {
 	return r.weeklyProfile.GenerateFrequency(day,rng)

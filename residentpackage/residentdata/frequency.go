@@ -16,16 +16,6 @@ type Frequency struct {
 
 }
 
-/*func NewFrequency() *Frequency{
-	return &Frequency{
-		freqToilet: 0,
-		freqShower: 0,
-		freqWashBassin: 0,
-		freqWashMachine: 0,
-		freqDishWasher: 0,
-		freqTanque: 0,
-	}
-}*/
 
 func (f *Frequency) FreqToilet() uint8 {
 	return f.freqToilet

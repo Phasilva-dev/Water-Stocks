@@ -1,14 +1,14 @@
 package globals
 
 import (
-	"sanitarydevice"
+	"interfaces"
 )
 
 // WashMachine map
-var washMachines = make(map[uint32]*sanitarydevice.SanitaryDevice)
+var washMachines = make(map[uint32]interfaces.SanitaryDevice)
 
 // GetWashMachine retrieves a wash machine profile by ID
-func GetWashMachine(id uint32) (*sanitarydevice.SanitaryDevice, bool) {
+func GetWashMachine(id uint32) (interfaces.SanitaryDevice, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	washMachine, exists := washMachines[id]
@@ -16,7 +16,7 @@ func GetWashMachine(id uint32) (*sanitarydevice.SanitaryDevice, bool) {
 }
 
 // SetWashMachine stores or updates a wash machine profile
-func SetWashMachine(id uint32, profile *sanitarydevice.SanitaryDevice) {
+func SetWashMachine(id uint32, profile interfaces.SanitaryDevice) {
 	mu.Lock()
 	defer mu.Unlock()
 	washMachines[id] = profile

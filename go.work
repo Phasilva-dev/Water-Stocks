@@ -12,5 +12,5 @@ use (
 	./housepackage/houseprofiles
 	./globals
 	./entities
-	./models
+	./interfaces
 )

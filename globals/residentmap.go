@@ -1,16 +1,16 @@
 package globals
 
 import (
-	"models"
+	"interfaces"
 )
 
 // Global storage for resident profiles
 var (
-	residents = make(map[uint32]*models.ResidentProfile)
+	residents = make(map[uint32]interfaces.ResidentProfile)
 )
 
 // GetResident retrieves a resident profile by ID
-func GetResident(id uint32) (*models.ResidentProfile, bool) {
+func GetResident(id uint32) (interfaces.ResidentProfile, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	resident, exists := residents[id]
@@ -18,7 +18,7 @@ func GetResident(id uint32) (*models.ResidentProfile, bool) {
 }
 
 // SetResident stores or updates a resident profile
-func SetResident(id uint32, profile *models.ResidentProfile) {
+func SetResident(id uint32, profile interfaces.ResidentProfile) {
 	mu.Lock()
 	defer mu.Unlock()
 	residents[id] = profile

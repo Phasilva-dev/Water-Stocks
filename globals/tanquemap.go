@@ -1,14 +1,14 @@
 package globals
 
 import (
-	"models"
+	"interfaces"
 )
 
 // Tanque map
-var tanques = make(map[uint32]*models.SanitaryDevice)
+var tanques = make(map[uint32]interfaces.SanitaryDevice)
 
 // GetTanque retrieves a tanque profile by ID
-func GetTanque(id uint32) (*models.SanitaryDevice, bool) {
+func GetTanque(id uint32) (interfaces.SanitaryDevice, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	tanque, exists := tanques[id]
@@ -16,7 +16,7 @@ func GetTanque(id uint32) (*models.SanitaryDevice, bool) {
 }
 
 // SetTanque stores or updates a tanque profile
-func SetTanque(id uint32, profile *models.SanitaryDevice) {
+func SetTanque(id uint32, profile interfaces.SanitaryDevice) {
 	mu.Lock()
 	defer mu.Unlock()
 	tanques[id] = profile

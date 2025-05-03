@@ -3,7 +3,9 @@ package entities
 import (
 	"math/rand/v2"
 	"residentdata"
-	"residentprofiles"
+	//"residentprofiles"
+	"interfaces"
+
 
 )
 
@@ -11,12 +13,12 @@ type Resident struct {
 	age uint8
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *residentdata.DailyData
-	residentProfile *residentprofiles.ResidentProfile
+	residentProfile interfaces.ResidentProfile
 	//residentdata.ResidentSanitaryLog
 	house *House
 }
 
-func NewResident(age uint8, occupation uint32, profile *residentprofiles.ResidentProfile, house *House) *Resident {
+func NewResident(age uint8, occupation uint32, profile interfaces.ResidentProfile, house *House) *Resident {
 	return &Resident{
 		age: age,
 		occupationID: occupation,
@@ -37,7 +39,7 @@ func (r *Resident) DayData() *residentdata.DailyData {
 	return r.dayData
 }
 
-func (r *Resident) ResidentProfile() *residentprofiles.ResidentProfile {
+func (r *Resident) ResidentProfile() interfaces.ResidentProfile {
 	return r.residentProfile
 }
 

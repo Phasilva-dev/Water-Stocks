@@ -1,14 +1,14 @@
 package globals
 
 import (
-	"models"
+	"interfaces"
 )
 
 // DishWasher map
-var dishWashers = make(map[uint32]*models.SanitaryDevice)
+var dishWashers = make(map[uint32]interfaces.SanitaryDevice)
 
 // GetDishWasher retrieves a dish washer profile by ID
-func GetDishWasher(id uint32) (*models.SanitaryDevice, bool) {
+func GetDishWasher(id uint32) (interfaces.SanitaryDevice, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	dishWasher, exists := dishWashers[id]
@@ -16,7 +16,7 @@ func GetDishWasher(id uint32) (*models.SanitaryDevice, bool) {
 }
 
 // SetDishWasher stores or updates a dish washer profile
-func SetDishWasher(id uint32, profile *models.SanitaryDevice) {
+func SetDishWasher(id uint32, profile interfaces.SanitaryDevice) {
 	mu.Lock()
 	defer mu.Unlock()
 	dishWashers[id] = profile

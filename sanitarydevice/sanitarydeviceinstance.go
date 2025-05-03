@@ -1,20 +1,22 @@
 package sanitarydevice
 
-
+import (
+	"interfaces"
+)
 
 type SanitaryDeviceInstance struct {
-	device *SanitaryDevice
+	device interfaces.SanitaryDevice
 	amount uint8
 }
 
-func NewSanitaryDeviceInstance(deviceType *SanitaryDevice, amount uint8) *SanitaryDeviceInstance {
+func NewSanitaryDeviceInstance(deviceType interfaces.SanitaryDevice, amount uint8) interfaces.SanitaryDeviceInstance {
 	return &SanitaryDeviceInstance{
 		device: deviceType,
 		amount: amount,
 	}
 }
 
-func (sdi *SanitaryDeviceInstance) Device() *SanitaryDevice {
+func (sdi *SanitaryDeviceInstance) Device() interfaces.SanitaryDevice {
     return sdi.device
 }
 

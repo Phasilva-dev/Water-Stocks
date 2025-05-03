@@ -1,19 +1,19 @@
 package globals
 
 import (
-	"models"
+	"interfaces"
 	"sync"
 )
 
 // Global storage for house profiles
 var (
-	houses = make(map[uint32]*models.HouseProfile)
+	houses = make(map[uint32]interfaces.HouseProfile)
 	// mu ensures thread-safe access to the maps
 	mu sync.RWMutex
 )
 
 // GetHouse retrieves a house profile by ID
-func GetHouse(id uint32) (*models.HouseProfile, bool) {
+func GetHouse(id uint32) (interfaces.HouseProfile, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	house, exists := houses[id]
@@ -21,7 +21,7 @@ func GetHouse(id uint32) (*models.HouseProfile, bool) {
 }
 
 // SetHouse stores or updates a house profile
-func SetHouse(id uint32, profile *models.HouseProfile) {
+func SetHouse(id uint32, profile interfaces.HouseProfile) {
 	mu.Lock()
 	defer mu.Unlock()
 	houses[id] = profile

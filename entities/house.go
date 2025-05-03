@@ -58,4 +58,16 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 	return nil
 }
 
-func (h *House) GenerateSanitaryDeviceOfHouse() {}
+func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand,devices map[string]uint32) error {
+	numberOfResidents := uint8(len(h.residents))
+	amountOfSanitarys, err := h.houseProfile.GenerateNumberOfSanitaryDevices(rng,numberOfResidents)
+	if err != nil {
+		return err
+	}
+	sanitHouse, err := h.houseProfile.GenerateSanitaryHouse(devices, amountOfSanitarys)
+	if err != nil {
+		return err
+	}
+	h.sanitaryHouse = sanitHouse
+	return nil
+}

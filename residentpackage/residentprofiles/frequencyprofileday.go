@@ -3,6 +3,8 @@ package residentprofiles
 import (
 	"math/rand/v2"
 	"residentdata"
+	//"interfaces"
+
 )
 
 type FrequencyProfileDay struct {

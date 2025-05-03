@@ -1,14 +1,14 @@
 package globals
 
 import (
-	"models"
+	"interfaces"
 )
 
 // WashBasin map
-var washBasins = make(map[uint32]*models.SanitaryDevice)
+var washBasins = make(map[uint32]interfaces.SanitaryDevice)
 
 // GetWashBasin retrieves a wash basin profile by ID
-func GetWashBasin(id uint32) (*models.SanitaryDevice, bool) {
+func GetWashBasin(id uint32) (interfaces.SanitaryDevice, bool) {
 	mu.RLock()
 	defer mu.RUnlock()
 	washBasin, exists := washBasins[id]
@@ -16,7 +16,7 @@ func GetWashBasin(id uint32) (*models.SanitaryDevice, bool) {
 }
 
 // SetWashBasin stores or updates a wash basin profile
-func SetWashBasin(id uint32, profile *models.SanitaryDevice) {
+func SetWashBasin(id uint32, profile interfaces.SanitaryDevice) {
 	mu.Lock()
 	defer mu.Unlock()
 	washBasins[id] = profile

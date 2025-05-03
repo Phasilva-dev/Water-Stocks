@@ -4,46 +4,48 @@ import (
 	"sanitarydevice"
 	"globals"
 	"fmt"
+	"interfaces"
 )
 
 type SanitaryHouse struct {
-	toilet *sanitarydevice.SanitaryDeviceInstance
-	shower *sanitarydevice.SanitaryDeviceInstance
-	washbassin *sanitarydevice.SanitaryDeviceInstance
+	toilet interfaces.SanitaryDeviceInstance
+	shower interfaces.SanitaryDeviceInstance
+	washbassin interfaces.SanitaryDeviceInstance
 
-	washmachine *sanitarydevice.SanitaryDeviceInstance
-	dishwasher *sanitarydevice.SanitaryDeviceInstance
-	tanque *sanitarydevice.SanitaryDeviceInstance
+	washmachine interfaces.SanitaryDeviceInstance
+	dishwasher interfaces.SanitaryDeviceInstance
+	tanque interfaces.SanitaryDeviceInstance
+	amount uint8
 }
 
 func NewSanitaryHouse(
-	devices map[string]uint32, amount uint8, GetToiletFunc func(uint32)) (*SanitaryHouse, error) {
+	devices map[string]uint32, amount uint8) (*SanitaryHouse, error) {
 	toiletDevice, exists := globals.GetToilet(devices["toilet"])
 	if !exists {
 		return nil, fmt.Errorf("toilet device with ID %d not found", devices["toilet"])
 	}
 
-	showerDevice, exists := globals.GetToilet(devices["shower"])
+	showerDevice, exists := globals.GetShower(devices["shower"])
 	if !exists {
 		return nil, fmt.Errorf("shower device with ID %d not found", devices["shower"])
 	}
 
-	washbassinDevice, exists := globals.GetToilet(devices["washbassin"])
+	washbassinDevice, exists := globals.GetWashBasin(devices["washbassin"])
 	if !exists {
 		return nil, fmt.Errorf("washbassin device with ID %d not found", devices["washbassin"])
 	}
 
-	washmachineDevice, exists := globals.GetToilet(devices["washmachine"])
+	washmachineDevice, exists := globals.GetWashMachine(devices["washmachine"])
 	if !exists {
 		return nil, fmt.Errorf("washmachine device with ID %d not found", devices["washmachine"])
 	}
 
-	dishwasherDevice, exists := globals.GetToilet(devices["dishwasher"])
+	dishwasherDevice, exists := globals.GetDishWasher(devices["dishwasher"])
 	if !exists {
 		return nil, fmt.Errorf("dishwasher device with ID %d not found", devices["dishwasher"])
 	}
 
-	tanqueDevice, exists := globals.GetToilet(devices["tanque"])
+	tanqueDevice, exists := globals.GetTanque(devices["tanque"])
 	if !exists {
 		return nil, fmt.Errorf("tanque device with ID %d not found", devices["tanque"])
 	}
@@ -55,29 +57,30 @@ func NewSanitaryHouse(
 		washmachine: sanitarydevice.NewSanitaryDeviceInstance(washmachineDevice, 1),
 		dishwasher:  sanitarydevice.NewSanitaryDeviceInstance(dishwasherDevice, 1),
 		tanque:      sanitarydevice.NewSanitaryDeviceInstance(tanqueDevice, 1),
+		amount: amount,
 	}, nil
 }
 
-func (h *SanitaryHouse) Toilet() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) Toilet() interfaces.SanitaryDeviceInstance {
 	return h.toilet
 }
 
-func (h *SanitaryHouse) Shower() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) Shower() interfaces.SanitaryDeviceInstance {
 	return h.shower
 }
 
-func (h *SanitaryHouse) WashBassin() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) WashBassin() interfaces.SanitaryDeviceInstance {
 	return h.washbassin
 }
 
-func (h *SanitaryHouse) WashMachine() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) WashMachine() interfaces.SanitaryDeviceInstance {
 	return h.washmachine
 }
 
-func (h *SanitaryHouse) DishWasher() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) DishWasher() interfaces.SanitaryDeviceInstance {
 	return h.dishwasher
 }
 
-func (h *SanitaryHouse) Tanque() *sanitarydevice.SanitaryDeviceInstance {
+func (h *SanitaryHouse) Tanque() interfaces.SanitaryDeviceInstance {
 	return h.tanque
 }

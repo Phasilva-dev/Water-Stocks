@@ -1,0 +1,3 @@
+module usagemock
+
+go 1.24.1

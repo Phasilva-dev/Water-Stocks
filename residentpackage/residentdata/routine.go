@@ -25,10 +25,19 @@ func (r *Routine) WakeupTime() int32 {
 	return r.times[0]
 }
 
+func (r *Routine) ReturnHome() int32 {
+	return r.times[2]
+}
+
+func (r *Routine) WorkTime() int32 {
+	return r.times[1]
+}
+
+/*
 func (r *Routine) EntryHomeTime(index uint8) int32{
 	return r.times[index]
 }
 
 func (r *Routine) ExitHomeTime(index uint8) int32{
 	return r.times[index]
-}
+}*/

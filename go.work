@@ -2,16 +2,10 @@ go 1.24.1
 
 use (
 	./app
-	./devtest
-	./dists
-	./misc
 	./profiles
 	./residentpackage/residentdata
 	./residentpackage/residentprofiles
-	./sanitarydevice
 	./housepackage/housedata
 	./housepackage/houseprofiles
-	./globals
 	./entities
-	./interfaces
 )

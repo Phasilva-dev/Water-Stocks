@@ -1,7 +1,7 @@
 package count
 
 import (
-	"dists"
+	"simulation/internal/dists"
 	"math"
 	"math/rand/v2"
 )

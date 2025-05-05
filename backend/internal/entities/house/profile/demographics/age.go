@@ -1,7 +1,7 @@
 package demographics
 
 import (
-	"dists"
+	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
 )

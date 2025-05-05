@@ -3,7 +3,7 @@ package misc
 import(
 	"errors"
 	"math/rand/v2"
-	"dists"
+	"simulation/internal/dists"
 	"sort"
 )
 

@@ -1,16 +1,17 @@
-package residentprofiles
-
+package usagemock
+/*
 import (
 	"dists"
 	"math/rand/v2"
 	"residentdata"
 	"errors"
 	"entities"
-)
+)*/
 /*get_up = WakeUpTime
 work_time = WorkTime
 sleep_time = get_up - sleep_duration = SleepTime
 return_home = time_out + work_time = ReturnHome*/
+/*
 type UsageToilet struct {
 }
 
@@ -36,4 +37,4 @@ func GenerateUsage(routine *residentdata.Routine, house *entities.House, rng *ra
 
 
 	
-}
+}*/

@@ -1,5 +1,5 @@
 package housedata
-
+/*
 import (
 	"sanitarydevice"
 	"globals"
@@ -83,4 +83,4 @@ func (h *SanitaryHouse) DishWasher() interfaces.SanitaryDeviceInstance {
 
 func (h *SanitaryHouse) Tanque() interfaces.SanitaryDeviceInstance {
 	return h.tanque
-}
+}*/

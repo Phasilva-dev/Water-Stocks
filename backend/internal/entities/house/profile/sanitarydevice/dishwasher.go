@@ -1,10 +1,9 @@
 package sanitarydevice
 
 import (
-	"dists"
+	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
-	"interfaces"
 )
 
 type DishWasher struct {
@@ -15,7 +14,7 @@ type DishWasher struct {
 
 }
 
-func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint32) interfaces.DishWasher {
+func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint32) *DishWasher {
 	return &DishWasher{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,

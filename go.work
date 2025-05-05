@@ -5,6 +5,7 @@ use (
 	./devtest
 	./dists
 	./misc
+	./profiles
 	./residentpackage/residentdata
 	./residentpackage/residentprofiles
 	./sanitarydevice
@@ -13,5 +14,4 @@ use (
 	./globals
 	./entities
 	./interfaces
-	./usagemock
 )

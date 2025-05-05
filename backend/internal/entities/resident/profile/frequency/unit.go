@@ -1,7 +1,7 @@
-// Package behavioral fornece tipos e funções para definir perfis
-// relacionados ao comportamento base do residente como frequências,para simulações ou
-// geração de dados.
-package behavioral
+// Package frequency fornece tipos e funções para definir perfis
+// relacionados ao comportamento de frequências de uso de aparelhos sanitarios,
+// para simulações ou geração de dados.
+package frequency
 
 import (
 	"simulation/internal/dists" // Assumindo que "dists" é um pacote local ou de terceiros contendo a interface Distribution.

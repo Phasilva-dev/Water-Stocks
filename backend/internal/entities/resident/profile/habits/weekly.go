@@ -1,9 +1,9 @@
-package residentprofiles
+package habits
 
 import (
 	"errors"
 	"math/rand/v2"
-	"residentdata"
+	"simulation/internal/entities/resident/ds/behavioral"
 )
 
 type ResidentWeeklyProfile struct {
@@ -20,12 +20,12 @@ func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProf
 	}, nil
 }
 
-func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) *residentdata.Frequency {
+func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) *behavioral.Frequency {
 	day = r.normalizeDay(day)
 	return r.profiles[day].GenerateFrequency(rng)
 }
 
-func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) *residentdata.Routine {
+func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) *behavioral.Routine {
 	day = r.normalizeDay(day)
 	return r.profiles[day].GenerateRoutine(rng)
 }

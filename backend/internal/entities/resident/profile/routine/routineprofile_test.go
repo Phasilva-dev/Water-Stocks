@@ -1,9 +1,9 @@
-package residentprofiles
+package routine
 
 import (
 	"testing"
-	"dists"
-	"residentdata"
+	"simulation/internal/dists"
+	"simulation/internal/entities/resident/ds/behavioral"
 
 	"math/rand/v2"
 
@@ -116,7 +116,7 @@ func TestGenerateData(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*residentdata.Routine, 0, numRoutines)
+	routines := make([]*behavioral.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)
@@ -188,7 +188,7 @@ func TestGenerateDataBatch(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*residentdata.Routine, 0, numRoutines)
+	routines := make([]*behavioral.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)
@@ -259,7 +259,7 @@ func TestGenerateDataReal(t *testing.T) {
 	// 3. Gera as rotinas
 	src := rand.NewPCG(42,1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
-	routines := make([]*residentdata.Routine, 0, numRoutines)
+	routines := make([]*behavioral.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
 		routine := profile.GenerateData(rng)

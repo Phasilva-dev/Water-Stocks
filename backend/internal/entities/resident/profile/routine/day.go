@@ -1,7 +1,7 @@
 // Package behavioral fornece tipos e funções para definir perfis
 // relacionados ao comportamento base de um residente como frequências e rotinas diárias,
 // para simulações ou geração de dados.
-package behavioral
+package routine
 
 import (
 	"simulation/internal/dists" // Assumindo pacote local/terceiro com a interface Distribution.

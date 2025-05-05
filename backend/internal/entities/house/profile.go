@@ -7,6 +7,7 @@ import (
 	"simulation/internal/entities/house/profile/count"
 	"simulation/internal/entities/house/profile/demographics"
 	"simulation/internal/entities/house/profile/sanitarydevice"
+	"simulation/internal/entities/resident"
 	"errors"
 
 )
@@ -25,6 +26,7 @@ type HouseProfile struct {
 	ageProfile *demographics.Age
 	occupationProfile *demographics.Occupation
 	numSanitarysDevice *count.SanitaryCount
+	residentprofiles map[uint32]*resident.ResidentProfile
 
 	// No futuro, seria bom ter um profile para decidir as chances de uma casa ter cada tipo de sanitaryDevice*/ 
 	

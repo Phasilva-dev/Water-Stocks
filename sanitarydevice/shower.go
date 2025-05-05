@@ -4,6 +4,7 @@ import (
 	"dists"
 	"math/rand/v2"
 	"math"
+	"interfaces"
 )
 
 type Shower struct {
@@ -13,7 +14,7 @@ type Shower struct {
 
 }
 
-func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) *Shower {
+func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) interfaces.Shower {
 	return &Shower{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,

@@ -1,4 +1,4 @@
-package residentdata
+/*
 
 import (
 )
@@ -16,7 +16,7 @@ type Usage struct {
 
 }
 
-/*func NewUsage() *Usage{
+func NewUsage() *Usage{
 	return &Usage{
 		usageToilet: 0,
 		usageShower: 0,
@@ -25,7 +25,7 @@ type Usage struct {
 		usageDishWasher: 0,
 		usageTanque: 0,
 	}
-}*/
+}
 
 func (f *Usage) UsageToilet() []int32 {
 	return f.usageToilet
@@ -64,4 +64,4 @@ func NewUsage(
 		usageDishWasher:  dishWasher,
 		usageTanque:      tanque,
 	}
-}
+}*/

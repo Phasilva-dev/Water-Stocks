@@ -1,4 +1,4 @@
-package residentprofiles
+/* Esse é um arquivo.go
 
 import (
 	"misc"
@@ -48,4 +48,4 @@ func (u *UsageProfile) GenerateData(rng *rand.Rand, freq uint8) ([]int32, error)
 		result = append(result, val)
 	}
 	return result, nil
-}
+}*/

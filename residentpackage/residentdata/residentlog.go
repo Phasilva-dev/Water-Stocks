@@ -20,7 +20,7 @@ func NewResidentLog(
 		houseClassID:         houseClassID,
 		residentOccupationID: residentOccupationID,
 		age:                  age,
-		sanitaryLogs:         NewResidentSanitaryLog(),
+		sanitaryLogs:         , //FALTA AQUI
 	}
 }
 

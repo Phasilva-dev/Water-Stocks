@@ -1,4 +1,4 @@
-package residentprofiles
+/* Esse é um arquivo.go
 
 import (
 	"residentdata"
@@ -88,4 +88,7 @@ func (f *UsageProfileDay) GenerateData(rng *rand.Rand, freq *residentdata.Freque
 		usageDishWasher,
 		usageTanque,
 	), nil
-}
+}*/
+
+
+

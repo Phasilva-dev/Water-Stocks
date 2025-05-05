@@ -89,6 +89,8 @@ func (r *Routine) WorkTime() int32 {
 	return r.times[1]
 }
 
+
+
 /* Código comentado mantido do original:
 func (r *Routine) EntryHomeTime(index uint8) int32{
 	return r.times[index]

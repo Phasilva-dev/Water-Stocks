@@ -3,7 +3,6 @@ package entities
 import (
 	"math/rand/v2"
 	"residentdata"
-	//"residentprofiles"
 	"interfaces"
 
 
@@ -14,7 +13,7 @@ type Resident struct {
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *residentdata.DailyData
 	residentProfile interfaces.ResidentProfile
-	//residentdata.ResidentSanitaryLog
+	sanitaryLog *residentdata.ResidentSanitaryLog
 	house *House
 }
 
@@ -22,8 +21,9 @@ func NewResident(age uint8, occupation uint32, profile interfaces.ResidentProfil
 	return &Resident{
 		age: age,
 		occupationID: occupation,
-		dayData: nil,
+		dayData: residentdata.NewDailyData(nil,nil),
 		residentProfile: profile,
+		sanitaryLog: nil,
 		house: house,
 	}
 }
@@ -51,21 +51,10 @@ func (r *Resident) GenerateFrequency(day uint8, rng *rand.Rand) {
 func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
 	r.dayData.SetRoutine(r.residentProfile.GenerateRoutine(day,rng))
 }
-//Terei que trocar
-func (r *Resident) GenerateUsage(day uint8, rng *rand.Rand) error {
-	usage, err := r.residentProfile.GenerateUsage(day,r.dayData.Frequency(), rng)
-	if err != nil {
-		// Propaga o erro para a função chamadora
-		return err
-	}
-	// Se não houver erro, define o uso normalmente
-	r.dayData.SetUsage(usage)
-	return nil
-}
+
 
 //Terei que trocar
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 	r.GenerateRoutine(day,rng)
 	r.GenerateFrequency(day,rng)
-	r.GenerateUsage(day,rng)
 }

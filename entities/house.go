@@ -15,6 +15,10 @@ type House struct {
 	houseProfile *houseprofiles.HouseProfile
 }
 
+func (h *House) SanitaryHouse() *housedata.SanitaryHouse {
+	return h.sanitaryHouse
+}
+
 func NewHouse(houseClassID uint32, houseProfile *houseprofiles.HouseProfile) *House {
 	return &House{
 		houseClassID:  houseClassID,

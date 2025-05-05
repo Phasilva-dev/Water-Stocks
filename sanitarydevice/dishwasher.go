@@ -4,6 +4,7 @@ import (
 	"dists"
 	"math/rand/v2"
 	"math"
+	"interfaces"
 )
 
 type DishWasher struct {
@@ -14,7 +15,7 @@ type DishWasher struct {
 
 }
 
-func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint32) *DishWasher {
+func NewDishWasher(flowLeakDist, durationDist dists.Distribution, id uint32) interfaces.DishWasher {
 	return &DishWasher{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,

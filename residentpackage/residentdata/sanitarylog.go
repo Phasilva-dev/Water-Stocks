@@ -3,11 +3,11 @@ package residentdata
 
 type SanitaryLog struct {
 	sanitaryType     string
-	sanitaryDeviceID uint16
+	sanitaryDeviceID uint32
 	usageLogs        []*UsageLog
 }
 
-func NewSanitaryLog(sanitaryType string, sanitaryDeviceID uint16) *SanitaryLog {
+func NewSanitaryLog(sanitaryType string, sanitaryDeviceID uint32) *SanitaryLog {
 	return &SanitaryLog{
 		sanitaryType:     sanitaryType,
 		sanitaryDeviceID: sanitaryDeviceID,
@@ -25,7 +25,7 @@ func (s *SanitaryLog) GetSanitaryType() string {
 	return s.sanitaryType
 }
 
-func (s *SanitaryLog) GetSanitaryDeviceID() uint16 {
+func (s *SanitaryLog) GetSanitaryDeviceID() uint32 {
 	return s.sanitaryDeviceID
 }
 

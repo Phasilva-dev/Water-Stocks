@@ -82,6 +82,14 @@ func (h *HouseProfile) NumSanitarysDevice() *count.SanitaryCount {
 	return h.numSanitarysDevice
 }
 
+func (h *HouseProfile) ResidentProfile(ID uint32) (*resident.ResidentProfile, error) {
+	p := h.residentprofiles[ID]
+	if p != nil {
+		return p,nil
+	}
+	return nil, errors.New("missing resident profile in house profile")
+}
+
 
 func (h *HouseProfile) GenerateNumbersOfResidents(rng *rand.Rand) uint8 {
 	return h.numResidentsProfile.GenerateData(rng)

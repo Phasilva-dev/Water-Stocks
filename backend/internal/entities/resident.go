@@ -4,6 +4,7 @@ import (
 	"math/rand/v2"
 	"simulation/internal/entities/resident/ds/temporal"
 	"simulation/internal/entities/resident"
+	"simulation/internal/log"
 
 
 )
@@ -13,7 +14,7 @@ type Resident struct {
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *temporal.DailyData
 	residentProfile *resident.ResidentProfile
-	//sanitaryLog *residentdata.ResidentSanitaryLog
+	sanitaryLog *log.Resident
 	house *House
 }
 
@@ -23,10 +24,12 @@ func NewResident(age uint8, occupation uint32, profile *resident.ResidentProfile
 		occupationID: occupation,
 		dayData: temporal.NewDailyData(nil,nil),
 		residentProfile: profile,
-		//sanitaryLog: nil,
+		sanitaryLog: nil,
 		house: house,
 	}
 }
+
+
 
 func (r *Resident) Age() uint8 {
 	return r.age
@@ -52,8 +55,6 @@ func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
 	r.dayData.SetRoutine(r.residentProfile.GenerateRoutine(day,rng))
 }
 
-
-//Terei que trocar
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 	r.GenerateRoutine(day,rng)
 	r.GenerateFrequency(day,rng)

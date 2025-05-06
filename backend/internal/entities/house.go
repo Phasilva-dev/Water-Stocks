@@ -1,11 +1,11 @@
 package entities
 
 import (
-	"simulation/internal/entities/house/ds/sanitarysystem"
+	"fmt"
 	"math/rand/v2"
 	"simulation/internal/entities/house"
-	"globals"
-	"fmt"
+	"simulation/internal/entities/house/ds/sanitarysystem"
+	"simulation/internal/entities/house/profile/sanitarydevice"
 )
 
 type House struct {
@@ -51,8 +51,8 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 
 		occupation := h.houseProfile.GenerateOccupation(age, rng)
 
-		profile, exists := globals.GetResident(occupation)
-		if !exists {
+		profile, err := h.houseProfile.ResidentProfile(occupation)
+		if err != nil {
 			return fmt.Errorf("resident profile with occupation ID %d not found", occupation)
 		}
 
@@ -62,7 +62,7 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 	return nil
 }
 
-func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand,devices map[string]uint32) error {
+func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand,devices map[string]sanitarydevice.SanitaryDevice) error {
 	numberOfResidents := uint8(len(h.residents))
 	amountOfSanitarys, err := h.houseProfile.GenerateNumberOfSanitaryDevices(rng,numberOfResidents)
 	if err != nil {

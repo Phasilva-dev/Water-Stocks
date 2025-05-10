@@ -25,22 +25,22 @@ func NewResident(
 }
 
 // Getters
-func (r *Resident) GetDay() uint8 {
+func (r *Resident) Day() uint8 {
 	return r.day
 }
 
-func (r *Resident) GetHouseClassID() uint32 {
+func (r *Resident) HouseClassID() uint32 {
 	return r.houseClassID
 }
 
-func (r *Resident) GetResidentOccupationID() uint32 {
+func (r *Resident) ResidentOccupationID() uint32 {
 	return r.residentOccupationID
 }
 
-func (r *Resident) GetAge() uint8 {
+func (r *Resident) Age() uint8 {
 	return r.age
 }
 
-func (r *Resident) GetSanitaryLogs() *ResidentSanitary {
+func (r *Resident) SanitaryLogs() *ResidentSanitary {
 	return r.sanitaryLogs
 }

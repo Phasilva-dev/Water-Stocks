@@ -1,73 +1,38 @@
-// Package behavioral define estruturas de dados para armazenar informações de compotamento do resident
-// relacionadas a residentes, como frequências de uso de água.
+// Package behavioral define estruturas relacionadas ao comportamento de uso de água
+// por residentes, incluindo frequências diárias por tipo de ponto de consumo.
 package behavioral
 
-import () // Bloco de import mantido, pode ser ajustado por goimports.
+import () // Pode ser ajustado automaticamente por ferramentas como goimports.
 
-// Frequency armazena as contagens de frequência de uso diário para diferentes
-// pontos de consumo de água em uma residência.
+// Frequency armazena a frequência diária de uso de diferentes pontos de consumo
+// de água, divididos entre usos individuais e compartilhados.
 //
-// Os campos internos (não exportados) registram as frequências para usos
-// individuais (vaso sanitário, chuveiro, pia) e compartilhados (máquina
-// de lavar roupa, lava-louças, tanque). O acesso a esses valores deve ser
-// feito através dos métodos exportados (ex: FreqToilet()).
+// Use os métodos públicos para acessar os dados.
 type Frequency struct {
 	// Uso individual
-	freqToilet     uint8 // Frequência de uso do vaso sanitário.
-	freqShower     uint8 // Frequência de uso do chuveiro.
-	freqWashBassin uint8 // Frequência de uso da pia do banheiro/lavatório.
+	freqToilet     uint8 // Vaso sanitário
+	freqShower     uint8 // Chuveiro
+	freqWashBassin uint8 // Pia do banheiro
 
 	// Uso compartilhado
-	freqWashMachine uint8 // Frequência de uso da máquina de lavar roupa.
-	freqDishWasher  uint8 // Frequência de uso da máquina de lavar louça.
-	freqTanque      uint8 // Frequência de uso do tanque.
+	freqWashMachine uint8 // Máquina de lavar roupa
+	freqDishWasher  uint8 // Lava-louças
+	freqTanque      uint8 // Tanque
 }
 
-// FreqToilet retorna a frequência de uso diário do vaso sanitário.
-func (f *Frequency) FreqToilet() uint8 {
-	return f.freqToilet
-}
+// Métodos de acesso às frequências de uso individual.
 
-// FreqShower retorna a frequência de uso diário do chuveiro.
-func (f *Frequency) FreqShower() uint8 {
-	return f.freqShower
-}
+func (f *Frequency) FreqToilet() uint8     { return f.freqToilet }
+func (f *Frequency) FreqShower() uint8     { return f.freqShower }
+func (f *Frequency) FreqWashBassin() uint8 { return f.freqWashBassin }
 
-// FreqWashBassin retorna a frequência de uso diário da pia do banheiro/lavatório.
-func (f *Frequency) FreqWashBassin() uint8 {
-	return f.freqWashBassin
-}
+// Métodos de acesso às frequências de uso compartilhado.
 
-// --- Uso Compartilhado ---
+func (f *Frequency) FreqWashMachine() uint8 { return f.freqWashMachine }
+func (f *Frequency) FreqDishWasher() uint8  { return f.freqDishWasher }
+func (f *Frequency) FreqTanque() uint8      { return f.freqTanque }
 
-// FreqWashMachine retorna a frequência de uso diário da máquina de lavar roupa.
-func (f *Frequency) FreqWashMachine() uint8 {
-	return f.freqWashMachine
-}
-
-// FreqDishWasher retorna a frequência de uso diário da máquina de lavar louça.
-func (f *Frequency) FreqDishWasher() uint8 {
-	return f.freqDishWasher
-}
-
-// FreqTanque retorna a frequência de uso diário do tanque.
-func (f *Frequency) FreqTanque() uint8 {
-	return f.freqTanque
-}
-
-// NewFrequency cria e retorna uma nova instância de Frequency com os valores
-// de frequência fornecidos para cada tipo de uso.
-//
-// Parâmetros:
-//   - toilet: Frequência (uint8) para o vaso sanitário.
-//   - shower: Frequência (uint8) para o chuveiro.
-//   - washBassin: Frequência (uint8) para a pia/lavatório.
-//   - washMachine: Frequência (uint8) para a máquina de lavar roupa.
-//   - dishWasher: Frequência (uint8) para a máquina de lavar louça.
-//   - tanque: Frequência (uint8) para o tanque.
-//
-// Retorna:
-//   - Um ponteiro (*Frequency) para a struct recém-criada e inicializada.
+// NewFrequency cria uma nova instância de Frequency com os valores fornecidos.
 func NewFrequency(
 	toilet, shower, washBassin, washMachine, dishWasher, tanque uint8,
 ) *Frequency {

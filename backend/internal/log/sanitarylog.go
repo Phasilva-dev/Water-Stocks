@@ -21,17 +21,20 @@ func (s *Sanitary) AddUsageLog(log *Usage) {
 }
 
 // Getters
-func (s *Sanitary) GetSanitaryType() string {
+func (s *Sanitary) SanitaryType() string {
 	return s.sanitaryType
 }
 
-func (s *Sanitary) GetSanitaryDeviceID() uint32 {
+func (s *Sanitary) SanitaryDeviceID() uint32 {
 	return s.sanitaryDeviceID
 }
 
 // GetUsageLogs returns all usage logs
-func (s *Sanitary) GetUsageLogs() []*Usage {
-	return s.usageLogs
+func (s *Sanitary) UsageLogs() ([]*Usage, bool) {
+	if len(s.usageLogs) == 0{
+		return nil,false
+	}
+	return s.usageLogs,true
 }
 
 func (s *Sanitary) ClearUsageLogs() {

@@ -1,12 +1,12 @@
 package routine
 
 import (
-	"testing"
+	"fmt"
+	"math/rand/v2"
 	"simulation/internal/dists"
 	"simulation/internal/entities/resident/ds/behavioral"
-
-	"math/rand/v2"
-
+	"testing"
+	"time"
 )
 
 const (
@@ -19,50 +19,45 @@ func TestNewRoutineProfile(t *testing.T) {
 
 	// Tabela de testes (table-driven tests)
 	tests := []struct {
-		name        string               // Nome descritivo do teste
-		symbol      string               // Input: símbolo
-		shift   int32                // Input: shift
-		events      []dists.Distribution // Input: distribuições
-		wantErr     bool                 // Se esperamos erro
-		errMsg      string               // Mensagem de erro esperada
+		name     string                // Nome descritivo do teste
+		shift    float64               // Input: shift
+		events   []dists.Distribution  // Input: distribuições
+		wantErr  bool                  // Se esperamos erro
+		errMsg   string                // Mensagem de erro esperada
 	}{
 		{
-			name:      "Caso válido",
-			symbol:    "home",
-			shift: 5,
-			events:    []dists.Distribution{mockDist, mockDist},
-			wantErr:   false,
+			name:     "Caso válido",
+			shift:    5,
+			events:   []dists.Distribution{mockDist, mockDist},
+			wantErr:  false,
 		},
 		{
-			name:      "Número ímpar de eventos",
-			symbol:    "work",
-			shift: 5,
-			events:    []dists.Distribution{mockDist},
-			wantErr:   true,
-			errMsg:    "number of elements in events must be even",
+			name:     "Número ímpar de eventos",
+			shift:    5,
+			events:   []dists.Distribution{mockDist},
+			wantErr:  true,
+			errMsg:   "number of elements in events must be even",
 		},
 		{
-			name:      "shift negativa",
-			symbol:    "school",
-			shift: -1,
-			events:    []dists.Distribution{mockDist, mockDist},
-			wantErr:   true,
-			errMsg:    "shift must be positive",
+			name:     "shift negativa",
+			shift:    -1,
+			events:   []dists.Distribution{mockDist, mockDist},
+			wantErr:  true,
+			errMsg:   "shift must be positive",
 		},
 		{
-			name:      "Distribuição nil",
-			symbol:    "park",
-			shift: 5,
-			events:    []dists.Distribution{mockDist, nil},
-			wantErr:   true,
-			errMsg:    "no distribution can be empty",
+			name:     "Distribuição nil",
+			shift:    5,
+			events:   []dists.Distribution{mockDist, nil},
+			wantErr:  true,
+			errMsg:   "no distribution can be empty",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Executa a função
-			got, err := NewRoutineProfile(tt.shift, tt.events)
+			got, err := NewRoutineProfile(tt.events, tt.shift)
 
 			// Verifica se o erro é o esperado
 			if tt.wantErr {
@@ -81,7 +76,7 @@ func TestNewRoutineProfile(t *testing.T) {
 			}
 
 			if got.shift != tt.shift {
-				t.Errorf("shift incorreta\nEsperada: %d\nObtida: %d", tt.shift, got.shift)
+				t.Errorf("shift incorreta\nEsperada: %f\nObtida: %f", tt.shift, got.shift)
 			}
 
 			if len(got.Events()) != len(tt.events) {
@@ -94,8 +89,7 @@ func TestNewRoutineProfile(t *testing.T) {
 func TestGenerateData(t *testing.T) {
 	const (
 		numRoutines = 1000   // Quantidade de rotinas a gerar
-		symbol      = "home" // Símbolo esperado
-		shift   = 60 * 15 // Gap mínimo entre entrada/saída
+		shift       = 60 * 15 // Gap mínimo entre entrada/saída
 	)
 
 	// 1. Cria uma distribuição determinística
@@ -106,15 +100,15 @@ func TestGenerateData(t *testing.T) {
 
 	// 2. Cria o perfil
 	profile, err := NewRoutineProfile(
-		shift,
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},
+		shift,
 	)
 	if err != nil {
 		t.Fatalf("Falha ao criar perfil: %v", err)
 	}
 
 	// 3. Gera as rotinas
-	src := rand.NewPCG(42,1)
+	src := rand.NewPCG(42, 1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
 	routines := make([]*behavioral.Routine, 0, numRoutines)
 
@@ -124,11 +118,9 @@ func TestGenerateData(t *testing.T) {
 	}
 
 	// 4. Verificações
-	expectedTimes := []int32{5 * 60 * 60, 7 * 60 * 60, 18 * 60 * 60, 23 * 60 * 60}
+	expectedTimes := []float64{5 * 60 * 60, 7 * 60 * 60, 18 * 60 * 60, 23 * 60 * 60}
 
 	for i, routine := range routines {
-
-
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != len(expectedTimes) {
 			t.Fatalf("[Rotina %d] Número de tempos incorreto. Esperado: %d, Obtido: %d",
@@ -138,7 +130,7 @@ func TestGenerateData(t *testing.T) {
 		// Verifica valores e gap mínimo
 		for j := 0; j < len(expectedTimes); j++ {
 			if routine.Times()[j] != expectedTimes[j] {
-				t.Errorf("[Rotina %d] Tempo na posição %d incorreto. Esperado: %d, Obtido: %d",
+				t.Errorf("[Rotina %d] Tempo na posição %d incorreto. Esperado: %f, Obtido: %f",
 					i, j, expectedTimes[j], routine.Times()[j])
 			}
 		}
@@ -155,9 +147,9 @@ func TestGenerateData(t *testing.T) {
 			exit := routine.Times()[k+1]  // Tempo de saída
 
 			// Verifica se o gap mínimo foi respeitado
-			if exit-entry < shift {
-				t.Errorf("[Rotina %d] Gap inválido entre %d (entrada) e %d (saída). Esperado: mínimo %d",
-					i, entry, exit, shift)
+			if exit-entry < float64(shift) {
+				t.Errorf("[Rotina %d] Gap inválido entre %f (entrada) e %f (saída). Esperado: mínimo %f",
+					i, entry, exit, float64(shift))
 			}
 		}
 	}
@@ -169,8 +161,7 @@ func TestGenerateDataBatch(t *testing.T) {
 	// Configuração determinística
 	const (
 		numRoutines = 1000   // Quantidade de rotinas a gerar
-		symbol      = "home" // Símbolo esperado
-		shift   = 5      // Gap mínimo entre entrada/saída
+		shift       = 5.0    // Gap mínimo entre entrada/saída
 	)
 
 	// 1. Cria uma distribuição determinística (sempre retorna 10)
@@ -178,15 +169,15 @@ func TestGenerateDataBatch(t *testing.T) {
 
 	// 2. Cria o perfil com 2 eventos (entrada e saída)
 	profile, err := NewRoutineProfile(
-		shift,
 		[]dists.Distribution{mockDist, mockDist},
+		shift,
 	)
 	if err != nil {
 		t.Fatalf("Falha ao criar perfil: %v", err)
 	}
 
 	// 3. Gera as rotinas
-	src := rand.NewPCG(42,1)
+	src := rand.NewPCG(42, 1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
 	routines := make([]*behavioral.Routine, 0, numRoutines)
 
@@ -196,10 +187,9 @@ func TestGenerateDataBatch(t *testing.T) {
 	}
 
 	// 4. Verificações
-	expectedTimes := []int32{10, 15} // Entrada: 10, Saída: 10 + shift = 15
+	expectedTimes := []float64{10, 15} // Entrada: 10, Saída: 10 + shift = 15
 
 	for i, routine := range routines {
-
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != len(expectedTimes) {
 			t.Fatalf("[Rotina %d] Número de tempos incorreto. Esperado: %d, Obtido: %d",
@@ -209,7 +199,7 @@ func TestGenerateDataBatch(t *testing.T) {
 		// Verifica valores e gap mínimo
 		for j := 0; j < len(expectedTimes); j++ {
 			if routine.Times()[j] != expectedTimes[j] {
-				t.Errorf("[Rotina %d] Tempo na posição %d incorreto. Esperado: %d, Obtido: %d",
+				t.Errorf("[Rotina %d] Tempo na posição %d incorreto. Esperado: %f, Obtido: %f",
 					i, j, expectedTimes[j], routine.Times()[j])
 			}
 		}
@@ -225,7 +215,7 @@ func TestGenerateDataBatch(t *testing.T) {
 
 			// O gap deve ser exatamente igual à shift
 			if exit-entry != shift {
-				t.Errorf("[Rotina %d] Gap inválido entre %d (entrada) e %d (saída). Esperado: %d",
+				t.Errorf("[Rotina %d] Gap inválido entre %f (entrada) e %f (saída). Esperado: %f",
 					i, entry, exit, shift)
 			}
 		}
@@ -236,9 +226,8 @@ func TestGenerateDataBatch(t *testing.T) {
 
 func TestGenerateDataReal(t *testing.T) {
 	const (
-		numRoutines = 100000   // Quantidade de rotinas a gerar
-		symbol      = "clt"   // Símbolo esperado
-		shift   = 60*15 // 15 minutos
+		numRoutines = 1_000_000   // Quantidade de rotinas a gerar
+		shift       = 60 * 15  // 15 minutos
 	)
 
 	// 1. Cria uma distribuição determinística
@@ -249,15 +238,15 @@ func TestGenerateDataReal(t *testing.T) {
 
 	// 2. Cria o perfil
 	profile, err := NewRoutineProfile(
-		shift,
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},
+		shift,
 	)
 	if err != nil {
 		t.Fatalf("Falha ao criar perfil: %v", err)
 	}
 
 	// 3. Gera as rotinas
-	src := rand.NewPCG(42,1)
+	src := rand.NewPCG(42, 1)
 	rng := rand.New(src) // Seed fixa para reprodutibilidade
 	routines := make([]*behavioral.Routine, 0, numRoutines)
 
@@ -270,8 +259,6 @@ func TestGenerateDataReal(t *testing.T) {
 	var length int = 4
 
 	for i, routine := range routines {
-
-
 		// Verifica quantidade de tempos
 		if len(routine.Times()) != length {
 			t.Fatalf("[Rotina %d] Número de tempos incorreto. Esperado: %d, Obtido: %d",
@@ -290,104 +277,20 @@ func TestGenerateDataReal(t *testing.T) {
 			exit := routine.Times()[k+1]  // Tempo de saída
 
 			// Verifica se o gap mínimo foi respeitado
-			if exit-entry < shift {
-				t.Errorf("[Rotina %d] Gap inválido entre %d (entrada) e %d (saída). Esperado: mínimo %d",
-					i, entry, exit, shift)
+			if exit-entry < float64(shift) {
+				t.Errorf("[Rotina %d] Gap inválido entre %f (entrada) e %f (saída). Esperado: mínimo %f",
+					i, entry, exit, float64(shift))
 			}
 		}
 	}
-	println(routines[0].Times()[0])
-	println(routines[0].Times()[1])
-	println(routines[0].Times()[2])
-	println(routines[0].Times()[3])
-	
-	/*
-	// 5. Criação dos histogramas
-	p := plot.New()
-	p.Title.Text = "Distribuição de Atividades"
-	p.X.Label.Text = "Hora do Dia"
-	p.Y.Label.Text = "Frequência"
-	p.Legend.Top = true
-	p.Legend.Left = false
 
-	// Bins de 1 hora (0-23h)
-	bins := make([]float64, 24)
-	for h := 0; h < 24; h++ {
-			bins[h] = float64(h * 3600)
+	// Formatação dos tempos como datetime
+	baseDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	fmt.Println("\nTempos da primeira rotina formatados:")
+	for i, timeSec := range routines[0].Times() {
+		// Converte segundos para duração e adiciona à data base
+		duration := time.Duration(int64(timeSec)) * time.Second
+		dateTime := baseDate.Add(duration)
+		fmt.Printf("%d: %s (%.0f segundos)\n", i+1, dateTime.Format("02/01/2006 15:04:05"), timeSec)
 	}
-
-	// Cores com transparência (RGBA)
-	colors := []color.Color{
-			color.RGBA{R: 0, G: 0, B: 255, A: 128},   // Azul - Acordar
-			color.RGBA{R: 50, G: 205, B: 50, A: 128}, // Verde - Sair
-			color.RGBA{R: 255, G: 0, B: 0, A: 128},   // Vermelho - Voltar
-			color.RGBA{R: 128, G: 0, B: 128, A: 128}, // Roxo - Dormir
-	}
-
-	// Função para criar barras preenchidas
-	createBars := func(times []float64, name string, clr color.Color) *plotter.BarChart {
-			counts := make(plotter.Values, len(bins))
-			
-			// Contagem manual nos bins
-			for _, t := range times {
-					for i := 0; i < len(bins); i++ {
-							if t >= bins[i] && t < bins[i]+3600 {
-									counts[i]++
-									break
-							}
-					}
-			}
-			
-			// Cria barras preenchidas
-			bars, err := plotter.NewBarChart(counts, 0.8)
-			if err != nil {
-					t.Fatalf("Erro ao criar barras: %v", err)
-			}
-			bars.Color = clr
-			bars.LineStyle.Width = 0 // Remove bordas das barras
-			return bars
-	}
-
-	// Extrai os tempos
-	var wakeUp, leave, ret, sleep []float64
-	for _, r := range routines {
-			t := r.Times()
-			wakeUp = append(wakeUp, float64(t[0]))
-			leave = append(leave, float64(t[1]))
-			ret = append(ret, float64(t[2]))
-			sleep = append(sleep, float64(t[3]))
-	}
-
-	// Adiciona as séries
-	wakeUpBars := createBars(wakeUp, "Acordar", colors[0])
-	leaveBars := createBars(leave, "Sair", colors[1])
-	retBars := createBars(ret, "Voltar", colors[2])
-	sleepBars := createBars(sleep, "Dormir", colors[3])
-
-	p.Add(wakeUpBars, leaveBars, retBars, sleepBars)
-
-	// Adiciona legendas manualmente
-	p.Legend.Add("Acordar", wakeUpBars)
-	p.Legend.Add("Sair", leaveBars)
-	p.Legend.Add("Voltar", retBars)
-	p.Legend.Add("Dormir", sleepBars)
-
-	// Configura eixo X para mostrar horas
-	p.X.Tick.Marker = plot.TickerFunc(func(min, max float64) []plot.Tick {
-			ticks := make([]plot.Tick, 24)
-			for h := 0; h < 24; h++ {
-					ticks[h] = plot.Tick{
-							Value: float64(h * 3600),
-							Label: fmt.Sprintf("%d", h),
-					}
-			}
-			return ticks
-	})
-
-	// Salva o gráfico
-	if err := p.Save(15*vg.Inch, 8*vg.Inch, "times_distribution.png"); err != nil {
-			t.Fatal(err)
-	}
-
-	t.Logf("Geradas %d rotinas consistentes", numRoutines)*/
 }

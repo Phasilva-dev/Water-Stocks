@@ -14,7 +14,7 @@ type Resident struct {
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *temporal.DailyData
 	residentProfile *resident.ResidentProfile
-	sanitaryLog *log.Resident
+	residentLog *log.Resident
 	house *House
 }
 
@@ -24,11 +24,14 @@ func NewResident(age uint8, occupation uint32, profile *resident.ResidentProfile
 		occupationID: occupation,
 		dayData: temporal.NewDailyData(nil,nil),
 		residentProfile: profile,
-		sanitaryLog: nil,
+		residentLog: nil,
 		house: house,
 	}
 }
 
+func (r *Resident) ResidentLog() *log.Resident {
+	return r.residentLog
+}
 
 
 func (r *Resident) Age() uint8 {

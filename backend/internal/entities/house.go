@@ -19,6 +19,10 @@ func (h *House) SanitaryHouse() *sanitarysystem.SanitaryHouse {
 	return h.sanitaryHouse
 }
 
+func (h *House) Residents() []*Resident {
+	return h.residents
+}
+
 func NewHouse(houseClassID uint32, houseProfile *house.HouseProfile) *House {
 	return &House{
 		houseClassID:  houseClassID,

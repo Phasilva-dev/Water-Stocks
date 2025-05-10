@@ -25,26 +25,26 @@ func NewResidentSanitary(sanitaryHouse *sanitarysystem.SanitaryHouse) *ResidentS
 }
 
 // Getters for each log type
-func (r *ResidentSanitary) GetToiletLog() *Sanitary {
+func (r *ResidentSanitary) ToiletLog() *Sanitary {
 	return r.toiletLog
 }
 
-func (r *ResidentSanitary) GetShowerLog() *Sanitary {
+func (r *ResidentSanitary) ShowerLog() *Sanitary {
 	return r.showerLog
 }
 
-func (r *ResidentSanitary) GetWashBassinLog() *Sanitary {
+func (r *ResidentSanitary) WashBassinLog() *Sanitary {
 	return r.washBassinLog
 }
 
-func (r *ResidentSanitary) GetWashMachineLog() *Sanitary {
+func (r *ResidentSanitary) WashMachineLog() *Sanitary {
 	return r.washMachineLog
 }
 
-func (r *ResidentSanitary) GetDishWasherLog() *Sanitary {
+func (r *ResidentSanitary) DishWasherLog() *Sanitary {
 	return r.dishWasherLog
 }
 
-func (r *ResidentSanitary) GetTanqueLog() *Sanitary {
+func (r *ResidentSanitary) TanqueLog() *Sanitary {
 	return r.tanqueLog
 }

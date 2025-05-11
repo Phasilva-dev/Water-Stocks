@@ -23,8 +23,8 @@ func GenerateToiletUsage(routine *behavioral.Routine, house *entities.House, rng
 
 	workTime := routine.WorkTime()
 	wakeUpTime := routine.WakeupTime()
-	sleepTime := float64(routine.SleepTime())
-	returnHome := float64(routine.ReturnHome())
+	sleepTime := routine.SleepTime()
+	returnHome := routine.ReturnHome()
 	
 	var dist dists.UniformDist
 	var err error

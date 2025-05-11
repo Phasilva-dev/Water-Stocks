@@ -1,5 +1,5 @@
 package usagemock
-/*
+
 import (
 	"simulation/internal/dists"
 	"simulation/internal/log"
@@ -14,10 +14,9 @@ import (
 work_time = WorkTime
 sleep_time = get_up - sleep_duration = SleepTime
 return_home = time_out + work_time = ReturnHome*/
-/*
-func GenerateWashBassinUsage(routine *behavioral.Routine, house *entities.House, rng *rand.Rand) (*log.Usage, error) {
-	p := rng.Float64() //Isso é a mesma coisa que uma 0 a 1 uniform
 
+func GenerateWashBassinUsage(routine *behavioral.Routine, house *entities.House, rng *rand.Rand) (*log.Usage, error) {
+	p := rng.Float64()
 	device := house.SanitaryHouse().WashBassin().Device()
 	durationUsage := device.GenerateDuration(rng)
 
@@ -26,34 +25,46 @@ func GenerateWashBassinUsage(routine *behavioral.Routine, house *entities.House,
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
-	// Pré-calcula versões em float64
-	ftWorkTime := float64(workTime)
-	ftWakeUp := float64(wakeUpTime)
-	ftSleep := float64(sleepTime)
-	ftReturn := float64(returnHome)
+	var dist dists.UniformDist
+	var err error
 
-	if workTime - wakeUpTime < 3600 {
-		if p < ((work))
+	if workTime-wakeUpTime < 3600 {
+		switch {
+		case p < ((workTime - wakeUpTime - float64(durationUsage)) / (workTime - wakeUpTime + 3600)):
+			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+		case p < ((workTime - wakeUpTime + 1800) / (workTime - wakeUpTime + 3600)):
+			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+		default: // Esse bloco default está MUITO ERRADO
+			if sleepTime < 1800 { //Condição impossivel de ser atingida
+				switch {
+				case p < (sleepTime / 1800):
+					dist, err = dists.UniformDistNew(0, sleepTime) //Isso aqui literalmente diz que a pessoa pode lavar a mão mesmo fora de casa
+				default:
+					dist, err = dists.UniformDistNew(sleepTime-1800, 86400) 
+				}
+			} else {
+				dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			}
+		}
+	} else {
+		switch {
+		case p < 0.15:
+			dist, err = dists.UniformDistNew(wakeUpTime, wakeUpTime+1800)
+		case p < 0.35:
+			dist, err = dists.UniformDistNew(workTime-1800, workTime)
+		case p < 0.75:
+			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+		default:
+			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+		}
 	}
 
+	if err != nil {
+		return nil, err
+	}
 
+	startUsage := int32(dist.Sample(rng))
+	endUsage := startUsage + durationUsage
 
-	if work_time-get_up<3600
-            if ph_pia<((work_time-get_up-duracao(f))/(work_time-get_up+3600))
-                horario(f)=random('Uniform',get_up,work_time);
-            elseif (((work_time-get_up)/(work_time-get_up+3600))<=ph_pia) && (ph_pia<(work_time-get_up+1800)/(work_time-get_up+3600))
-                horario(f)=random('Uniform',return_home,return_home+1800);
-            else
-                if sleep_time<1800
-                    p=random('Uniform',0,1);
-                    if p<(sleep_time/1800)
-                        horario(f)=random('Uniform',0,sleep_time);
-                    else
-                        horario(f)=random('Uniform',86400-1800+sleep_time,86400);
-                    end
-                else
-                    horario(f)=random('Uniform',sleep_time-1800,sleep_time);
-                end
-            end
-
-}*/
+	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng)), nil
+}

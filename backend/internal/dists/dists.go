@@ -31,13 +31,14 @@ type Distribution interface {
 // corresponde ao esperado para aquele tipo de distribuição.
 //
 // Parâmetros esperados por tipo (`distType`):
-//   - "normal":    mean, stdDev (2 parâmetros: média e desvio padrão)
-//   - "poisson":   lambda (1 parâmetro: taxa média de ocorrência)
-//   - "uniform":   min, max (2 parâmetros: limite inferior e superior)
-//   - "gamma":     shape, scale (2 parâmetros: forma e escala)
-//   - "lognormal": mean, std (2 parâmetros: média e desvio padrão da normal subjacente)
-//   - "triangle":  a, b, c (3 parâmetros: mínimo, moda e máximo)
-//   - "weibull":   shape, scale (2 parâmetros: forma k e escala λ)
+//   - "normal":      mean, stdDev (2 parâmetros: média e desvio padrão)
+//   - "poisson":     lambda (1 parâmetro: taxa média de ocorrência)
+//   - "uniform":     min, max (2 parâmetros: limite inferior e superior)
+//   - "gamma":       shape, scale (2 parâmetros: forma e escala)
+//   - "lognormal":   mean, std (2 parâmetros: média e desvio padrão da normal subjacente)
+//   - "triangle":    a, b, c (3 parâmetros: mínimo, moda e máximo)
+//   - "weibull":     shape, scale (2 parâmetros: forma k e escala λ)
+//   - "loglogistic": shape, scale (2 parâmetros: forma α e escala β)  // <-- ADICIONADO AQUI
 //
 // Retorna um valor que implementa a interface `Distribution` e um erro `nil` em caso
 // de sucesso. Se `distType` for desconhecido ou o número de `params` estiver
@@ -52,49 +53,56 @@ func CreateDistribution(distType string, params ...float64) (Distribution, error
 			return nil, errors.New("distribuição normal requer exatamente 2 parâmetros: mean (média) e stdDev (desvio padrão)")
 		}
 		// Chama o construtor específico da NormalDist (assumido existir).
-		return NewNormalDist(params[0], params[1])
+		return NewNormalDist(params[0], params[1]) // Assume que NewNormalDist existe
 	case "poisson":
 		// Verifica o número correto de parâmetros para a distribuição de Poisson.
 		if len(params) != 1 {
 			return nil, errors.New("distribuição poisson requer exatamente 1 parâmetro: lambda (taxa)")
 		}
 		// Chama o construtor específico da PoissonDist (assumido existir).
-		return NewPoissonDist(params[0])
+		return NewPoissonDist(params[0]) // Assume que NewPoissonDist existe
 	case "uniform":
 		// Verifica o número correto de parâmetros para a distribuição Uniforme.
 		if len(params) != 2 {
 			return nil, errors.New("distribuição uniforme requer exatamente 2 parâmetros: min (mínimo) e max (máximo)")
 		}
 		// Chama o construtor específico da UniformDist (assumido existir).
-		return NewUniformDist(params[0], params[1])
+		return NewUniformDist(params[0], params[1]) // Assume que NewUniformDist existe
 	case "gamma":
 		// Verifica o número correto de parâmetros para a distribuição Gamma.
 		if len(params) != 2 {
 			return nil, errors.New("distribuição gamma requer exatamente 2 parâmetros: shape (forma) e scale (escala)")
 		}
 		// Chama o construtor específico da GammaDist (assumido existir).
-		return NewGammaDist(params[0], params[1])
+		return NewGammaDist(params[0], params[1]) // Assume que NewGammaDist existe
 	case "lognormal":
 		// Verifica o número correto de parâmetros para a distribuição LogNormal.
 		if len(params) != 2 {
 			return nil, errors.New("distribuição lognormal requer exatamente 2 parâmetros: mean (média normal subjacente) e std (desvio padrão normal subjacente)")
 		}
 		// Chama o construtor específico da LogNormalDist (assumido existir).
-		return NewLogNormalDist(params[0], params[1])
+		return NewLogNormalDist(params[0], params[1]) // Assume que NewLogNormalDist existe
 	case "triangle":
 		// Verifica o número correto de parâmetros para a distribuição Triangular.
 		if len(params) != 3 {
 			return nil, errors.New("distribuição triangular requer exatamente 3 parâmetros: a (mínimo), b (moda) e c (máximo)")
 		}
 		// Chama o construtor específico da TriangleDist (assumido existir).
-		return NewTriangleDist(params[0], params[1], params[2])
+		return NewTriangleDist(params[0], params[1], params[2]) // Assume que NewTriangleDist existe
 	case "weibull":
 		// Verifica o número correto de parâmetros para a distribuição Weibull.
 		if len(params) != 2 {
 			return nil, errors.New("distribuição weibull requer exatamente 2 parâmetros: shape (forma, k) e scale (escala, lambda)")
 		}
 		// Chama o construtor específico da WeibullDist (assumido existir).
-		return NewWeibullDist(params[0], params[1])
+		return NewWeibullDist(params[0], params[1]) // Assume que NewWeibullDist existe
+	case "loglogistic": // <-- NOVO CASE ADICIONADO
+		// Verifica o número correto de parâmetros para a distribuição LogLogistic.
+		if len(params) != 2 {
+			return nil, errors.New("distribuição loglogistic requer exatamente 2 parâmetros: shape (forma, α) e scale (escala, β)")
+		}
+		// Chama o construtor específico da LogLogisticDist.
+		return NewLogLogisticDist(params[0], params[1])
 	default:
 		// Caso o distType fornecido não corresponda a nenhuma distribuição conhecida.
 		return nil, fmt.Errorf("tipo de distribuição desconhecido: %s", distType)
@@ -104,6 +112,6 @@ func CreateDistribution(distType string, params ...float64) (Distribution, error
 // --- NOTA: Este código assume que as funções construtoras ---
 // --- (NewNormalDist, NewPoissonDist, NewUniformDist,     ---
 // --- NewGammaDist, NewLogNormalDist, NewTriangleDist,    ---
-// --- NewWeibullDist) e as respectivas structs que         ---
+// --- NewWeibullDist,NewLogLogisticDist) e as respectivas structs que         ---
 // --- implementam a interface Distribution estão definidas ---
 // --- neste mesmo pacote 'dists'.                          ---

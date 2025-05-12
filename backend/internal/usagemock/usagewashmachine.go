@@ -24,7 +24,7 @@ func GenerateWashMachineUsage(routine *behavioral.Routine, house *entities.House
 	}
 
 	startUsage := int32(dist.Sample(rng))
-	device := house.SanitaryHouse().Toilet().Device()
+	device := house.SanitaryHouse().WashMachine().Device()
 	durationUsage := device.GenerateDuration(rng)
 
 	//Deve ter um tratamento de Colisão aqui

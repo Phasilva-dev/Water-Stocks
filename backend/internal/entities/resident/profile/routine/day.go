@@ -58,13 +58,15 @@ func generateTime(dist dists.Distribution, rng *rand.Rand) float64 {
 	return math.Trunc(dist.Sample(rng))
 }
 
+/*
 // enforceMinimunGap garante que o tempo de saída respeite o intervalo mínimo.
-func (p *RoutineProfile) enforceMinimunGap(entryTime, exitTime float64) float64 {
-	if exitTime < entryTime+p.shift {
-		return entryTime + p.shift
+func enforceMinimunGap(entryTime, exitTime, shift float64) float64 {
+	if exitTime < entryTime + shift {
+		diff := math.Abs(exitTime - entryTime)
+		return exitTime + diff + shift
 	}
 	return exitTime
-}
+}*/
 
 // GenerateData gera uma rotina com base no perfil atual e em um gerador de números aleatórios.
 func (p *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
@@ -78,7 +80,11 @@ func (p *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
 		// `times[i-1]` é o tempo de "entrada" (par).
 		// `times[i]` é o tempo de "saída" (ímpar) bruto.
 		// Ajusta `times[i]` (saída) para garantir o gap mínimo após `times[i-1]` (entrada).
-		times[i] = p.enforceMinimunGap(times[i-1], times[i])
+		// Essa saida é sempre igual ao modulo da diferença entre a saida e entrada somada ao shift para garantir um tempo minimo
+		if times[i] <= times [i-1] + p.shift {
+			diff := math.Abs(times[i] - times[i-1])
+			times[i] = times[i] + diff + p.shift
+		}
 	}
 	return behavioral.NewRoutine(times)
 }

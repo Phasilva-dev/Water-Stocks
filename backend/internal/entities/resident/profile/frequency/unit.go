@@ -6,6 +6,7 @@ package frequency
 import (
 	"errors"
 	"math/rand/v2"
+	"math"
 	"simulation/internal/dists" // Interface de distribuição estatística.
 )
 
@@ -28,13 +29,11 @@ func (f *FrequencyProfile) StatDist() dists.Distribution {
 
 // NewFrequencyProfile cria um novo perfil de frequência com o shift mínimo e
 // uma distribuição estatística base. Retorna erro se a distribuição for nula.
-func (f *FrequencyProfile) NewFrequencyProfile(shift uint8, dist dists.Distribution) (*FrequencyProfile, error) {
+func (f *FrequencyProfile) NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
 	if dist == nil {
 		return nil, errors.New("a distribuição não pode ser nula")
 	}
-	if shift < 0 {
-		return nil, errors.New("shift não pode ser negativo")
-	}
+
 	return &FrequencyProfile{
 		statDist: dist,
 		shift:    shift,
@@ -43,17 +42,18 @@ func (f *FrequencyProfile) NewFrequencyProfile(shift uint8, dist dists.Distribut
 
 // generateFrequency gera um valor bruto de frequência, aplicando limites e o shift.
 // Utiliza um gerador de números aleatórios (rng) fornecido.
-func (f *FrequencyProfile) generateFrequency(rng *rand.Rand) uint8 {
-	val := f.statDist.Sample(rng)
+func generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution) uint8 {
+	val := statDist.Sample(rng)
 	if val < 0 {
-		val = 0
-	} else if val > 255 {
+		val = math.Abs(val)
+	} 
+	if val > 255 {
 		val = 255
 	}
 
 	freq := uint8(val)
-	if freq < f.shift {
-		return f.shift
+	if freq < shift {
+		return shift
 	}
 	return freq
 }
@@ -61,5 +61,5 @@ func (f *FrequencyProfile) generateFrequency(rng *rand.Rand) uint8 {
 // GenerateData gera um valor de frequência com base na distribuição e no shift
 // definidos no perfil, utilizando o gerador aleatório fornecido.
 func (f *FrequencyProfile) GenerateData(rng *rand.Rand) uint8 {
-	return f.generateFrequency(rng)
+	return generateFrequency(rng, f.shift , f.statDist)
 }

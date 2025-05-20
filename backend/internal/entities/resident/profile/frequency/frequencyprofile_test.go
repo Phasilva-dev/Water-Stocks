@@ -25,11 +25,10 @@ func (m *MockDistribution) String() string {
 
 func TestNewFrequencyProfile(t *testing.T) {
 	// Testa criação com distribuição válida
-	fp := &FrequencyProfile{}
 	shift := uint8(10)
 	dist := &MockDistribution{returnValue: 50.0}
 	
-	profile, err := fp.NewFrequencyProfile(dist, shift)
+	profile, err := NewFrequencyProfile(dist, shift)
 	if err != nil {
 		t.Errorf("Erro inesperado ao criar perfil de frequência: %v", err)
 	}
@@ -43,7 +42,7 @@ func TestNewFrequencyProfile(t *testing.T) {
 	}
 	
 	// Testa criação com distribuição nula
-	profile, err = fp.NewFrequencyProfile(nil, shift)
+	profile, err = NewFrequencyProfile(nil, shift)
 	if err == nil {
 		t.Error("Deveria retornar erro ao criar perfil com distribuição nula")
 	}
@@ -464,33 +463,33 @@ func TestFrequencyProfileDayGenerateData(t *testing.T) {
 	// Cria perfis de frequência usando os mocks.
 	// Usamos shift=0 para simplificar a expectativa do valor retornado (será o returnValue da mock, limitado a 255).
 	// **Verificamos os erros aqui**
-	fpToilet, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistToilet, 0)
+	fpToilet, err := NewFrequencyProfile(mockDistToilet, 0)
 	if err != nil { t.Fatalf("Failed to create fpToilet: %v", err) }
 	
-	fpShower, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistShower, 0)
+	fpShower, err := NewFrequencyProfile(mockDistShower, 0)
 	if err != nil { t.Fatalf("Failed to create fpShower: %v", err) }
 	
-	fpWashBassin, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistWashBassin, 0)
+	fpWashBassin, err := NewFrequencyProfile(mockDistWashBassin, 0)
 	if err != nil { t.Fatalf("Failed to create fpWashBassin: %v", err) }
 	
-	fpWashMachine, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistWashMachine, 0)
+	fpWashMachine, err := NewFrequencyProfile(mockDistWashMachine, 0)
 	if err != nil { t.Fatalf("Failed to create fpWashMachine: %v", err) }
 	
-	fpDishWasher, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistDishWasher, 0)
+	fpDishWasher, err := NewFrequencyProfile(mockDistDishWasher, 0)
 	if err != nil { t.Fatalf("Failed to create fpDishWasher: %v", err) }
 	
-	fpTanque, err := (&FrequencyProfile{}).NewFrequencyProfile(mockDistTanque, 0)
+	fpTanque, err := NewFrequencyProfile(mockDistTanque, 0)
 	if err != nil { t.Fatalf("Failed to create fpTanque: %v", err) }
 
 	// Criação de perfis específicos para os casos de edge (limites, negativos, shift)
 	// **Verificamos os erros aqui**
-	fpToiletOver255, err := (&FrequencyProfile{}).NewFrequencyProfile(&MockDistribution{returnValue: 300.0}, 0)
+	fpToiletOver255, err := NewFrequencyProfile(&MockDistribution{returnValue: 300.0}, 0)
 	if err != nil { t.Fatalf("Failed to create fpToiletOver255: %v", err) }
 
-	fpToiletNegative, err := (&FrequencyProfile{}).NewFrequencyProfile(&MockDistribution{returnValue: -10.0}, 0)
+	fpToiletNegative, err := NewFrequencyProfile(&MockDistribution{returnValue: -10.0}, 0)
 	if err != nil { t.Fatalf("Failed to create fpToiletNegative: %v", err) }
 
-	fpToiletBelowShift, err := (&FrequencyProfile{}).NewFrequencyProfile(&MockDistribution{returnValue: 5.0}, 10)
+	fpToiletBelowShift, err := NewFrequencyProfile(&MockDistribution{returnValue: 5.0}, 10)
 	if err != nil { t.Fatalf("Failed to create fpToiletBelowShift: %v", err) }
 
 

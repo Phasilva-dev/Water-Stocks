@@ -74,16 +74,24 @@ func (p *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
 	for i, dist := range p.events {
 		times[i] = generateTime(dist, rng)
 	}
-	//    Aplica a regra do intervalo mínimo (`shift`) aos eventos de índice ímpar.
-	//    Itera sobre os índices ímpares (1, 3, 5, ...).
-	for i := 1; i < len(p.events); i += 2 {
-		// `times[i-1]` é o tempo de "entrada" (par).
-		// `times[i]` é o tempo de "saída" (ímpar) bruto.
-		// Ajusta `times[i]` (saída) para garantir o gap mínimo após `times[i-1]` (entrada).
-		// Essa saida é sempre igual ao modulo da diferença entre a saida e entrada somada ao shift para garantir um tempo minimo
-		if times[i] <= times [i-1] + p.shift {
-			diff := math.Abs(times[i] - times[i-1])
-			times[i] = times[i] + diff + p.shift
+	//    Aplica a regra do intervalo mínimo (`shift`)
+	/*	A regra do intervalo minimo é a seguinte, um valor de tempo sempre deve ser maior que o proximo + o shift
+		Caso não seja, coletamos a diferença absoluta do entre o tempo anterior (i-1) e o atual (i)
+		Caso a diferença seja menor que o shift, definimos que o times[i] é igual ao tempo anterior somado a
+		a diferença absoluta + o desvio, caso seja maior ou igual ao desvio, será simplesmente
+		o tempo atual é igual ao tempo anterior + a diferença
+		Essa é a forma que encontrei de representar melhor o código do módelo antigo, tornando possivel usar
+		distribuições muito espaçadas sem necessariamente definir ela sempre como tempo anterior + shift caso fosse menor
+		*/
+	for i := 1; i < len(p.events); i++ {
+		if times[i] < times [i-1] + p.shift {
+			diff := times[i] - times[i-1]
+			absDiff := math.Abs(diff)
+			if absDiff < p.shift {
+				times[i] = times[i-1] + absDiff + p.shift
+			} else {
+				times[i] = times[i-1] + absDiff
+			}
 		}
 	}
 	return behavioral.NewRoutine(times)

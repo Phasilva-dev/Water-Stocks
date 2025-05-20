@@ -29,7 +29,7 @@ func (f *FrequencyProfile) StatDist() dists.Distribution {
 
 // NewFrequencyProfile cria um novo perfil de frequência com o shift mínimo e
 // uma distribuição estatística base. Retorna erro se a distribuição for nula.
-func (f *FrequencyProfile) NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
+func NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
 	if dist == nil {
 		return nil, errors.New("a distribuição não pode ser nula")
 	}

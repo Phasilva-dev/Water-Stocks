@@ -10,6 +10,8 @@ type ResidentWeeklyProfile struct {
 	profiles []*ResidentDayProfile
 }
 
+
+
 func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProfile, error) {
 	if len(values) > 7 || len(values) == 0 {
 		return nil, errors.New("profile list must contain between 1 and 7 entries")
@@ -18,6 +20,10 @@ func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProf
 	return &ResidentWeeklyProfile{
 		profiles: values,
 	}, nil
+}
+
+func (r *ResidentWeeklyProfile) Profiles() []*ResidentDayProfile{
+	return r.profiles
 }
 
 func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) *behavioral.Frequency {

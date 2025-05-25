@@ -10,38 +10,38 @@ import () // Pode ser ajustado automaticamente por ferramentas como goimports.
 // Use os métodos públicos para acessar os dados.
 type Frequency struct {
 	// Uso individual
-	freqToilet     uint8 // Vaso sanitário
-	freqShower     uint8 // Chuveiro
-	freqWashBassin uint8 // Pia do banheiro
+	toilet     uint8 // Vaso sanitário
+	shower     uint8 // Chuveiro
+	washBassin uint8 // Pia do banheiro
 
 	// Uso compartilhado
-	freqWashMachine uint8 // Máquina de lavar roupa
-	freqDishWasher  uint8 // Lava-louças
-	freqTanque      uint8 // Tanque
+	washMachine uint8 // Máquina de lavar roupa
+	dishWasher  uint8 // Lava-louças
+	tanque      uint8 // Tanque
 }
 
 // Métodos de acesso às frequências de uso individual.
 
-func (f *Frequency) FreqToilet() uint8     { return f.freqToilet }
-func (f *Frequency) FreqShower() uint8     { return f.freqShower }
-func (f *Frequency) FreqWashBassin() uint8 { return f.freqWashBassin }
+func (f *Frequency) Toilet() uint8     { return f.toilet }
+func (f *Frequency) Shower() uint8     { return f.shower }
+func (f *Frequency) WashBassin() uint8 { return f.washBassin }
 
 // Métodos de acesso às frequências de uso compartilhado.
 
-func (f *Frequency) FreqWashMachine() uint8 { return f.freqWashMachine }
-func (f *Frequency) FreqDishWasher() uint8  { return f.freqDishWasher }
-func (f *Frequency) FreqTanque() uint8      { return f.freqTanque }
+func (f *Frequency) WashMachine() uint8 { return f.washMachine }
+func (f *Frequency) DishWasher() uint8  { return f.dishWasher }
+func (f *Frequency) Tanque() uint8      { return f.tanque }
 
 // NewFrequency cria uma nova instância de Frequency com os valores fornecidos.
 func NewFrequency(
 	toilet, shower, washBassin, washMachine, dishWasher, tanque uint8,
 ) *Frequency {
 	return &Frequency{
-		freqToilet:      toilet,
-		freqShower:      shower,
-		freqWashBassin:  washBassin,
-		freqWashMachine: washMachine,
-		freqDishWasher:  dishWasher,
-		freqTanque:      tanque,
+		toilet:      toilet,
+		shower:      shower,
+		washBassin:  washBassin,
+		washMachine: washMachine,
+		dishWasher:  dishWasher,
+		tanque:      tanque,
 	}
 }

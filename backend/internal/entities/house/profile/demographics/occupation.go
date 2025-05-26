@@ -1,8 +1,10 @@
 package demographics
 
 import (
-	"simulation/internal/misc"
 	"math/rand/v2"
+	"simulation/internal/misc"
+
+	"errors"
 )
 
 type Occupation struct {
@@ -12,27 +14,20 @@ type Occupation struct {
 }
 
 func NewOccupation(
-	under18 []misc.Tuple[uint32, float64],
-	adult []misc.Tuple[uint32, float64],
-	over65 []misc.Tuple[uint32, float64],
+	under18 *misc.PercentSelector[uint32],
+	adult *misc.PercentSelector[uint32],
+	over65 *misc.PercentSelector[uint32],
 ) (*Occupation, error) {
-	u18Sel, err := misc.NewPercentSelector(under18)
-	if err != nil {
-		return nil, err
-	}
-	adultSel, err := misc.NewPercentSelector(adult)
-	if err != nil {
-		return nil, err
-	}
-	over65Sel, err := misc.NewPercentSelector(over65)
-	if err != nil {
-		return nil, err
+	// Adicione a validação para seletores nil aqui
+	if under18 == nil || adult == nil || over65 == nil {
+		// Uma mensagem de erro informativa ajuda a depurar
+		return nil, errors.New("failed to create occupation: one or more selector inputs are nil")
 	}
 
 	return &Occupation{
-		under18Selector: u18Sel,
-		adultSelector:   adultSel,
-		over65Selector:  over65Sel,
+		under18Selector: under18,
+		adultSelector:   adult,
+		over65Selector:  over65,
 	}, nil
 }
 

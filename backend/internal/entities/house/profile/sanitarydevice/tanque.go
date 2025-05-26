@@ -4,6 +4,7 @@ import (
 	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
+	"errors"
 )
 
 type Tanque struct {
@@ -13,12 +14,18 @@ type Tanque struct {
 
 }
 
-func NewTanque(flowLeakDist, durationDist dists.Distribution, id uint32) *Tanque {
+func NewTanque(flowLeakDist, durationDist dists.Distribution, id uint32) (*Tanque,error) {
+	if flowLeakDist == nil || durationDist == nil {
+		return nil, errors.New("distributions cannot be nil")
+	}
+	if id == 0 {
+		return nil, errors.New("zero is invalid id")
+	}
 	return &Tanque{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-	}
+	},nil
 }
 
 func (t *Tanque) SanitaryDeviceID() uint32 {

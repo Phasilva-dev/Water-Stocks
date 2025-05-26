@@ -2,6 +2,7 @@ package sanitarysystem
 
 import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
+	"errors"
 	//"globals"
 	"fmt"
 	//"interfaces" Caso eu for usar globals
@@ -20,45 +21,84 @@ type SanitaryHouse struct {
 
 func NewSanitaryHouse(
 	devices map[string]sanitarydevice.SanitaryDevice, amount uint8) (*SanitaryHouse, error) {
-	toiletDevice := devices["toilet"]
-	if toiletDevice != nil {
-		return nil, fmt.Errorf("toilet device with ID %d not found", devices["toilet"])
+
+	// --- Recupera e cria instâncias para cada tipo de dispositivo, verificando erros ---
+
+	// Sanitário (Toilet)
+	toiletDevice, ok := devices["toilet"]
+	// Verifica se a chave "toilet" existe NO mapa E se o valor associado não é nil
+	if !ok || toiletDevice == nil {
+		return nil, errors.New("dispositivo 'toilet' faltando ou é nil no mapa fornecido")
+	}
+	// Chama NewSanitaryDeviceInstance e verifica o erro retornado
+	toiletInstance, err := sanitarydevice.NewSanitaryDeviceInstance(toiletDevice, amount)
+	if err != nil {
+		// Se NewSanitaryDeviceInstance falhar, retorna o erro, possivelmente empacotando-o
+		return nil, fmt.Errorf("falha ao criar instância para 'toilet': %w", err)
 	}
 
-	showerDevice := devices["shower"]
-	if showerDevice != nil {
-		return nil, fmt.Errorf("shower device with ID %d not found", devices["shower"])
+
+	// Chuveiro (Shower)
+	showerDevice, ok := devices["shower"]
+	if !ok || showerDevice == nil {
+		return nil, errors.New("dispositivo 'shower' faltando ou é nil no mapa fornecido")
+	}
+	showerInstance, err := sanitarydevice.NewSanitaryDeviceInstance(showerDevice, amount)
+	if err != nil {
+		return nil, fmt.Errorf("falha ao criar instância para 'shower': %w", err)
 	}
 
-	washbassinDevice := devices["wash_bassin"]
-	if washbassinDevice != nil {
-		return nil, fmt.Errorf("washbassin device with ID %d not found", devices["washbassin"])
+	// Lavatório (Washbassin)
+	washbassinDevice, ok := devices["wash_bassin"] // Chave no mapa é "wash_bassin"
+	if !ok || washbassinDevice == nil {
+		return nil, errors.New("dispositivo 'wash_bassin' faltando ou é nil no mapa fornecido")
+	}
+	washbassinInstance, err := sanitarydevice.NewSanitaryDeviceInstance(washbassinDevice, amount)
+	if err != nil {
+		return nil, fmt.Errorf("falha ao criar instância para 'wash_bassin': %w", err)
 	}
 
-	washmachineDevice := devices["wash_machine"]
-	if washmachineDevice != nil {
-		return nil, fmt.Errorf("washmachine device with ID %d not found", devices["washmachine"])
+	// Máquina de Lavar Roupa (Washmachine) - Quantidade fixa em 1
+	washmachineDevice, ok := devices["wash_machine"] // Chave no mapa é "wash_machine"
+	if !ok || washmachineDevice == nil {
+		return nil, errors.New("dispositivo 'wash_machine' faltando ou é nil no mapa fornecido")
+	}
+	washmachineInstance, err := sanitarydevice.NewSanitaryDeviceInstance(washmachineDevice, 1)
+	if err != nil {
+		return nil, fmt.Errorf("falha ao criar instância para 'wash_machine': %w", err)
 	}
 
-	dishwasherDevice := devices["dish_washer"]
-	if dishwasherDevice != nil {
-		return nil, fmt.Errorf("dishwasher device with ID %d not found", devices["dishwasher"])
+	// Máquina de Lavar Louça (Dishwasher) - Quantidade fixa em 1
+	dishwasherDevice, ok := devices["dish_washer"] // Chave no mapa é "dish_washer"
+	if !ok || dishwasherDevice == nil {
+		return nil, errors.New("dispositivo 'dish_washer' faltando ou é nil no mapa fornecido")
+	}
+	dishwasherInstance, err := sanitarydevice.NewSanitaryDeviceInstance(dishwasherDevice, 1)
+	if err != nil {
+		return nil, fmt.Errorf("falha ao criar instância para 'dish_washer': %w", err)
 	}
 
-	tanqueDevice := devices["tanque"]
-	if tanqueDevice != nil {
-		return nil, fmt.Errorf("tanque device with ID %d not found", devices["tanque"])
+	// Tanque - Quantidade fixa em 1
+	tanqueDevice, ok := devices["tanque"]
+	if !ok || tanqueDevice == nil {
+		return nil, errors.New("dispositivo 'tanque' faltando ou é nil no mapa fornecido")
+	}
+	tanqueInstance, err := sanitarydevice.NewSanitaryDeviceInstance(tanqueDevice, 1)
+	if err != nil {
+		return nil, fmt.Errorf("falha ao criar instância para 'tanque': %w", err)
 	}
 
+
+	// Se todas as instâncias de dispositivo foram criadas com sucesso, retorna a casa
 	return &SanitaryHouse{
-		toilet:      sanitarydevice.NewSanitaryDeviceInstance(toiletDevice, amount),
-		shower:      sanitarydevice.NewSanitaryDeviceInstance(showerDevice, amount),
-		washbassin:  sanitarydevice.NewSanitaryDeviceInstance(washbassinDevice, amount),
-		washmachine: sanitarydevice.NewSanitaryDeviceInstance(washmachineDevice, 1),
-		dishwasher:  sanitarydevice.NewSanitaryDeviceInstance(dishwasherDevice, 1),
-		tanque:      sanitarydevice.NewSanitaryDeviceInstance(tanqueDevice, 1),
-		amount: amount,
-	}, nil
+		toilet:      toiletInstance,
+		shower:      showerInstance,
+		washbassin:  washbassinInstance,
+		washmachine: washmachineInstance,
+		dishwasher:  dishwasherInstance,
+		tanque:      tanqueInstance,
+		amount: amount, 
+	}, nil // Retorna nil para o erro, indicando sucesso
 }
 
 func (h *SanitaryHouse) Toilet() *sanitarydevice.SanitaryDeviceInstance {

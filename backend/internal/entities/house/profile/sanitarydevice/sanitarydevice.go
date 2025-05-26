@@ -1,6 +1,7 @@
 package sanitarydevice
 
 import (
+	"errors"
 	"math/rand/v2"
 )
 
@@ -15,11 +16,14 @@ type SanitaryDeviceInstance struct {
 	amount uint8
 }
 
-func NewSanitaryDeviceInstance(deviceType SanitaryDevice, amount uint8) *SanitaryDeviceInstance {
+func NewSanitaryDeviceInstance(deviceType SanitaryDevice, amount uint8) (*SanitaryDeviceInstance, error) {
+	if deviceType == nil {
+		return nil, errors.New("devicetype cannot be nil")
+	}
 	return &SanitaryDeviceInstance{
 		device: deviceType,
 		amount: amount,
-	}
+	},nil
 }
 
 func (sdi *SanitaryDeviceInstance) Device() SanitaryDevice {

@@ -4,6 +4,7 @@ import (
 	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
+	"errors"
 
 )
 
@@ -14,12 +15,18 @@ type Shower struct {
 
 }
 
-func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) *Shower {
+func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) (*Shower,error) {
+	if flowLeakDist == nil || durationDist == nil {
+		return nil, errors.New("distributions cannot be nil")
+	}
+	if id == 0 {
+		return nil, errors.New("zero is invalid id")
+	}
 	return &Shower{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-	}
+	},nil
 }
 
 func (t *Shower) SanitaryDeviceID() uint32 {

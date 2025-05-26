@@ -4,6 +4,7 @@ import (
 	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
+	"errors"
 )
 
 type WashBassin struct {
@@ -13,12 +14,20 @@ type WashBassin struct {
 
 }
 
-func NewWashBassin(flowLeakDist, durationDist dists.Distribution, id uint32) *WashBassin {
+func NewWashBassin(flowLeakDist, durationDist dists.Distribution, id uint32) (*WashBassin, error) {
+
+	if flowLeakDist == nil || durationDist == nil {
+		return nil, errors.New("distributions cannot be nil")
+	}
+	if id == 0 {
+		return nil, errors.New("zero is invalid id")
+	}
+
 	return &WashBassin{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-	}
+	},nil
 }
 
 func (t *WashBassin) SanitaryDeviceID() uint32 {

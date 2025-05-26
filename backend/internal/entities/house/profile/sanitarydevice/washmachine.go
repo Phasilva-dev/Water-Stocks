@@ -2,6 +2,7 @@ package sanitarydevice
 
 import (
 	"math/rand/v2"
+	"errors"
 )
 
 type WashMachine struct {
@@ -11,12 +12,20 @@ type WashMachine struct {
 
 }
 
-func NewWashMachine(flowLeak float64, duration int32, id uint32) *WashMachine {
+func NewWashMachine(flowLeak float64, duration int32, id uint32) (*WashMachine, error) {
+
+	if flowLeak <= 0 || duration <= 0 {
+		return nil, errors.New("flowleak and duration cannot be 0 or negative")
+	}
+	if id == 0 {
+		return nil, errors.New("zero is invalid id")
+	}
+
 	return &WashMachine{
 		sanitaryDeviceID: id,
 		flowLeak: flowLeak,
 		duration: duration,
-	}
+	},nil
 }
 
 func (t *WashMachine) SanitaryDeviceID() uint32 {

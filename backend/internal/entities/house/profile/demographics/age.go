@@ -20,14 +20,14 @@ func (a *Age) AgeDist() dists.Distribution {
 	return a.dist
 }
 
-func (a *Age) GenerateData(rng *rand.Rand) uint32 {
+func (a *Age) GenerateData(rng *rand.Rand) uint8 {
 	sample := a.dist.Sample(rng)
 	absSample := math.Abs(sample)
 
-	if absSample > math.MaxInt32 {
-		absSample = math.MaxInt32
+	if absSample > math.MaxUint8 {
+		absSample = math.MaxUint8
 	}
 
-	return uint32(absSample)
+	return uint8(absSample)
 }
 

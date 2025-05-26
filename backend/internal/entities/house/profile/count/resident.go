@@ -21,11 +21,11 @@ func NewResidentCount(dist dists.Distribution) *ResidentCount {
 func (r *ResidentCount) GenerateData(rng *rand.Rand) uint8 {
 	sample := r.dist.Sample(rng)
 	
-	processedValue := math.Ceil(math.Abs(sample))
+	processedValue := math.Ceil(sample)
 
 	if processedValue < 0 {
 		processedValue = 0
-	} else if processedValue > 255 {
+	} else if processedValue > math.MaxUint8 {
 		processedValue = 255
 	}
 

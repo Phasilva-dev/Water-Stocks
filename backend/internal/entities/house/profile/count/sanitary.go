@@ -4,9 +4,12 @@ import (
 	"errors"
 	"math/rand/v2"
 )
+var ErrNoResidents = errors.New("house without residents")
 
 type SanitaryCount struct { }
 
+
+// Feito assim para futuramente ser adicionado uma forma de mudar o modelo de GenerateData
 func NewSanitaryCount() *SanitaryCount {
 	return &SanitaryCount{
 	}
@@ -14,7 +17,7 @@ func NewSanitaryCount() *SanitaryCount {
 
 func (s *SanitaryCount) GenerateData(rng *rand.Rand, numResidents uint8) (uint8, error) {
 	if numResidents <= 0 {
-		return 0,errors.New("house without residents")
+		return 0, ErrNoResidents
 	}
 
 	// Gera um número aleatório inteiro entre 0 e 99 (inclusive)

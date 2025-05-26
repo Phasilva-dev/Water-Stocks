@@ -24,8 +24,10 @@ type HouseProfile struct {
 	
 	numResidentsProfile *count.ResidentCount
 	ageProfile *demographics.Age
+
 	occupationProfile *demographics.Occupation
 	numSanitarysDevice *count.SanitaryCount
+	
 	residentprofiles map[uint32]*resident.ResidentProfile
 
 	// No futuro, seria bom ter um profile para decidir as chances de uma casa ter cada tipo de sanitaryDevice*/ 

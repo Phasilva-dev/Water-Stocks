@@ -17,6 +17,7 @@ var (
 	ErrNilAgeProfile            = errors.New("age profile cannot be nil")
 	ErrNilOccupationProfile     = errors.New("occupation profile cannot be nil")
 	ErrNilSanitaryCountProfile  = errors.New("sanitary count profile cannot be nil")
+	IdInvalid = errors.New("0 is a invalid ID")
 )
 
 type HouseProfile struct {
@@ -52,6 +53,9 @@ func NewHouseProfile(
 	}
 	if numSanitarysDevice == nil {
 		return nil, ErrNilSanitaryCountProfile
+	}
+	if houseClassID == 0 {
+		return nil, IdInvalid
 	}
 
 	return &HouseProfile{

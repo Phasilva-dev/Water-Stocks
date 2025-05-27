@@ -14,13 +14,14 @@ func NewResident(
 	houseClassID uint32,
 	residentOccupationID uint32,
 	age uint8,
+	log *ResidentSanitary,
 ) *Resident {
 	return &Resident{
 		day:                  day,
 		houseClassID:         houseClassID,
 		residentOccupationID: residentOccupationID,
 		age:                  age,
-		sanitaryLogs:         nil, //FALTA AQUI
+		sanitaryLogs:         log,
 	}
 }
 

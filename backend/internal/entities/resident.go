@@ -5,7 +5,7 @@ import (
 	"simulation/internal/entities/resident/ds/temporal"
 	"simulation/internal/entities/resident"
 	"simulation/internal/log"
-
+	"simulation/internal/usagemock"
 
 )
 
@@ -61,4 +61,79 @@ func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 	r.GenerateRoutine(day,rng)
 	r.GenerateFrequency(day,rng)
+}
+
+func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
+	frequency := r.dayData.Frequency()
+	routine := r.dayData.Routine()
+
+	usageToilet := make([]*log.Usage, frequency.Toilet())
+	usageShower := make([]*log.Usage, frequency.Shower())
+	usageWashBassin := make([]*log.Usage, frequency.WashBassin())
+	usageWashMachine := make([]*log.Usage, frequency.WashMachine())
+	usageDishWasher := make([]*log.Usage, frequency.DishWasher())
+	usageTanque := make([]*log.Usage, frequency.Tanque())
+
+	sanitaryHouse := r.house.SanitaryHouse()
+
+	for i := 0; i < len(usageToilet); i++ {
+		usage, err := usagemock.GenerateToiletUsage(routine, sanitaryHouse.Toilet().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageToilet[i] = usage
+	}
+
+	for i := 0; i < len(usageShower); i++ {
+		usage, err := usagemock.GenerateShowerUsage(routine, sanitaryHouse.Shower().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageShower[i] = usage
+	}
+
+	for i := 0; i < len(usageWashBassin); i++ {
+		usage, err := usagemock.GenerateWashBassinUsage(routine, sanitaryHouse.WashBassin().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageWashBassin[i] = usage
+	}
+
+	for i := 0; i < len(usageWashMachine); i++ {
+		usage, err := usagemock.GenerateWashMachineUsage(routine, sanitaryHouse.WashMachine().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageWashMachine[i] = usage
+	}
+
+	for i := 0; i < len(usageDishWasher); i++ {
+		usage, err := usagemock.GenerateDishWasherUsage(routine, sanitaryHouse.DishWasher().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageDishWasher[i] = usage
+	}
+
+	for i := 0; i < len(usageTanque); i++ {
+		usage, err := usagemock.GenerateTanqueUsage(routine, sanitaryHouse.Tanque().Device(), rng)
+		if err != nil {
+			return err
+		}
+		usageTanque[i] = usage
+	}
+	toiletLog := log.NewSanitary("toilet", sanitaryHouse.Toilet().Device().SanitaryDeviceID(),usageToilet)
+	showerLog := log.NewSanitary("shower", sanitaryHouse.Shower().Device().SanitaryDeviceID(),usageShower)
+	washBassinLog := log.NewSanitary("wash_bassin", sanitaryHouse.WashBassin().Device().SanitaryDeviceID(),usageWashBassin)
+	washMachineLog := log.NewSanitary("wash_machine", sanitaryHouse.WashMachine().Device().SanitaryDeviceID(),usageWashMachine)
+	dishWasherLog := log.NewSanitary("dish_washer", sanitaryHouse.DishWasher().Device().SanitaryDeviceID(),usageDishWasher)
+	tanqueLog := log.NewSanitary("tanque", sanitaryHouse.Tanque().Device().SanitaryDeviceID(),usageTanque)
+
+	residentSanitarylog := log.NewResidentSanitary(toiletLog,showerLog,washBassinLog,washMachineLog,dishWasherLog,tanqueLog)
+
+	log.NewResident(day, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
+
+	r.dayData.ClearData()
+	return nil
 }

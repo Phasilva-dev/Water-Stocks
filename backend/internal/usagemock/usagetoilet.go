@@ -3,7 +3,7 @@ package usagemock
 import (
 	"simulation/internal/dists"
 	"simulation/internal/log"
-	"simulation/internal/entities"
+	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
 	//"errors"
@@ -17,7 +17,8 @@ return_home = time_out + work_time = ReturnHome*/
 type UsageToilet struct {
 }
 
-func GenerateToiletUsage(routine *behavioral.Routine, house *entities.House, rng *rand.Rand) (*log.Usage, error) {
+func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.SanitaryDevice,
+	 rng *rand.Rand,) (*log.Usage, error) {
 	probDist, _ := dists.UniformDistNew(0, 1)
 	p := probDist.Sample(rng)
 
@@ -52,7 +53,7 @@ func GenerateToiletUsage(routine *behavioral.Routine, house *entities.House, rng
 	}
 
 	startUsage = int32(dist.Sample(rng))
-	device := house.SanitaryHouse().Toilet().Device()
+
 	durationUsage := device.GenerateDuration(rng)
 
 	//Deve ter um tratamento de Colisão aqui

@@ -7,17 +7,12 @@ type Sanitary struct {
 	usageLogs        []*Usage
 }
 
-func NewSanitary(sanitaryType string, sanitaryDeviceID uint32) *Sanitary {
+func NewSanitary(sanitaryType string, sanitaryDeviceID uint32, usages []*Usage) *Sanitary {
 	return &Sanitary{
 		sanitaryType:     sanitaryType,
 		sanitaryDeviceID: sanitaryDeviceID,
-		usageLogs:        make([]*Usage, 0), // Initialize empty slice
+		usageLogs:        usages, // Initialize empty slice
 	}
-}
-
-// AddUsageLog adds a new usage log to the sanitary device
-func (s *Sanitary) AddUsageLog(log *Usage) {
-	s.usageLogs = append(s.usageLogs, log)
 }
 
 // Getters

@@ -34,7 +34,7 @@ func (d *DailyData) SetFrequency(f *behavioral.Frequency) {
 	d.frequency = f
 }
 
-func (d *DailyData) clearData() {
+func (d *DailyData) ClearData() {
 	d.SetFrequency(nil)
 	d.SetRoutine(nil)
 }

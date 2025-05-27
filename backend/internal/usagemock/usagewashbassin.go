@@ -3,7 +3,7 @@ package usagemock
 import (
 	"simulation/internal/dists"
 	"simulation/internal/log"
-	"simulation/internal/entities"
+	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
 	//"errors"
@@ -15,9 +15,10 @@ work_time = WorkTime
 sleep_time = get_up - sleep_duration = SleepTime
 return_home = time_out + work_time = ReturnHome*/
 
-func GenerateWashBassinUsage(routine *behavioral.Routine, house *entities.House, rng *rand.Rand) (*log.Usage, error) {
+func GenerateWashBassinUsage(routine *behavioral.Routine, device sanitarydevice.SanitaryDevice,
+	 rng *rand.Rand,) (*log.Usage, error) {
 	p := rng.Float64()
-	device := house.SanitaryHouse().WashBassin().Device()
+
 	durationUsage := device.GenerateDuration(rng)
 
 	workTime := routine.WorkTime()

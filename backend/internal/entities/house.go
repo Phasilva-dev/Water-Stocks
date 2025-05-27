@@ -26,7 +26,7 @@ func (h *House) Residents() []*Resident {
 func NewHouse(houseClassID uint32, houseProfile *house.HouseProfile) *House {
 	return &House{
 		houseClassID:  houseClassID,
-		residents:     []*Resident{},
+		residents:     nil,
 		sanitaryHouse: nil,
 		houseProfile:  houseProfile,
 	}
@@ -36,7 +36,7 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 	num := h.houseProfile.GenerateNumbersOfResidents(rng)
 	h.residents = make([]*Resident, num)
 
-	for i := 0; i < int(num); i++ {
+	for i := uint8(0); i < num; i++ {
 		var age uint8
 
 		if i == 0 {

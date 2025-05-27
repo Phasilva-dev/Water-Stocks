@@ -1,6 +1,6 @@
 package log
 
-import "simulation/internal/entities/house/ds/sanitarysystem"
+
 
 type ResidentSanitary struct {
 	toiletLog      *Sanitary
@@ -12,15 +12,15 @@ type ResidentSanitary struct {
 }
 
 // NewResidentSanitary creates a new ResidentSanitary with initialized Sanitary instances
-func NewResidentSanitary(sanitaryHouse *sanitarysystem.SanitaryHouse) *ResidentSanitary {
+func NewResidentSanitary(toilet,shower,washBassin,washMachine,dishWasher,tanque *Sanitary) *ResidentSanitary {
 
 	return &ResidentSanitary{
-		toiletLog:      NewSanitary("toilet", sanitaryHouse.Toilet().Device().SanitaryDeviceID()),
-		showerLog:      NewSanitary("shower", sanitaryHouse.Shower().Device().SanitaryDeviceID()),
-		washBassinLog:  NewSanitary("wash_bassin", sanitaryHouse.WashBassin().Device().SanitaryDeviceID()),
-		washMachineLog: NewSanitary("wash_machine", sanitaryHouse.WashMachine().Device().SanitaryDeviceID()),
-		dishWasherLog:  NewSanitary("dish_washer", sanitaryHouse.DishWasher().Device().SanitaryDeviceID()),
-		tanqueLog:      NewSanitary("tanque", sanitaryHouse.Tanque().Device().SanitaryDeviceID()),
+		toiletLog:      toilet,
+		showerLog:      shower,
+		washBassinLog:  washBassin,
+		washMachineLog: washMachine,
+		dishWasherLog:  dishWasher,
+		tanqueLog:      tanque,
 	}
 }
 

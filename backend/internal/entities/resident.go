@@ -14,7 +14,6 @@ type Resident struct {
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *temporal.DailyData
 	residentProfile *resident.ResidentProfile
-	residentLog *log.Resident
 	house *House
 }
 
@@ -24,15 +23,9 @@ func NewResident(age uint8, occupation uint32, profile *resident.ResidentProfile
 		occupationID: occupation,
 		dayData: temporal.NewDailyData(nil,nil),
 		residentProfile: profile,
-		residentLog: nil,
 		house: house,
 	}
 }
-
-func (r *Resident) ResidentLog() *log.Resident {
-	return r.residentLog
-}
-
 
 func (r *Resident) Age() uint8 {
 	return r.age
@@ -63,7 +56,7 @@ func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 	r.GenerateFrequency(day,rng)
 }
 
-func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
+func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) {
 	frequency := r.dayData.Frequency()
 	routine := r.dayData.Routine()
 
@@ -79,7 +72,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageToilet); i++ {
 		usage, err := usagemock.GenerateToiletUsage(routine, sanitaryHouse.Toilet().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageToilet[i] = usage
 	}
@@ -87,7 +80,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageShower); i++ {
 		usage, err := usagemock.GenerateShowerUsage(routine, sanitaryHouse.Shower().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageShower[i] = usage
 	}
@@ -95,7 +88,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageWashBassin); i++ {
 		usage, err := usagemock.GenerateWashBassinUsage(routine, sanitaryHouse.WashBassin().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageWashBassin[i] = usage
 	}
@@ -103,7 +96,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageWashMachine); i++ {
 		usage, err := usagemock.GenerateWashMachineUsage(routine, sanitaryHouse.WashMachine().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageWashMachine[i] = usage
 	}
@@ -111,7 +104,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageDishWasher); i++ {
 		usage, err := usagemock.GenerateDishWasherUsage(routine, sanitaryHouse.DishWasher().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageDishWasher[i] = usage
 	}
@@ -119,7 +112,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 	for i := 0; i < len(usageTanque); i++ {
 		usage, err := usagemock.GenerateTanqueUsage(routine, sanitaryHouse.Tanque().Device(), rng)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		usageTanque[i] = usage
 	}
@@ -132,8 +125,8 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) error {
 
 	residentSanitarylog := log.NewResidentSanitary(toiletLog,showerLog,washBassinLog,washMachineLog,dishWasherLog,tanqueLog)
 
-	log.NewResident(day, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
+	residentLog := log.NewResident(day, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
 
 	r.dayData.ClearData()
-	return nil
+	return residentLog,nil
 }

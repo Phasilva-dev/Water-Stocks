@@ -21,7 +21,9 @@ func NewResidentCount(dist dists.Distribution) *ResidentCount {
 func (r *ResidentCount) GenerateData(rng *rand.Rand) uint8 {
 	sample := r.dist.Sample(rng)
 	
-	processedValue := math.Ceil(sample)
+	absolutValue := math.Abs(sample)
+	processedValue := math.Ceil(absolutValue)
+	
 
 	if processedValue < 0 {
 		processedValue = 0

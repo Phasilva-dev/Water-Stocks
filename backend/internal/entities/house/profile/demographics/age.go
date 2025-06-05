@@ -23,11 +23,15 @@ func (a *Age) AgeDist() dists.Distribution {
 func (a *Age) GenerateData(rng *rand.Rand) uint8 {
 	sample := a.dist.Sample(rng)
 	absSample := math.Abs(sample)
+	ceilSample := math.Ceil(absSample)
 
-	if absSample > math.MaxUint8 {
-		absSample = math.MaxUint8
+	if ceilSample < 0 {
+		ceilSample = 0
+	}
+	if ceilSample > math.MaxUint8 {
+		ceilSample = math.MaxUint8
 	}
 
-	return uint8(absSample)
+	return uint8(ceilSample)
 }
 

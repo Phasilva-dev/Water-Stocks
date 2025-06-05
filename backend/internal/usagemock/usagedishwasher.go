@@ -29,7 +29,7 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	var dist dists.UniformDist
 	var err error
 
-	if sleepTime > returnHome { //Mas isso sempre é verade .-.
+	if sleepTime > returnHome { //Mas isso sempre é verdade .-.
 		if p < 0.05 {
 			dist, err = dists.UniformDistNew(float64(inverteHorarioCiclico(int32(sleepTime))), workTime)
 		} else if p < 0.3 {

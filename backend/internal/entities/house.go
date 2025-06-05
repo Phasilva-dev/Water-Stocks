@@ -6,6 +6,7 @@ import (
 	"simulation/internal/entities/house"
 	"simulation/internal/entities/house/ds/sanitarysystem"
 	"simulation/internal/entities/house/profile/sanitarydevice"
+	"simulation/internal/log"
 )
 
 type House struct {
@@ -13,6 +14,7 @@ type House struct {
 	residents []*Resident
 	sanitaryHouse *sanitarysystem.SanitaryHouse
 	houseProfile *house.HouseProfile
+	residentLogs []*log.Resident
 }
 
 func (h *House) SanitaryHouse() *sanitarysystem.SanitaryHouse {
@@ -23,12 +25,21 @@ func (h *House) Residents() []*Resident {
 	return h.residents
 }
 
+func (h *House) ResidentLogs() []*log.Resident {
+	return h.residentLogs
+}
+
+func (h *House) HouseClassID() uint32 {
+	return h.houseClassID
+}
+
 func NewHouse(houseClassID uint32, houseProfile *house.HouseProfile) *House {
 	return &House{
 		houseClassID:  houseClassID,
 		residents:     nil,
 		sanitaryHouse: nil,
 		houseProfile:  houseProfile,
+		residentLogs: nil,
 	}
 }
 
@@ -77,5 +88,31 @@ func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand,devices map[string]
 		return err
 	}
 	h.sanitaryHouse = sanitHouse
+	return nil
+}
+
+func (h *House) GenerateLogs (day uint8,rng *rand.Rand) error {
+
+	h.residentLogs = make([]*log.Resident,len(h.residents))
+	for i := 0; i < len(h.residents); i++ {
+		residentLog, err := h.residents[i].GenerateLogs(day, rng)
+		if err != nil {
+			return err
+		}
+		h.residentLogs[i] = residentLog
+	}
+	return nil
+
+}
+
+func (h *House) GenerateHouseData (rng *rand.Rand,devices map[string]sanitarydevice.SanitaryDevice) error {
+	err := h.GenerateResidents(rng)
+	if err != nil {
+		return nil
+	}
+	err = h.GenerateSanitaryDeviceOfHouse(rng, devices)
+	if err != nil {
+		return err
+	}
 	return nil
 }

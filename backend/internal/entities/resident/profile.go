@@ -18,6 +18,7 @@ func NewResidentProfile(profile *habits.ResidentWeeklyProfile, id uint32) (*Resi
 	if profile == nil {
 		return nil, errors.New("weekly profile cannot be nil")
 	}
+	//Adicione uma checkagem para ID 0
 	return &ResidentProfile{
 		OccupationID: id,
 		weeklyProfile: profile,

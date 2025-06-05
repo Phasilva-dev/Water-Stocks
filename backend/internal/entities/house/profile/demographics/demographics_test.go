@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand/v2"
 	"testing"
-	"reflect"
+	//"reflect"
 
 	"simulation/internal/dists"
 	"simulation/internal/misc"
@@ -76,8 +76,6 @@ func TestGenerateDataClampsToMaxUint8(t *testing.T) {
 
 
 
-// Teste de Occupation
-
 func createOccupationTestData() (
 	[]misc.Tuple[uint32, float64],
 	[]misc.Tuple[uint32, float64],
@@ -87,25 +85,22 @@ func createOccupationTestData() (
 	*misc.PercentSelector[uint32],
 	error,
 ) {
-	// Definindo os dados brutos para cada faixa etária
 	under18 := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(uint32(1), 60.0), // Ex: Estudante 1 (60%)
-		*misc.NewTuple(uint32(2), 40.0), // Ex: Estudante 2 (40%)
+		*misc.NewTuple(uint32(1), 60.0),
+		*misc.NewTuple(uint32(2), 40.0),
 	}
 
 	adult := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(uint32(3), 50.0), // Ex: Trabalhador (50%)
-		*misc.NewTuple(uint32(4), 50.0), // Ex: Desempregado/Outro (50%)
+		*misc.NewTuple(uint32(3), 50.0),
+		*misc.NewTuple(uint32(4), 50.0),
 	}
 
 	over65 := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(uint32(5), 100.0), // Ex: Aposentado (100%)
+		*misc.NewTuple(uint32(5), 100.0),
 	}
 
-	// Criando os PercentSelectors a partir dos dados brutos
 	u18Sel, err := misc.NewPercentSelector(under18)
 	if err != nil {
-		// Retorna os dados brutos também, caso o chamador precise deles mesmo em caso de erro
 		return under18, adult, over65, nil, nil, nil, err
 	}
 
@@ -119,13 +114,9 @@ func createOccupationTestData() (
 		return under18, adult, over65, u18Sel, adultSel, nil, err
 	}
 
-	// Retorna os dados brutos E os seletores criados com sucesso
 	return under18, adult, over65, u18Sel, adultSel, over65Sel, nil
 }
 
-
-// setupOccupationTestData é uma função auxiliar para obter os dados de teste
-// e seletores, tratando qualquer erro fatalmente no teste.
 func setupOccupationTestData(t *testing.T) (
 	[]misc.Tuple[uint32, float64],
 	[]misc.Tuple[uint32, float64],
@@ -134,190 +125,177 @@ func setupOccupationTestData(t *testing.T) (
 	*misc.PercentSelector[uint32],
 	*misc.PercentSelector[uint32],
 ) {
-	t.Helper() // Marca esta função como um helper, para que as linhas de erro apontem para o teste chamador
+	t.Helper()
 	u18Data, adultData, over65Data, u18Sel, adultSel, over65Sel, err := createOccupationTestData()
 	if err != nil {
-		// Se a função auxiliar de teste falhar, o teste não pode prosseguir
-		t.Fatalf("Falha ao criar dados de teste usando createOccupationTestData: %v", err)
+		t.Fatalf("Falha ao criar dados de teste: %v", err)
 	}
 	return u18Data, adultData, over65Data, u18Sel, adultSel, over65Sel
 }
 
 func TestNewOccupation(t *testing.T) {
 	t.Run("DadosValidos", func(t *testing.T) {
-		// Arrange: Obter dados válidos da função auxiliar de teste
 		_, _, _, u18Sel, adultSel, over65Sel := setupOccupationTestData(t)
 
-		// Act: Chamar o construtor com os dados válidos
-		occ, err := NewOccupation(u18Sel, adultSel, over65Sel)
-
-		// Assert: Verificar se não houve erro e o objeto foi criado
+		u18Selector, err := NewAgeRangeSelector(0, 17, u18Sel)
 		if err != nil {
-			t.Errorf("NewOccupation com dados válidos retornou um erro inesperado: %v", err)
+			t.Fatalf("Erro criando AgeRangeSelector: %v", err)
+		}
+		adultSelector, err := NewAgeRangeSelector(18, 64, adultSel)
+		if err != nil {
+			t.Fatalf("Erro criando AgeRangeSelector: %v", err)
+		}
+		over65Selector, err := NewAgeRangeSelector(65, 120, over65Sel)
+		if err != nil {
+			t.Fatalf("Erro criando AgeRangeSelector: %v", err)
+		}
+
+		selectors := []*AgeRangeSelector{
+			u18Selector,
+			adultSelector,
+			over65Selector,
+		}
+
+		occ, err := NewOccupation(selectors)
+		if err != nil {
+			t.Errorf("NewOccupation retornou erro inesperado: %v", err)
 		}
 		if occ == nil {
-			t.Fatal("NewOccupation com dados válidos retornou nil")
+			t.Fatal("NewOccupation retornou nil com dados válidos")
 		}
 	})
 
-	t.Run("DadosInvalidosPropagaErro", func(t *testing.T) {
-		// Arrange: Criar dados que devem causar um erro no NewPercentSelector
-		// Exemplo: Slice vazio geralmente é inválido para seletores baseados em percentual.
-		//invalidData := []misc.Tuple[uint32, float64]{}
-
-		// Usamos setupOccupationTestData para obter dados válidos para os outros grupos.
-		_, _, _, u18Sel, adultSel, _ := setupOccupationTestData(t) // Ignora os seletores aqui
-
-		// Act: Tentar criar Occupation com dados inválidos para um grupo
-		occ, err := NewOccupation(u18Sel, adultSel, nil)
-
-		// Assert: Verificar se um erro foi retornado e o objeto é nil
+	t.Run("SelectorsVazio", func(t *testing.T) {
+		occ, err := NewOccupation([]*AgeRangeSelector{})
 		if err == nil {
-			t.Error("NewOccupation com dados inválidos era esperado retornar um erro, mas não retornou")
+			t.Error("Era esperado erro para selectors vazio, mas não retornou erro")
 		}
 		if occ != nil {
-			t.Errorf("NewOccupation com dados inválidos era esperado retornar nil, mas retornou %v", occ)
-		}
-		// Opcional: Verificar se a mensagem de erro contém alguma indicação do problema
-		// if !strings.Contains(err.Error(), "falha ao criar PercentSelector") { ... }
-	})
-
-	// Adicionar mais casos de teste para diferentes tipos de dados inválidos se necessário
-	// (Ex: porcentagens que não somam 100%, dados com valores zero ou negativos, etc.)
-}
-
-func TestOccupationGetters(t *testing.T) {
-	// Arrange: Configurar os dados de teste e criar um objeto Occupation
-	_, _, _, expectedU18Sel, expectedAdultSel, expectedOver65Sel := setupOccupationTestData(t)
-
-	occ, err := NewOccupation(expectedU18Sel, expectedAdultSel, expectedOver65Sel)
-	if err != nil {
-		t.Fatalf("Falha ao criar objeto Occupation para testes de getters: %v", err)
-	}
-
-	// Act & Assert: Chamar cada getter e comparar o seletor retornado
-	t.Run("Under18Selector", func(t *testing.T) {
-		actualSel := occ.Under18Selector()
-		// Comparar ponteiros é uma forma eficaz de verificar se é o mesmo objeto seletor
-		if actualSel != expectedU18Sel {
-			t.Errorf("Under18Selector() retornou um ponteiro de seletor diferente. Esperado %p, Obtido %p", expectedU18Sel, actualSel)
-			// Se a comparação de ponteiro não for suficiente, você precisaria comparar o *conteúdo*
-			// dos seletores, o que pode ser complexo.
+			t.Error("Occupation deveria ser nil quando selectors são vazios")
 		}
 	})
 
-	t.Run("AdultSelector", func(t *testing.T) {
-		actualSel := occ.AdultSelector()
-		if actualSel != expectedAdultSel {
-			t.Errorf("AdultSelector() retornou um ponteiro de seletor diferente. Esperado %p, Obtido %p", expectedAdultSel, actualSel)
+	t.Run("SelectorComNil", func(t *testing.T) {
+		selectors := []*AgeRangeSelector{nil}
+		occ, err := NewOccupation(selectors)
+		if err == nil {
+			t.Error("Era esperado erro para selector nil, mas não retornou erro")
+		}
+		if occ != nil {
+			t.Error("Occupation deveria ser nil quando selector é nil")
 		}
 	})
 
-	t.Run("Over65Selector", func(t *testing.T) {
-		actualSel := occ.Over65Selector()
-		if actualSel != expectedOver65Sel {
-			t.Errorf("Over65Selector() retornou um ponteiro de seletor diferente. Esperado %p, Obtido %p", expectedOver65Sel, actualSel)
+	t.Run("FaixaIdadeInvalida", func(t *testing.T) {
+		_, _, _, u18Sel, _, _ := setupOccupationTestData(t)
+
+		// Criando selector inválido com minAge > maxAge
+		_, err := NewAgeRangeSelector(20, 10, u18Sel)
+		if err == nil {
+			t.Error("Era esperado erro para faixa etária inválida (minAge > maxAge), mas não retornou erro")
 		}
 	})
 }
 
-func TestOccupationSampling(t *testing.T) {
-	// Arrange: Configurar os dados de teste e criar um objeto Occupation
+func TestOccupationSample(t *testing.T) {
 	_, _, _, u18Sel, adultSel, over65Sel := setupOccupationTestData(t)
-	occ, err := NewOccupation(u18Sel, adultSel, over65Sel)
-	if err != nil {
-		t.Fatalf("Falha ao criar objeto Occupation para testes de amostragem: %v", err)
+
+	u18Selector, _ := NewAgeRangeSelector(0, 17, u18Sel)
+	adultSelector, _ := NewAgeRangeSelector(18, 64, adultSel)
+	over65Selector, _ := NewAgeRangeSelector(65, 120, over65Sel)
+
+	selectors := []*AgeRangeSelector{
+		u18Selector,
+		adultSelector,
+		over65Selector,
 	}
 
-	src := rand.NewPCG(42, 0)
+	occ, err := NewOccupation(selectors)
+	if err != nil {
+		t.Fatalf("Erro ao criar Occupation: %v", err)
+	}
+
+	src := rand.NewPCG(42, 0) // PCG é uma Source que implementa rand.Source
 	rng := rand.New(src)
 
-	// Testar o caso com 100% de probabilidade (Over65)
-	t.Run("GenerateOver65Selector", func(t *testing.T) {
-		// De acordo com createOccupationTestData, over65 sempre retorna 5
-		expectedID := uint32(5)
+	t.Run("AmostragemUnder18", func(t *testing.T) {
+		possible := map[uint32]bool{1: true, 2: true}
+
+		for i := 0; i < 20; i++ {
+			result, err := occ.Sample(10, rng)
+			if err != nil {
+				t.Errorf("Erro inesperado ao amostrar: %v", err)
+			}
+			if !possible[result] {
+				t.Errorf("Valor inesperado %d para idade 10", result)
+			}
+		}
+	})
+
+	t.Run("AmostragemAdulto", func(t *testing.T) {
+		possible := map[uint32]bool{3: true, 4: true}
+
+		for i := 0; i < 20; i++ {
+			result, err := occ.Sample(30, rng)
+			if err != nil {
+				t.Errorf("Erro inesperado ao amostrar: %v", err)
+			}
+			if !possible[result] {
+				t.Errorf("Valor inesperado %d para idade 30", result)
+			}
+		}
+	})
+
+	t.Run("AmostragemOver65", func(t *testing.T) {
+		expected := uint32(5)
 
 		for i := 0; i < 10; i++ {
-			sampledID := occ.GenerateOver65Selector(rng)
-			if sampledID != expectedID {
-				t.Errorf("GenerateOver65Selector() amostra %d: Esperado %d, Obtido %d", i, expectedID, sampledID)
+			result, err := occ.Sample(70, rng)
+			if err != nil {
+				t.Errorf("Erro inesperado ao amostrar: %v", err)
 			}
-
-			if sampledID == 0 {
-                 t.Errorf("GenerateOver65Selector() amostra %d retornou 0, indicando possível erro", i)
-            }
+			if result != expected {
+				t.Errorf("Esperava %d para idade 70, mas obteve %d", expected, result)
+			}
 		}
 	})
 
-	// Testar casos com probabilidades diferentes de 100% (Under18, Adult)
-	// Não podemos testar uma única amostra, mas podemos testar se o valor retornado
-	// está *dentro* dos possíveis resultados definidos nos dados de teste.
-	// Testar a *distribuição* de probabilidade corretamente exigiria muitas amostras
-	// e seria mais um teste para misc.PercentSelector do que para Occupation.
-	t.Run("GenerateUnder18Selector", func(t *testing.T) {
-		// Resultados possíveis: 1 (60%) ou 2 (40%) conforme createOccupationTestData
-		possibleIDs := map[uint32]bool{1: true, 2: true}
-
-		// Amostrar algumas vezes e verificar se o resultado é um dos esperados
-		for i := 0; i < 20; i++ { // Aumentamos um pouco as amostras para ter mais confiança
-			sampledID := occ.GenerateUnder18Selector(rng)
-			if _, ok := possibleIDs[sampledID]; !ok {
-				// reflect.ValueOf(possibleIDs).MapKeys() é uma forma de obter as chaves do map para a mensagem de erro
-				t.Errorf("GenerateUnder18Selector() amostra %d: Obtido ID inesperado %d. Esperado um de %v", i, sampledID, reflect.ValueOf(possibleIDs).MapKeys())
-			}
-			if sampledID == 0 {
-                t.Errorf("GenerateUnder18Selector() amostra %d retornou 0, indicando possível erro", i)
-            }
-		}
-	})
-
-	t.Run("GenerateAdultSelector", func(t *testing.T) {
-		// Resultados possíveis: 3 (50%) ou 4 (50%) conforme createOccupationTestData
-		possibleIDs := map[uint32]bool{3: true, 4: true}
-
-		// Amostrar algumas vezes e verificar se o resultado é um dos esperados
-		for i := 0; i < 20; i++ {
-			sampledID := occ.GenerateAdultSelector(rng)
-			if _, ok := possibleIDs[sampledID]; !ok {
-				t.Errorf("GenerateAdultSelector() amostra %d: Obtido ID inesperado %d. Esperado um de %v", i, sampledID, reflect.ValueOf(possibleIDs).MapKeys())
-			}
-             if sampledID == 0 {
-                t.Errorf("GenerateAdultSelector() amostra %d retornou 0, indicando possível erro", i)
-            }
+	t.Run("IdadeSemFaixa", func(t *testing.T) {
+		_, err := occ.Sample(150, rng)
+		if err == nil {
+			t.Error("Era esperado erro para idade sem faixa, mas não retornou erro")
 		}
 	})
 }
 
-// É uma boa prática testar a própria função de setup de teste, mesmo que simples.
-func TestCreateOccupationTestData(t *testing.T) {
-	u18Data, adultData, over65Data, u18Sel, adultSel, over65Sel, err := createOccupationTestData()
+func TestOccupationSelectorsGetter(t *testing.T) {
+	_, _, _, u18Sel, adultSel, over65Sel := setupOccupationTestData(t)
 
+	u18Selector, _ := NewAgeRangeSelector(0, 17, u18Sel)
+	adultSelector, _ := NewAgeRangeSelector(18, 64, adultSel)
+	over65Selector, _ := NewAgeRangeSelector(65, 120, over65Sel)
+
+	expectedSelectors := []*AgeRangeSelector{
+		u18Selector,
+		adultSelector,
+		over65Selector,
+	}
+
+	occ, err := NewOccupation(expectedSelectors)
 	if err != nil {
-		t.Fatalf("createOccupationTestData retornou erro: %v", err)
+		t.Fatalf("Erro ao criar Occupation: %v", err)
 	}
 
-	// Verificar se os slices de dados não são nulos/vazios (assumindo que não deveriam ser)
-	if u18Data == nil || len(u18Data) == 0 {
-		t.Error("Under18 data is nil or empty")
-	}
-	if adultData == nil || len(adultData) == 0 {
-		t.Error("Adult data is nil or empty")
-	}
-	if over65Data == nil || len(over65Data) == 0 {
-		t.Error("Over65 data is nil or empty")
+	actualSelectors := occ.Selectors()
+
+	if len(actualSelectors) != len(expectedSelectors) {
+		t.Fatalf("Número de selectors retornados (%d) difere do esperado (%d)", len(actualSelectors), len(expectedSelectors))
 	}
 
-	// Verificar se os seletores foram criados (não nulos)
-	if u18Sel == nil {
-		t.Error("Under18 selector is nil")
+	for i, expected := range expectedSelectors {
+		actual := actualSelectors[i]
+		if expected.MinAge() != actual.MinAge() || expected.MaxAge() != actual.MaxAge() || expected.Selector() != actual.Selector() {
+			t.Errorf("Selector %d não corresponde. Esperado %+v, Obtido %+v", i, expected, actual)
+		}
 	}
-	if adultSel == nil {
-		t.Error("Adult selector is nil")
-	}
-	if over65Sel == nil {
-		t.Error("Over65 selector is nil")
-	}
-
-	// Opcional: Adicionar verificações mais detalhadas sobre o conteúdo esperado dos dados/seletores
 }
-

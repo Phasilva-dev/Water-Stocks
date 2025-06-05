@@ -1,68 +1,88 @@
 package demographics
 
 import (
+	"errors"
 	"math/rand/v2"
 	"simulation/internal/misc"
-
-	"errors"
 )
 
-type Occupation struct {
-	under18Selector   *misc.PercentSelector[uint32]
-	adultSelector     *misc.PercentSelector[uint32]
-	over65Selector    *misc.PercentSelector[uint32]
+type AgeRangeSelector struct {
+	minAge   uint8
+	maxAge   uint8
+	selector *misc.PercentSelector[uint32]
 }
 
-func NewOccupation(
-	under18 *misc.PercentSelector[uint32],
-	adult *misc.PercentSelector[uint32],
-	over65 *misc.PercentSelector[uint32],
-) (*Occupation, error) {
-	// Adicione a validação para seletores nil aqui
-	if under18 == nil || adult == nil || over65 == nil {
-		// Uma mensagem de erro informativa ajuda a depurar
-		return nil, errors.New("failed to create occupation: one or more selector inputs are nil")
-	}
+func (a *AgeRangeSelector) MinAge() uint8 {
+	return a.minAge
+}
 
-	return &Occupation{
-		under18Selector: under18,
-		adultSelector:   adult,
-		over65Selector:  over65,
+func (a *AgeRangeSelector) MaxAge() uint8 {
+	return a.maxAge
+}
+
+func (a *AgeRangeSelector) Selector() *misc.PercentSelector[uint32] {
+	return a.selector
+}
+
+func NewAgeRangeSelector(minAge, maxAge uint8, selector *misc.PercentSelector[uint32]) (*AgeRangeSelector, error) {
+	if selector == nil {
+		return nil, errors.New("selector cannot be nil")
+	}
+	if minAge > maxAge {
+		return nil, errors.New("minAge cannot be greater than maxAge")
+	}
+	return &AgeRangeSelector{
+		minAge:   minAge,
+		maxAge:   maxAge,
+		selector: selector,
 	}, nil
 }
 
-func (o *Occupation) Under18Selector() *misc.PercentSelector[uint32] {
-	return o.under18Selector
+
+type Occupation struct {
+	selectors []*AgeRangeSelector
 }
 
-func (o *Occupation) AdultSelector() *misc.PercentSelector[uint32] {
-	return o.adultSelector
-}
-
-func (o *Occupation) Over65Selector() *misc.PercentSelector[uint32] {
-	return o.over65Selector
-}
-
-func (o *Occupation) GenerateUnder18Selector(rng *rand.Rand) uint32 {
-	id, err := o.under18Selector.Sample(rng)
-	if err != nil {
-		return 0
+func NewOccupation(selectors []*AgeRangeSelector) (*Occupation, error) {
+	if len(selectors) == 0 {
+		return nil, errors.New("selectors cannot be empty")
 	}
-	return id
+
+	// Verificar sobreposição
+	for i := 0; i < len(selectors); i++ {
+		selA := selectors[i]
+		if selA == nil {
+			return nil, errors.New("selectors cannot be nil")
+		}
+		for j := i + 1; j < len(selectors); j++ {
+			selB := selectors[j]
+			if selB == nil {
+				return nil, errors.New("selectors cannot be nil")
+			}
+
+			if rangesOverlap(selA.MinAge(), selA.MaxAge(), selB.MinAge(), selB.MaxAge()) {
+				return nil, errors.New(
+					"age ranges overlap between selectors")
+			}
+		}
+	}
+
+	return &Occupation{selectors: selectors}, nil
 }
 
-func (o *Occupation) GenerateAdultSelector(rng *rand.Rand) uint32 {
-	id, err := o.adultSelector.Sample(rng)
-	if err != nil {
-		return 0
-	}
-	return id
+func rangesOverlap(minA, maxA, minB, maxB uint8) bool {
+	return minA <= maxB && minB <= maxA
 }
 
-func (o *Occupation) GenerateOver65Selector(rng *rand.Rand) uint32 {
-	id, err := o.over65Selector.Sample(rng)
-	if err != nil {
-		return 0
+func (o *Occupation) Selectors() []*AgeRangeSelector {
+	return o.selectors
+}
+
+func (o *Occupation) Sample(age uint8, rng *rand.Rand) (uint32, error) {
+	for _, sel := range o.selectors {
+		if age >= sel.MinAge() && age <= sel.MaxAge() {
+			return sel.Selector().Sample(rng)
+		}
 	}
-	return id
+	return 0, errors.New("no selector found for age")
 }

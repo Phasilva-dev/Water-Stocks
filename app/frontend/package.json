@@ -9,10 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "plotly.js-dist-min": "^3.0.1",
     "vue": "^3.2.37"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^3.0.3",
-    "vite": "^3.0.7"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.2.2"
   }
 }

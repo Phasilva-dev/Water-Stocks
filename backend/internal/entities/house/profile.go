@@ -17,7 +17,9 @@ var (
 	ErrNilAgeProfile            = errors.New("age profile cannot be nil")
 	ErrNilOccupationProfile     = errors.New("occupation profile cannot be nil")
 	ErrNilSanitaryCountProfile  = errors.New("sanitary count profile cannot be nil")
-	IdInvalid = errors.New("0 is a invalid ID")
+	ErrIdInvalid = errors.New("0 is a invalid ID")
+	ErrNilSanitaryDevices = errors.New("should be have a sanitarydevice")
+	ErrNilResidentProfiles = errors.New("should be have almost one residentProfile")
 )
 
 type HouseProfile struct {
@@ -31,6 +33,8 @@ type HouseProfile struct {
 	
 	residentprofiles map[uint32]*resident.ResidentProfile
 
+	sanitaryDevices map[string]sanitarydevice.SanitaryDevice
+
 	// No futuro, seria bom ter um profile para decidir as chances de uma casa ter cada tipo de sanitaryDevice*/ 
 	
 }
@@ -41,6 +45,9 @@ func NewHouseProfile(
 	ageProfile *demographics.Age,
 	occupationProfile *demographics.Occupation,
 	numSanitarysDevice *count.SanitaryCount,
+	residentProfiles map[uint32]*resident.ResidentProfile,
+	sanitaryDevices map[string]sanitarydevice.SanitaryDevice,
+
 ) (*HouseProfile, error) {
 	if numResidentsProfile == nil {
 		return nil, ErrNilResidentCountProfile
@@ -55,7 +62,13 @@ func NewHouseProfile(
 		return nil, ErrNilSanitaryCountProfile
 	}
 	if houseClassID == 0 {
-		return nil, IdInvalid
+		return nil, ErrIdInvalid
+	}
+	if len(sanitaryDevices) == 0 {
+		return nil, ErrNilSanitaryDevices
+	}
+	if len(residentProfiles) == 0{
+		return nil, ErrNilResidentProfiles
 	}
 
 	return &HouseProfile{
@@ -64,6 +77,8 @@ func NewHouseProfile(
 		ageProfile:          ageProfile,
 		occupationProfile:   occupationProfile,
 		numSanitarysDevice:  numSanitarysDevice,
+		residentprofiles: residentProfiles,
+		sanitaryDevices: sanitaryDevices,
 	}, nil
 }
 
@@ -88,6 +103,10 @@ func (h *HouseProfile) NumSanitarysDevice() *count.SanitaryCount {
 	return h.numSanitarysDevice
 }
 
+func (h *HouseProfile) SanitaryDevices() map[string]sanitarydevice.SanitaryDevice {
+	return h.sanitaryDevices
+}
+
 func (h *HouseProfile) ResidentProfile(ID uint32) (*resident.ResidentProfile, error) {
 	p := h.residentprofiles[ID]
 	if p != nil {
@@ -105,13 +124,12 @@ func (h *HouseProfile) GenerateAgeofResidents(rng *rand.Rand) uint8 {
 	return uint8(h.ageProfile.GenerateData(rng))
 }
 
-func (h *HouseProfile) GenerateOccupation(age uint8, rng *rand.Rand) uint32 {
-	if age >= 18 && age < 65 {
-		return h.occupationProfile.GenerateAdultSelector(rng)
-	} else if age < 18 {
-		return h.occupationProfile.GenerateUnder18Selector(rng)
+func (h *HouseProfile) GenerateOccupation(age uint8, rng *rand.Rand) (uint32, error) {
+	occupation, err := h.occupationProfile.Sample(age,rng)
+	if err != nil {
+		return 0, err
 	}
-	return h.occupationProfile.GenerateOver65Selector(rng)
+	return occupation, nil
 }
 
 func (h *HouseProfile) GenerateNumberOfSanitaryDevices(rng *rand.Rand, numberOfResidents uint8) (uint8,error) {
@@ -119,6 +137,6 @@ func (h *HouseProfile) GenerateNumberOfSanitaryDevices(rng *rand.Rand, numberOfR
 	
 }
 
-func (h *HouseProfile) GenerateSanitaryHouse(devices map[string]sanitarydevice.SanitaryDevice, amount uint8) (*sanitarysystem.SanitaryHouse,error) {
-	return sanitarysystem.NewSanitaryHouse(devices,amount)
+func (h *HouseProfile) GenerateSanitaryHouse(amount uint8) (*sanitarysystem.SanitaryHouse,error) {
+	return sanitarysystem.NewSanitaryHouse(h.sanitaryDevices,amount)
 }

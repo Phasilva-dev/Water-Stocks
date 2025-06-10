@@ -25,8 +25,8 @@ func (r *ResidentCount) GenerateData(rng *rand.Rand) uint8 {
 	processedValue := math.Ceil(absolutValue)
 	
 
-	if processedValue < 0 {
-		processedValue = 0
+	if processedValue <= 0 {
+		processedValue = 1
 	} else if processedValue > math.MaxUint8 {
 		processedValue = 255
 	}

@@ -1,14 +1,21 @@
 package controller
 
 import (
+	//"fmt"
 	"simulation/internal/dists"
+	"simulation/internal/entities"
+	"simulation/internal/entities/house"
 	"simulation/internal/entities/house/profile/count"
 	"simulation/internal/entities/house/profile/demographics"
+	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident"
 	"simulation/internal/entities/resident/profile/frequency"
 	"simulation/internal/entities/resident/profile/habits"
 	"simulation/internal/entities/resident/profile/routine"
 	"simulation/internal/misc"
+
+	"math/rand/v2"
+	"time"
 )
 
 func defaultResidentProfiles()  map[uint32]*resident.ResidentProfile{
@@ -146,26 +153,170 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 
 }
 
-func defaultHouseProfile() {
+func defaultHouseProfile(toiletType, showerType int) *house.HouseProfile {
 	residentCountProfile := count.NewResidentCount(must(dists.CreateDistribution("gamma",4.09588,0.636582)))
 	sanitaryCountProfile := count.NewSanitaryCount()
-	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull",35.8311, 1.58364)))
+	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull", 1.58364, 35.8311)))
+
 
 
 	//residentOccupation
-	under18Selector := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(1, 80), // Adulto Empregado
-		*misc.NewTuple(2, 15), // Estudante
-		*misc.NewTuple(3, 5),  // Desempregado
+	// Definir os seletores de ocupação por faixa etária
+	childrenUnder15Selector := must(misc.NewPercentSelector([]misc.Tuple[uint32, float64]{
+		*misc.NewTuple(uint32(2), 50.0), // Criança Matutino
+		*misc.NewTuple(uint32(4), 50.0), // Criança Vespertino
+	}))
+
+	children15to17Selector := must(misc.NewPercentSelector([]misc.Tuple[uint32, float64]{
+		*misc.NewTuple(uint32(2), 45.0), // Criança Matutino
+		*misc.NewTuple(uint32(4), 45.0), // Criança Vespertino
+		*misc.NewTuple(uint32(5), 10.0), // Desempregado
+	}))
+
+	adultSelector := must(misc.NewPercentSelector([]misc.Tuple[uint32, float64]{
+		*misc.NewTuple(uint32(1), 90.0), // Adulto Empregado
+		*misc.NewTuple(uint32(5), 10.0), // Desempregado
+	}))
+
+	over64Selector := must(misc.NewPercentSelector([]misc.Tuple[uint32, float64]{
+		*misc.NewTuple(uint32(3), 100.0), // Idoso
+	}))
+
+	childUnder15 := must(demographics.NewAgeRangeSelector(0, 14, childrenUnder15Selector))
+	child15to17 := must(demographics.NewAgeRangeSelector(15, 17, children15to17Selector))
+	adult := must(demographics.NewAgeRangeSelector(18, 64, adultSelector))
+	elder := must(demographics.NewAgeRangeSelector(65, 130, over64Selector)) // 130 como limite superior
+
+	// Criar o Occupation
+	occupation := must(demographics.NewOccupation([]*demographics.AgeRangeSelector{
+		childUnder15,
+		child15to17,
+		adult,
+		elder,
+	}))
+
+	devices := defaultHouseSanitaryDevice(toiletType,showerType)
+
+	residentProfiles := defaultResidentProfiles()
+
+	profile := must(house.NewHouseProfile(
+		1,
+		residentCountProfile,
+		residentAgeProfile,
+		occupation,
+		sanitaryCountProfile,
+		residentProfiles,
+		devices))
+
+	return profile
+
+}
+
+func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitarydevice.SanitaryDevice {
+	devices := make(map[string]sanitarydevice.SanitaryDevice)
+
+	// Criar os toilets
+	toilet1 := must(sanitarydevice.NewToilet(0.4, 5, 1))
+	toilet2 := must(sanitarydevice.NewToilet(0.042, 1.8*60, 2))
+	toilet3 := must(sanitarydevice.NewToilet(0.25, 60, 3))
+	toilet4 := must(sanitarydevice.NewToilet(0.042, 1.2*60, 4))
+
+	// Selecionar o toilet com base no tipo
+	var selectedToilet sanitarydevice.SanitaryDevice
+	switch toiletType {
+	case 1:
+		selectedToilet = toilet1
+	case 2:
+		selectedToilet = toilet2
+	case 3:
+		selectedToilet = toilet3
+	case 4:
+		selectedToilet = toilet4
+	default:
+		selectedToilet = toilet1 // fallback
+	}
+	devices["toilet"] = selectedToilet
+
+	// Criar os showers
+	shower1 := must(sanitarydevice.NewShower(
+		must(dists.CreateDistribution("triangle", 3, 4, 5)),
+		must(dists.CreateDistribution("triangle", 2, 3.5, 5)),
+		1,
+	))
+
+	shower2 := must(sanitarydevice.NewShower(
+		must(dists.CreateDistribution("lognormal", -2.4205, 0.2014)),
+		must(dists.CreateDistribution("gamma", 6.5216, 0.7668)),
+		2,
+	))
+
+	// Selecionar o shower com base no tipo
+	var selectedShower sanitarydevice.SanitaryDevice
+	switch showerType {
+	case 1:
+		selectedShower = shower1
+	case 2:
+		selectedShower = shower2
+	default:
+		selectedShower = shower1 // fallback
+	}
+	devices["shower"] = selectedShower
+
+	// Criar os outros dispositivos (sem múltiplas opções)
+	devices["wash_bassin"] = must(sanitarydevice.NewWashBassin(
+		must(dists.CreateDistribution("normal", 1, 0)),
+		must(dists.CreateDistribution("lognormal", 3.3551, 0.8449)),
+		1,
+	))
+
+	devices["wash_machine"] = must(sanitarydevice.NewWashMachine(
+		0.1,
+		4*6*60,
+		1,
+	))
+
+	devices["dish_washer"] = must(sanitarydevice.NewDishWasher(
+		must(dists.CreateDistribution("weibull", 1.5871, 0.0569)),
+		must(dists.CreateDistribution("lognormal", 3.1763, 0.785)),
+		1,
+	))
+
+	devices["tanque"] = must(sanitarydevice.NewTanque(
+		must(dists.CreateDistribution("lognormal", -2.3485, 0.3279)),
+		must(dists.CreateDistribution("lognormal", 3.2905, 0.8918)),
+		1,
+	))
+
+	return devices
+}
+
+func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, rng *rand.Rand) {
+
+	for i := 0; i < size; i++ {
+
+		houses[i] = entities.NewHouse(1,profile)
+		houses[i].GenerateHouseData(rng) 
+
 	}
 
-	adultSelector := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(1, 90), // Adulto Empregado
-		*misc.NewTuple(5, 10), // Adulto Desempregado
-	}
+}
 
-	over64Selector := []misc.Tuple[uint32, float64]{
-		*misc.NewTuple(3, 100), // Idoso
-	}
 
+func RunSimulation(size, day, toiletType, showerType int) {
+
+	rng := rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), 0))
+
+	profile := defaultHouseProfile(toiletType, showerType)
+	houses := make([]*entities.House, size)
+
+	setHouses(profile, houses, size, rng)
+
+	for i := uint8(0); i < uint8(day); i++ {
+		for j := 0; j < size; j++ {
+			houses[i].GenerateLogs(i,rng)
+			//fmt.Println(j)
+		}
+	}
+	//PrintLogLines(houses[0].ResidentLogs()[0].ToLogLines())
+	
 }

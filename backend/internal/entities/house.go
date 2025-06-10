@@ -5,7 +5,6 @@ import (
 	"math/rand/v2"
 	"simulation/internal/entities/house"
 	"simulation/internal/entities/house/ds/sanitarysystem"
-	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/log"
 )
 
@@ -54,6 +53,7 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 			// Garantir que o primeiro residente tenha idade >= 18
 			for {
 				age = h.houseProfile.GenerateAgeofResidents(rng)
+
 				if age >= 18 {
 					break
 				}
@@ -62,9 +62,13 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 			age = h.houseProfile.GenerateAgeofResidents(rng)
 		}
 
+
 		
 
-		occupation := h.houseProfile.GenerateOccupation(age, rng)
+		occupation, err := h.houseProfile.GenerateOccupation(age, rng)
+		if err != nil {
+			return err
+		}
 
 		profile, err := h.houseProfile.ResidentProfile(occupation)
 		if err != nil {
@@ -77,17 +81,32 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 	return nil
 }
 
-func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand,devices map[string]sanitarydevice.SanitaryDevice) error {
+func (h *House) GenerateSanitaryDeviceOfHouse(rng *rand.Rand) error {
 	numberOfResidents := uint8(len(h.residents))
 	amountOfSanitarys, err := h.houseProfile.GenerateNumberOfSanitaryDevices(rng,numberOfResidents)
 	if err != nil {
 		return err
 	}
-	sanitHouse, err := h.houseProfile.GenerateSanitaryHouse(devices, amountOfSanitarys)
+	sanitHouse, err := h.houseProfile.GenerateSanitaryHouse(amountOfSanitarys)
 	if err != nil {
 		return err
 	}
 	h.sanitaryHouse = sanitHouse
+	return nil
+}
+
+func (h *House) GenerateHouseData (rng *rand.Rand) error {
+
+	err := h.GenerateResidents(rng)
+	if err != nil {
+		return nil
+	}
+
+	err = h.GenerateSanitaryDeviceOfHouse(rng)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -103,16 +122,4 @@ func (h *House) GenerateLogs (day uint8,rng *rand.Rand) error {
 	}
 	return nil
 
-}
-
-func (h *House) GenerateHouseData (rng *rand.Rand,devices map[string]sanitarydevice.SanitaryDevice) error {
-	err := h.GenerateResidents(rng)
-	if err != nil {
-		return nil
-	}
-	err = h.GenerateSanitaryDeviceOfHouse(rng, devices)
-	if err != nil {
-		return err
-	}
-	return nil
 }

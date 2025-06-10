@@ -215,7 +215,7 @@ func TestOccupationSample(t *testing.T) {
 		t.Fatalf("Erro ao criar Occupation: %v", err)
 	}
 
-	src := rand.NewPCG(42, 0) // PCG é uma Source que implementa rand.Source
+	src := rand.NewPCG(42, 0)
 	rng := rand.New(src)
 
 	t.Run("AmostragemUnder18", func(t *testing.T) {

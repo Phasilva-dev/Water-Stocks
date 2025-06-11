@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -28,6 +28,7 @@ func GenerateShowerUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
 
@@ -35,32 +36,33 @@ func GenerateShowerUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 		// período muito curto entre acordar e sair
 		switch {
 		case p < ((workTime-wakeUpTime) / (workTime-wakeUpTime+3600)):
-			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+			min, max = wakeUpTime, workTime
 		case p < ((workTime-wakeUpTime+1800) / (workTime-wakeUpTime+3600)):
-			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+			min, max = returnHome, returnHome+1800
 		default:
-			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			min, max = sleepTime-1800, sleepTime
 		}
 
 	} else {
 		switch {
 		case p < 0.5: //Caso mais comum 50%
 			if returnHome > 18*3600 {
-				dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+				min, max = returnHome, returnHome+1800
 			} else {
-				dist, err = dists.UniformDistNew(returnHome, sleepTime-1800)
+				min, max = returnHome, sleepTime-1800
 			}
 		case p < 0.8: // 30%
-			dist, err = dists.UniformDistNew(workTime-1800, workTime)
+			min, max = workTime-1800, workTime
 		case p < 0.95: // 15%
-			dist, err = dists.UniformDistNew(wakeUpTime, wakeUpTime+1800)
+			min, max = wakeUpTime, wakeUpTime+1800
 		default: //5%
-			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			min, max = sleepTime-1800, sleepTime
 		}
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do shower (min = %.2f, max = %.2f): %w", min, max, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))

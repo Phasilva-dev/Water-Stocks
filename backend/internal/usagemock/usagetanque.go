@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -34,16 +34,18 @@ func GenerateTanqueUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	if wakeUpTime + 3600 > workTime + 1800 { // Isso é uma condição que não faz sentido, pode ser falsa
 		if sleepTime > returnHome { // OUTRA CONDIÇÃO QUE É SEMPRE VERADE 
 			min, max = returnHome+1800, sleepTime-1800
-			dist, err = dists.UniformDistNew(returnHome+1800, sleepTime-1800)
 		} else {
-			min, max =  returnHome+1800, 86400 // Isso permite a pessao lavar roupa enquanto dorme
+			min, max = returnHome+1800, 86400
+			// Isso permite a pessao lavar roupa enquanto dorme
 		}
 	} else {
-		dist, err = dists.UniformDistNew(wakeUpTime+3600, workTime-1800) // Isso permite a pessoa potencialmente lavar roupa enquanto trabalha
+		min, max = wakeUpTime+3600, workTime-1800 
+		// Isso permite a pessoa potencialmente lavar roupa enquanto trabalha
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do tanque (min = %.2f, max = %.2f): %w", min, max, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))

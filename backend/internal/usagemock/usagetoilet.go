@@ -5,7 +5,7 @@ import (
 	"simulation/internal/log"
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
-
+	
 	//"errors"
 	"math/rand/v2"
 )
@@ -19,8 +19,7 @@ type UsageToilet struct {
 
 func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.SanitaryDevice,
 	 rng *rand.Rand,) (*log.Usage, error) {
-	probDist, _ := dists.UniformDistNew(0, 1)
-	p := probDist.Sample(rng)
+	p := rng.Float64() //Isso é a mesma coisa que uma 0 a 1 uniform
 
 	workTime := routine.WorkTime()
 	wakeUpTime := routine.WakeupTime()

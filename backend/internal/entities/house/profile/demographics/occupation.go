@@ -79,10 +79,24 @@ func (o *Occupation) Selectors() []*AgeRangeSelector {
 }
 
 func (o *Occupation) Sample(age uint8, rng *rand.Rand) (uint32, error) {
+	// Encontrar o maior MaxAge
+	var maxAllowedAge uint8 = 0
+	for _, sel := range o.selectors {
+		if sel.MaxAge() > maxAllowedAge {
+			maxAllowedAge = sel.MaxAge()
+		}
+	}
+
+	// Limitar a idade ao maior MaxAge
+	if age > maxAllowedAge {
+		age = maxAllowedAge
+	}
+
 	for _, sel := range o.selectors {
 		if age >= sel.MinAge() && age <= sel.MaxAge() {
 			return sel.Selector().Sample(rng)
 		}
 	}
+
 	return 0, errors.New("no selector found for age")
 }

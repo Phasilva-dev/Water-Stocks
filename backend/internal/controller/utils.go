@@ -3,6 +3,8 @@ package controller
 import (
 	"log"
 	"fmt"
+
+
 )
 
 // Helper para ignorar erro (não recomendado em produção sem cuidado)
@@ -21,3 +23,4 @@ func PrintLogLines(lines []string) {
         fmt.Println(line)
     }
 }
+

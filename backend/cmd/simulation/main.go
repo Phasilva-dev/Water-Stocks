@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"runtime"
 	"simulation/internal/controller" // seu pacote controller
 	"time"
 )
@@ -29,4 +30,5 @@ func main() {
 
 	fmt.Println("Simulação concluída.")
 	fmt.Printf("Tempo total: %s\n", elapsed)
+	runtime.GC()
 }

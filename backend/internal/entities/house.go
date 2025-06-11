@@ -75,7 +75,11 @@ func (h *House) GenerateResidents(rng *rand.Rand) error {
 			return fmt.Errorf("resident profile with occupation ID %d not found", occupation)
 		}
 
-		h.residents[i] = NewResident(age, occupation,profile, h)
+		resident, err := NewResident(age, occupation,profile, h)
+		if err != nil {
+			return err
+		}
+		h.residents[i] = resident
 	}
 
 	return nil
@@ -99,7 +103,7 @@ func (h *House) GenerateHouseData (rng *rand.Rand) error {
 
 	err := h.GenerateResidents(rng)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	err = h.GenerateSanitaryDeviceOfHouse(rng)
@@ -112,6 +116,7 @@ func (h *House) GenerateHouseData (rng *rand.Rand) error {
 
 func (h *House) GenerateLogs (day uint8,rng *rand.Rand) error {
 
+	
 	h.residentLogs = make([]*log.Resident,len(h.residents))
 	for i := 0; i < len(h.residents); i++ {
 		residentLog, err := h.residents[i].GenerateLogs(day, rng)

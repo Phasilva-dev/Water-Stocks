@@ -1,15 +1,14 @@
 package house
 
 import (
-
+	"errors"
+	"log"
 	"math/rand/v2"
 	"simulation/internal/entities/house/ds/sanitarysystem"
 	"simulation/internal/entities/house/profile/count"
 	"simulation/internal/entities/house/profile/demographics"
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident"
-	"errors"
-
 )
 
 var (
@@ -127,6 +126,7 @@ func (h *HouseProfile) GenerateAgeofResidents(rng *rand.Rand) uint8 {
 func (h *HouseProfile) GenerateOccupation(age uint8, rng *rand.Rand) (uint32, error) {
 	occupation, err := h.occupationProfile.Sample(age,rng)
 	if err != nil {
+		log.Printf("Erro para idade %d: %v", age, err)
 		return 0, err
 	}
 	return occupation, nil

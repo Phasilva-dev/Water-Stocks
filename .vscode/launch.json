@@ -8,7 +8,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/backend/cmd/simulation",
             "args": [
-                "-size", "1",
+                "-size", "100000",
                 "-day", "1",
                 "-toiletType", "2",
                 "-showerType", "1"

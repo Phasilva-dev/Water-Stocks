@@ -27,14 +27,16 @@ func GenerateTanqueUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
 
 	if wakeUpTime + 3600 > workTime + 1800 { // Isso é uma condição que não faz sentido, pode ser falsa
 		if sleepTime > returnHome { // OUTRA CONDIÇÃO QUE É SEMPRE VERADE 
+			min, max = returnHome+1800, sleepTime-1800
 			dist, err = dists.UniformDistNew(returnHome+1800, sleepTime-1800)
 		} else {
-			dist, err = dists.UniformDistNew(returnHome+1800, 86400) // Isso permite a pessao lavar roupa enquanto dorme
+			min, max =  returnHome+1800, 86400 // Isso permite a pessao lavar roupa enquanto dorme
 		}
 	} else {
 		dist, err = dists.UniformDistNew(wakeUpTime+3600, workTime-1800) // Isso permite a pessoa potencialmente lavar roupa enquanto trabalha

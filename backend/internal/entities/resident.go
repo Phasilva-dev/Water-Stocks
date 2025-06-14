@@ -112,14 +112,14 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) 
 	usageWashMachine := make([]*log.Usage, frequency.WashMachine())
 	usageDishWasher := make([]*log.Usage, frequency.DishWasher())
 	usageTanque := make([]*log.Usage, frequency.Tanque())
-
+/*
 	for i := 0; i < len(usageToilet); i++ {
 		usage, err := usagemock.GenerateToiletUsage(routine, sanitaryHouse.Toilet().Device(), rng)
 		if err != nil {
 			return nil, err
 		}
 		usageToilet[i] = usage
-	}
+	}*/
 
 	for i := 0; i < len(usageShower); i++ {
 		usage, err := usagemock.GenerateShowerUsage(routine, sanitaryHouse.Shower().Device(), rng)
@@ -128,7 +128,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) 
 		}
 		usageShower[i] = usage
 	}
-/*
+
 	for i := 0; i < len(usageWashBassin); i++ {
 		usage, err := usagemock.GenerateWashBassinUsage(routine, sanitaryHouse.WashBassin().Device(), rng)
 		if err != nil {
@@ -152,7 +152,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) 
 		}
 		usageDishWasher[i] = usage
 	}
-
+/*
 	for i := 0; i < len(usageTanque); i++ {
 		usage, err := usagemock.GenerateTanqueUsage(routine, sanitaryHouse.Tanque().Device(), rng)
 		if err != nil {

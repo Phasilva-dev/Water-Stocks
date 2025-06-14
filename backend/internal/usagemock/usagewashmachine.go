@@ -24,7 +24,7 @@ func GenerateWashMachineUsage(routine *behavioral.Routine, device sanitarydevice
 	dist, err := dists.NewLogLogisticDist(shape, scale) //Problema, não entendi oq foi feito aqui
 
 	if err != nil {
-		return nil, fmt.Errorf("erro ao gerar distribuição de uso do wash_machine (min = %.2f, max = %.2f): %w", shape, scale, err)
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do wash_machine (shape = %.2f, scale = %.2f): %w", shape, scale, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))

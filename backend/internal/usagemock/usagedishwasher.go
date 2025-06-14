@@ -29,36 +29,49 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	var min, max float64
 	var dist dists.UniformDist
 	var err error
+	var d int
 
 	if sleepTime > returnHome { //Mas isso sempre é verdade .-.
 		if p < 0.05 {
 			min, max = float64(inverteHorarioCiclico(int32(sleepTime))), workTime
+			if min > max {
+				fmt.Printf("sleep time = min é %1.f \n",sleepTime)
+				fmt.Printf("work time = min é %1.f \n",workTime)
+			}
+			d = 1
 		} else if p < 0.3 {
 			min, max = wakeUpTime, workTime
+			d = 2
 		} else {
 			min, max = returnHome, sleepTime
+			d = 3
 		}
 	} else { //Essa condição é sempre falsa
 		if p < 0.025 {
 			min, max = sleepTime, wakeUpTime // Isso literalmente retorna erro, pois Min > Max
+			d = 4
 		} else if p < 0.3 {
 			min, max = wakeUpTime, workTime
+			d = 5
 		} else {
 			if sleepTime < returnHome { //Isso é literalmente impossivel
 				if p < ((86400-returnHome) / (86400-returnHome+sleepTime)) {
 					min, max = returnHome, sleepTime
+					d = 6
 				} else {
 					min, max = 0, sleepTime // Isso literalmente ignora a rotina
+					d = 7
 				}
 			} else {
 				min, max = returnHome, sleepTime
+				d = 8
 			}
 		}
 	}
 
 	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao gerar distribuição de uso do dish_washer (min = %.2f, max = %.2f): %w", min, max, err)
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do dish_washer (p = %.4f), (decisão = %d): %w", p,d, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))

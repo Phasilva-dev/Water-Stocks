@@ -29,27 +29,35 @@ func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	var min, max float64
 	var dist dists.UniformDist
 	var err error
+	var d int
 	
 	switch {
 	case p < 0.05:
 		min, max = float64(inverteHorarioCiclico(int32(wakeUpTime))), 86400
+		d = 1
 	case p < 0.15:
 		min, max = wakeUpTime, wakeUpTime+1800
+		d = 2
 	case p < 0.20:
 		min, max = wakeUpTime+1800, workTime-1800
+		d = 2
 	case p < 0.325:
 		min, max = workTime-1800, workTime
+		d = 3
 	case p < 0.45:
 		min, max = returnHome, returnHome+1800
+		d = 4
 	case p < 0.55:
 		min, max = sleepTime-1800, sleepTime
+		d = 5
 	default:
 		min, max = returnHome, sleepTime-1800
+		d = 6
 	}
 
 	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao gerar distribuição de uso do toilet (min = %.2f, max = %.2f): %w", min, max, err)
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do toilet (p = %.4f), (decisao = %d): %w", p, d, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))

@@ -7,8 +7,8 @@ import (
 	"simulation/internal/entities/resident/ds/behavioral"
 )
 
-// FrequencyProfileDay agrega múltiplos FrequencyProfile para diferentes pontos
-// de consumo de água em um domicílio (vaso, chuveiro, lavatório, etc.).
+// FrequencyProfileDay agrega múltiplos FrequencyProfile, cada um representando
+// a frequência de uso de um tipo específico de aparelho sanitário em um domicílio.
 type FrequencyProfileDay struct {
 	freqToilet      *FrequencyProfile
 	freqShower      *FrequencyProfile
@@ -18,10 +18,11 @@ type FrequencyProfileDay struct {
 	freqTanque      *FrequencyProfile
 }
 
-// NewFrequencyProfileDay cria um novo FrequencyProfileDay a partir de um mapa
-// associando tipos de uso a perfis. Chaves esperadas: "toilet", "shower",
-// "washBassin", "washMachine", "dishWasher", "tanque".
-// Perfis ausentes são tratados como nil.
+// NewFrequencyProfileDay cria um novo FrequencyProfileDay.
+//
+// Recebe um mapa onde as chaves são nomes de tipos de uso (ex: "toilet", "shower")
+// e os valores são os perfis de frequência correspondentes.
+// Perfis não fornecidos no mapa (chaves ausentes) serão definidos como nil.
 func NewFrequencyProfileDay(profiles map[string]*FrequencyProfile) *FrequencyProfileDay {
 	return &FrequencyProfileDay{
 		freqToilet:      profiles["toilet"],
@@ -33,18 +34,26 @@ func NewFrequencyProfileDay(profiles map[string]*FrequencyProfile) *FrequencyPro
 	}
 }
 
-// Getters para os perfis de frequência por tipo de uso.
-// Podem retornar nil se o perfil correspondente não estiver definido.
+// FreqToilet retorna o perfil de frequência para vaso sanitário. Pode ser nil.
+func (f *FrequencyProfileDay) FreqToilet() *FrequencyProfile { return f.freqToilet }
 
-func (f *FrequencyProfileDay) FreqToilet() *FrequencyProfile      { return f.freqToilet }
-func (f *FrequencyProfileDay) FreqShower() *FrequencyProfile      { return f.freqShower }
-func (f *FrequencyProfileDay) FreqWashBassin() *FrequencyProfile  { return f.freqWashBassin }
+// FreqShower retorna o perfil de frequência para chuveiro. Pode ser nil.
+func (f *FrequencyProfileDay) FreqShower() *FrequencyProfile { return f.freqShower }
+
+// FreqWashBassin retorna o perfil de frequência para lavatório. Pode ser nil.
+func (f *FrequencyProfileDay) FreqWashBassin() *FrequencyProfile { return f.freqWashBassin }
+
+// FreqWashMachine retorna o perfil de frequência para máquina de lavar roupas. Pode ser nil.
 func (f *FrequencyProfileDay) FreqWashMachine() *FrequencyProfile { return f.freqWashMachine }
-func (f *FrequencyProfileDay) FreqDishWasher() *FrequencyProfile  { return f.freqDishWasher }
-func (f *FrequencyProfileDay) FreqTanque() *FrequencyProfile      { return f.freqTanque }
 
-// validateFrequencyProfile é uma função auxiliar para gerar dados de um perfil,
-// retornando 0 se o perfil for nil.
+// FreqDishWasher retorna o perfil de frequência para lava-louças. Pode ser nil.
+func (f *FrequencyProfileDay) FreqDishWasher() *FrequencyProfile { return f.freqDishWasher }
+
+// FreqTanque retorna o perfil de frequência para tanque. Pode ser nil.
+func (f *FrequencyProfileDay) FreqTanque() *FrequencyProfile { return f.freqTanque }
+
+// validateFrequencyProfile é uma função auxiliar que gera dados de um perfil de frequência.
+// Se o perfil for nil, retorna 0; caso contrário, usa o perfil para gerar os dados.
 func validateFrequencyProfile(profile *FrequencyProfile, rng *rand.Rand) uint8 {
 	if profile == nil {
 		return 0
@@ -52,8 +61,14 @@ func validateFrequencyProfile(profile *FrequencyProfile, rng *rand.Rand) uint8 {
 	return profile.GenerateData(rng)
 }
 
-// GenerateData retorna uma estrutura Frequency com os valores de uso gerados
-// a partir dos perfis definidos. Perfis não definidos resultam em valor 0.
+// GenerateData gera e retorna uma nova estrutura behavioral.Frequency.
+//
+// Popula a estrutura com os valores de uso diário gerados a partir de cada perfil
+// de frequência configurado no FrequencyProfileDay.
+// Se um perfil específico não estiver definido (nil), seu valor correspondente na estrutura
+// behavioral.Frequency será 0.
+//
+// rng: O gerador de números aleatórios a ser usado para a geração dos dados.
 func (f *FrequencyProfileDay) GenerateData(rng *rand.Rand) *behavioral.Frequency {
 	return behavioral.NewFrequency(
 		validateFrequencyProfile(f.freqToilet, rng),

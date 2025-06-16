@@ -31,7 +31,7 @@ func (f *FrequencyProfile) StatDist() dists.Distribution {
 // uma distribuição estatística base. Retorna erro se a distribuição for nula.
 func NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
 	if dist == nil {
-		return nil, errors.New("a distribuição não pode ser nula")
+		return nil, errors.New("distribution cannot be null")
 	}
 
 	return &FrequencyProfile{

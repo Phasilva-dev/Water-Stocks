@@ -79,5 +79,5 @@ func GenerateWashBassinUsage(routine *behavioral.Routine, device sanitarydevice.
 	startUsage := int32(dist.Sample(rng))
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
 }

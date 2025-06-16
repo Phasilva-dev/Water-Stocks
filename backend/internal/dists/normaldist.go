@@ -31,6 +31,10 @@ func (n *NormalDist) StdDev() float64 {
 	return n.stdDev
 }
 
+func (n *NormalDist) Params() []float64 {
+	return []float64{n.mean, n.stdDev}
+}
+
 // NewNormalDist cria e retorna uma nova instância de NormalDist.
 //
 // Recebe a média (mean) e o desvio padrão (stdDev) como parâmetros.
@@ -67,6 +71,16 @@ func (n *NormalDist) Sample(rng *rand.Rand) float64 {
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
 }
+
+func (n *NormalDist) Percentile(p float64) float64 {
+	dist := distuv.Normal{
+		Mu:    n.mean,
+		Sigma: n.stdDev,
+		// Sem Src porque Percentile não usa aleatoriedade
+	}
+	return dist.Quantile(p)
+}
+
 
 // String retorna uma representação textual da distribuição Normal,
 // formatada como "NormalDist{mean: X.XX, stdDev: Y.YY}".

@@ -19,7 +19,11 @@ type LogNormalDist struct {
 	mean float64
 	// std é o desvio padrão (σ) da distribuição Normal subjacente associada.
 	// Deve ser um valor estritamente positivo (> 0).
-	std float64
+	stdDev float64
+}
+
+func (n *LogNormalDist) Params() []float64 {
+	return []float64{n.mean, n.stdDev}
 }
 
 // Mean retorna a média (µ) da distribuição Normal subjacente
@@ -30,8 +34,8 @@ func (l *LogNormalDist) Mean() float64 {
 
 // Std retorna o desvio padrão (σ) da distribuição Normal subjacente
 // associada a esta distribuição Log-Normal.
-func (l *LogNormalDist) Std() float64 {
-	return l.std
+func (l *LogNormalDist) StdDev() float64 {
+	return l.stdDev
 }
 
 // NewLogNormalDist cria e retorna uma nova instância de LogNormalDist.
@@ -47,7 +51,7 @@ func NewLogNormalDist(mean, std float64) (*LogNormalDist, error) {
 	// Cria e retorna a instância da distribuição se os parâmetros são válidos.
 	return &LogNormalDist{
 		mean: mean,
-		std:  std,
+		stdDev:  std,
 	}, nil
 }
 
@@ -61,11 +65,19 @@ func (l *LogNormalDist) Sample(rng *rand.Rand) float64 {
 	// Cria uma instância da distribuição LogNormal do Gonum.
 	dist := distuv.LogNormal{
 		Mu:    l.mean, // Mu (média da Normal subjacente) corresponde ao nosso mean.
-		Sigma: l.std,  // Sigma (desvio padrão da Normal subjacente) corresponde ao nosso std.
+		Sigma: l.stdDev,  // Sigma (desvio padrão da Normal subjacente) corresponde ao nosso std.
 		Src:   rng,    // Define a fonte de aleatoriedade.
 	}
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
+}
+
+func (l *LogNormalDist) Percentile(p float64) float64 {
+	dist := distuv.LogNormal{
+		Mu:    l.mean, // Mu (média da Normal subjacente) corresponde ao nosso mean.
+		Sigma: l.stdDev,  // Sigma (desvio padrão da Normal subjacente) corresponde ao nosso std.
+	}
+	return dist.Quantile(p)
 }
 
 // String retorna uma representação textual da distribuição Log-Normal,
@@ -73,5 +85,5 @@ func (l *LogNormalDist) Sample(rng *rand.Rand) float64 {
 // Note que 'mean' e 'std' referem-se aos parâmetros da Normal subjacente.
 func (l *LogNormalDist) String() string {
 	// Formata a string de saída com os valores de mean e std da Normal subjacente.
-	return fmt.Sprintf("LogNormalDist{mean: %.2f, std: %.2f}", l.mean, l.std)
+	return fmt.Sprintf("LogNormalDist{mean: %.2f, std: %.2f}", l.mean, l.stdDev)
 }

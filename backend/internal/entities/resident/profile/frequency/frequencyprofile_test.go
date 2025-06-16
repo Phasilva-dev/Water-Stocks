@@ -23,6 +23,14 @@ func (m *MockDistribution) String() string {
 	return "MockDistribution"
 }
 
+func (m *MockDistribution) Params() []float64 {
+	return []float64{m.returnValue}
+}
+
+func (m *MockDistribution) Percentile(p float64) float64 {
+	return 3.22
+}
+
 func TestNewFrequencyProfile(t *testing.T) {
 	// Testa criação com distribuição válida
 	shift := uint8(10)

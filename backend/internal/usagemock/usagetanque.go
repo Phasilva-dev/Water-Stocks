@@ -42,7 +42,7 @@ func GenerateTanqueUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 			// Isso permite a pessao lavar roupa enquanto dorme
 		}
 	} else {
-		min, max = wakeUpTime+3600, workTime-1800 
+		min, max = wakeUpTime+900, workTime-900 //wakeUpTime+3600, workTime-1800
 		d = 3
 		// Isso permite a pessoa potencialmente lavar roupa enquanto trabalha
 	}

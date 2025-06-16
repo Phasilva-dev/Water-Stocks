@@ -13,6 +13,10 @@ type LogLogisticDist struct {
 	scale float64 // β, parâmetro de escala
 }
 
+func (l *LogLogisticDist) Params() []float64 {
+	return []float64{l.shape, l.scale}
+}
+
 // Shape retorna o parâmetro de forma (α).
 func (ll *LogLogisticDist) Shape() float64 {
 	return ll.shape
@@ -47,6 +51,29 @@ func (ll *LogLogisticDist) Sample(rng *rand.Rand) float64 {
 	}
 	return ll.scale * math.Pow(u/(1-u), 1/ll.shape)
 }
+
+// Percentile calcula o valor x tal que P(X <= x) = p.
+// p deve estar no intervalo [0, 1].
+func (ll *LogLogisticDist) Percentile(p float64) float64 {
+	if p < 0 || p > 1 {
+		// Comportamento comum para p fora do domínio [0,1] é retornar NaN.
+		return math.NaN()
+	}
+	if p == 0 {
+		// Se p = 0, x = β * (0 / 1)^(1/α) = β * 0 = 0.
+		return 0.0
+	}
+	if p == 1 {
+		// Se p = 1, x = β * (1 / 0)^(1/α) = β * ∞^(1/α) = ∞.
+		return math.Inf(1) // Retorna +Infinito
+	}
+
+	// Fórmula da função quantil: β * (p / (1-p))^(1/α)
+	// α = ll.shape
+	// β = ll.scale
+	return ll.scale * math.Pow(p/(1.0-p), 1.0/ll.shape)
+}
+
 
 // String retorna uma representação textual da distribuição.
 func (ll *LogLogisticDist) String() string {

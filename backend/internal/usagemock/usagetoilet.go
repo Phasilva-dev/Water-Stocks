@@ -32,27 +32,31 @@ func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	var d int
 	
 	switch {
+
+	case p < 0.025: 
+		min, max = sleepTime - 86400, 86400 //Se possivel, seria bom não usar valores fixos
+    	d = 1
 	case p < 0.05:
-		min, max = float64(inverteHorarioCiclico(int32(wakeUpTime))), 86400
-		d = 1
+		min, max = 0, wakeUpTime //Se possivel, seria bom não usar valores fixos
+    	d = -1
 	case p < 0.15:
 		min, max = wakeUpTime, wakeUpTime+1800
 		d = 2
 	case p < 0.20:
-		min, max = wakeUpTime+1800, workTime-1800
-		d = 2
+		min, max = wakeUpTime+900, workTime-900 //min, max = wakeUpTime+1800, workTime-1800
+		d = 3
 	case p < 0.325:
 		min, max = workTime-1800, workTime
-		d = 3
+		d = 4
 	case p < 0.45:
 		min, max = returnHome, returnHome+1800
-		d = 4
+		d = 5
 	case p < 0.55:
 		min, max = sleepTime-1800, sleepTime
-		d = 5
+		d = 6
 	default:
 		min, max = returnHome, sleepTime-1800
-		d = 6
+		d = 7
 	}
 
 	dist, err = dists.UniformDistNew(min, max)

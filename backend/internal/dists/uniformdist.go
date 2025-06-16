@@ -20,6 +20,10 @@ type UniformDist struct {
 	max float64
 }
 
+func (u *UniformDist) Params() []float64 {
+	return []float64{u.min, u.max}
+}
+
 // Min retorna o limite inferior (min) da distribuição Uniforme.
 func (u *UniformDist) Min() float64 {
 	return u.min
@@ -82,6 +86,15 @@ func (u *UniformDist) Sample(rng *rand.Rand) float64 {
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
 }
+
+func (u *UniformDist) Percentile(p float64) float64 {
+	dist := distuv.Uniform{
+		Min: u.min, // Define o limite inferior.
+		Max: u.max, // Define o limite superior.
+	}
+	return dist.Quantile(p)
+}
+
 
 // String retorna uma representação textual da distribuição Uniforme,
 // formatada como "UniformDist{min: X.XX, max: Y.YY}".

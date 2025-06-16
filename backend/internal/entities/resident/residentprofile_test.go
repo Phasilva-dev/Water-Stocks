@@ -35,7 +35,7 @@ var frequencyProfileMock, _ = frequency.NewFrequencyProfile(mockFreqDist, 0)
 
 var routineProfileMock, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockWakeUpDist, mockWorkTimeDist, mockReturnHomeDist, mockSleepTimeDist},
-	0,
+	0,0,
 )
 
 var rdp = habits.NewResidentDayProfile(routineProfileMock, frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyProfile{

@@ -32,13 +32,12 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	var d int
 
 	if sleepTime > returnHome { //Mas isso sempre é verdade .-.
-		if p < 0.05 {
-			min, max = float64(inverteHorarioCiclico(int32(sleepTime))), workTime
-			if min > max {
-				fmt.Printf("sleep time = min é %1.f \n",sleepTime)
-				fmt.Printf("work time = min é %1.f \n",workTime)
-			}
-			d = 1
+		if p < 0.025 {
+			min, max = sleepTime - 86400, 86400 //Se possivel, seria bom não usar valores fixos
+    		d = 1
+		} else if p < 0.05 {
+			min, max = 0, wakeUpTime //Se possivel, seria bom não usar valores fixos
+    		d = -1
 		} else if p < 0.3 {
 			min, max = wakeUpTime, workTime
 			d = 2

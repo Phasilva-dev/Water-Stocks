@@ -19,6 +19,11 @@ type GammaDist struct {
 	scale float64
 }
 
+func (g *GammaDist) Params() []float64 {
+	return []float64{g.shape, g.scale}
+}
+
+
 // Shape retorna o parâmetro de forma (α) da distribuição Gamma.
 func (g *GammaDist) Shape() float64 {
 	return g.shape
@@ -49,6 +54,8 @@ func NewGammaDist(shape, scale float64) (*GammaDist, error) {
 	}, nil
 }
 
+
+
 // Sample gera uma amostra aleatória (um valor) da distribuição Gamma.
 //
 // Utiliza a fonte de números aleatórios (rng *rand.Rand) fornecida.
@@ -63,6 +70,14 @@ func (g *GammaDist) Sample(rng *rand.Rand) float64 {
 	}
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
+}
+
+func (g *GammaDist) Percentile(p float64) float64 {
+	dist := distuv.Gamma{
+		Alpha: g.shape,     // Alpha (forma) corresponde ao nosso shape.
+		Beta:  1 / g.scale, // Beta (rate) é o inverso do nosso scale.
+	}
+	return dist.Quantile(p)
 }
 
 // String retorna uma representação textual da distribuição Gamma,

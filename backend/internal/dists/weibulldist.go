@@ -39,6 +39,10 @@ func NewWeibullDist(shape, scale float64) (*WeibullDist, error) {
 	}, nil
 }
 
+func (w *WeibullDist) Params() []float64 {
+	return []float64{w.shape, w.scale}
+}
+
 // Shape retorna o parâmetro de forma (k) da distribuição de Weibull.
 func (w *WeibullDist) Shape() float64 {
 	return w.shape
@@ -63,6 +67,14 @@ func (w *WeibullDist) Sample(rng *rand.Rand) float64 {
 	}
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
+}
+
+func (w *WeibullDist) Percentile(p float64) float64 {
+	dist := distuv.Weibull{
+		K:      w.shape, // K (forma) corresponde ao nosso shape.
+		Lambda: w.scale, // Lambda (escala) corresponde ao nosso scale.
+	}
+	return dist.Quantile(p)
 }
 
 // String retorna uma representação textual da distribuição de Weibull,

@@ -34,7 +34,7 @@ func (f *FrequencyProfile) StatDist() dists.Distribution {
 // Retorna um ponteiro para o FrequencyProfile ou um erro se a distribuição for nula.
 func NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
 	if dist == nil {
-		return nil, errors.New("distribution cannot be nil") // Corrigido para "nil"
+		return nil, errors.New("invalid FrequencyProfile: distribution cannot be nil \n ")
 	}
 
 	return &FrequencyProfile{

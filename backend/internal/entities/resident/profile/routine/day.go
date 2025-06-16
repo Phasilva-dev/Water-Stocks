@@ -104,7 +104,6 @@ func (r *RoutineProfile) enforceMinShift(prev, current float64) float64 {
 // Caso contrário, 'sample' é truncado para o valor do percentil se for maior.
 func (r *RoutineProfile) enforceMaxValue(dist dists.Distribution, sample float64) float64 {
 	if r.maxPercent >= 1 || r.maxPercent <= 0 {
-		// Sem limite por percentil (ou com percentil que não faz sentido limitar)
 		return sample
 	}
 

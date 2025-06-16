@@ -14,7 +14,7 @@ type ResidentWeeklyProfile struct {
 
 func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProfile, error) {
 	if len(values) > 7 || len(values) == 0 {
-		return nil, fmt.Errorf("invalid ResidentWeeklyProfile: list must contain between 1 and 7 entries (got entries = %d) \n ", len(values))
+		return nil, fmt.Errorf("invalid ResidentWeeklyProfile: 'values' slice must contain between 1 and 7 entries (got entries = %d) \n ", len(values))
 	}
 
 	return &ResidentWeeklyProfile{

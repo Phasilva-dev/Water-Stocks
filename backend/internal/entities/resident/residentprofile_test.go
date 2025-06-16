@@ -76,7 +76,7 @@ func TestNewResidentProfile_NilWeeklyProfile(t *testing.T) {
 	if rp != nil {
 		t.Error("expected nil ResidentProfile, got non-nil")
 	}
-	expectedErr := "weekly profile cannot be nil"
+	expectedErr := "invalid ResidentProfile: weekly profile cannot be nil"
 	if err.Error() != expectedErr {
 		t.Errorf("expected error '%s', got '%s'", expectedErr, err.Error())
 	}

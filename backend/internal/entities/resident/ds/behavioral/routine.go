@@ -2,64 +2,72 @@
 // de residentes em casa, com base em eventos-chave ao longo do dia.
 package behavioral
 
-import () // Pode ser ajustado automaticamente por goimports.
-
-// Routine representa uma sequência de horários (timestamps) de eventos diários
-// na rotina de um residente, como acordar, sair, retornar e dormir.
+// Routine representa uma sequência de horários (timestamps em segundos desde a meia-noite)
+// de eventos importantes na rotina de um residente, como acordar, sair, retornar e dormir.
+// Os tempos devem estar em ordem cronológica.
 type Routine struct {
-	times []float64 // Timestamps em ordem cronológica.
+	times []float64 // Timestamps dos eventos em segundos.
 }
 
-// NewRoutine cria uma nova instância de Routine com os horários fornecidos.
+// NewRoutine cria e retorna uma nova instância de Routine com os horários fornecidos.
 //
-// Nota: o slice passado não é copiado — alterações externas ao slice original
-// afetam diretamente a rotina. Se desejar imutabilidade, passe uma cópia.
+// times: Um slice de float64 representando os horários dos eventos. O slice é armazenado
+//        por referência; portanto, modificações externas ao slice original afetarão esta rotina.
+//        É responsabilidade do chamador garantir que os horários estejam em ordem cronológica.
+//
+// Retorna um ponteiro para a estrutura Routine.
 func NewRoutine(times []float64) *Routine {
 	return &Routine{times: times}
 }
 
-// Métodos de acesso à rotina.
-
 // Times retorna o slice completo de horários da rotina.
-// O slice retornado é o mesmo armazenado internamente.
+// O slice retornado é o mesmo armazenado internamente, ou seja, é uma referência.
+// Modificações no slice retornado afetarão a rotina.
 func (r *Routine) Times() []float64 {
 	return r.times
 }
 
-// WakeupTime retorna o primeiro horário da rotina (ex: acordar).
-// Presume que o slice não está vazio.
+// WakeupTime retorna o horário do primeiro evento na rotina, tipicamente o horário de acordar.
+//
+// Pré-condição: O slice 'times' deve conter ao menos um elemento.
+// Panics: Se o slice 'times' estiver vazio.
 func (r *Routine) WakeupTime() float64 {
 	return r.times[0]
 }
 
-// WorkTime retorna o segundo horário da rotina (ex: saída para o trabalho).
-// Presume ao menos dois eventos no slice.
+// WorkTime retorna o horário do segundo evento na rotina, tipicamente a saída de casa para o trabalho.
+//
+// Pré-condição: O slice 'times' deve conter ao menos dois elementos.
+// Panics: Se o slice 'times' tiver menos de dois elementos.
 func (r *Routine) WorkTime() float64 {
 	return r.times[1]
 }
 
-
-// ReturnHome retorna o terceiro horário da rotina (ex: retorno para casa).
-// Presume ao menos três eventos no slice.
+// ReturnHome retorna o horário do terceiro evento na rotina, tipicamente o retorno para casa.
+//
+// Pré-condição: O slice 'times' deve conter ao menos três elementos.
+// Panics: Se o slice 'times' tiver menos de três elementos.
 func (r *Routine) ReturnHome() float64 {
 	return r.times[2]
 }
 
-// SleepTime retorna o último horário da rotina (ex: dormir).
-// Presume que o slice não está vazio.
+// SleepTime retorna o horário do último evento na rotina, tipicamente o horário de dormir.
+//
+// Pré-condição: O slice 'times' deve conter ao menos um elemento.
+// Panics: Se o slice 'times' estiver vazio.
 func (r *Routine) SleepTime() float64 {
 	return r.times[len(r.times)-1]
 }
 
 /*
-Tanto ReturnHome quanto SleepTime foram feitos apenas para seguir um modelo feito previamente em MATLAB
-Observação: As funções acima seguem uma estrutura baseada em um modelo MATLAB
-anterior. Elas presumem uma ordem fixa de eventos no slice `times`.
+As funções WakeupTime, WorkTime, ReturnHome e SleepTime foram projetadas
+para seguir uma estrutura de modelo feita previamente em MATLAB. Elas assumem
+uma ordem fixa e um número mínimo de eventos no slice `times` (e podem causar panic
+se as pré-condições não forem atendidas).
 
-Sinta-se à vontade para adaptar esse modelo ou criar um novo baseado
-em parâmetros dinâmicos — este código foi projetado com essa flexibilidade em mente.
-
-A ideia inicial era criar um software de análise exploratória de dados,
+Este código foi projetado com flexibilidade em mente para adaptações futuras
+ou para a criação de novos modelos baseados em parâmetros dinâmicos. A ideia
+inicial era criar um software de análise exploratória de dados,
 então a estrutura está aberta para evolução!
 */
 

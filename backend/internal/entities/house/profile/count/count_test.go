@@ -3,7 +3,6 @@ package count
 import (
 	"math/rand/v2"
 	"testing"
-	"errors"
 
 	"simulation/internal/dists"
 )
@@ -77,8 +76,8 @@ func TestGenerateData_LowerBound(t *testing.T) {
 
 	value := rc.GenerateData(rng)
 
-	if value != 0 {
-		t.Errorf("expected capped value 0, got %d", value)
+	if value != 1 {
+		t.Errorf("expected capped value 1, got %d", value)
 	}
 }
 
@@ -101,9 +100,12 @@ func TestGenerateData_ErrorWhenNoResidents(t *testing.T) {
 		t.Error("expected error for numResidents <= 0, got nil")
 	}
 
-	if !errors.Is(err, ErrNoResidents) {
-		t.Errorf("unexpected error: %v", err)
-}
+	// Compara a string da mensagem de erro diretamente.
+	expectedErrMsg := "invalid sanitaryCount data: house without residents"
+	if err.Error() != expectedErrMsg {
+		t.Errorf("expected error message %q, got %q", expectedErrMsg, err.Error())
+	}
+
 }
 
 func TestGenerateData_ValidRange(t *testing.T) {

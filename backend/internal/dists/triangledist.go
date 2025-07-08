@@ -23,6 +23,10 @@ type TriangleDist struct {
 	c float64
 }
 
+func (t *TriangleDist) Params() []float64 {
+	return []float64{t.a, t.b, t.c}
+}
+
 // A retorna o limite inferior (a) da distribuição Triangular.
 func (t *TriangleDist) A() float64 {
 	return t.a
@@ -73,6 +77,12 @@ func (t *TriangleDist) Sample(rng *rand.Rand) float64 {
 	dist := distuv.NewTriangle(t.a, t.c, t.b, rng)
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
+}
+
+func (t *TriangleDist) Percentile(p float64) float64 {
+
+	dist := distuv.NewTriangle(t.a, t.c, t.b, nil) // rand.Source é nil
+	return dist.Quantile(p)
 }
 
 // String retorna uma representação textual da distribuição Triangular,

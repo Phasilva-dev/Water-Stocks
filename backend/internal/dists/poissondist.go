@@ -19,6 +19,10 @@ type PoissonDist struct {
 	lambda float64
 }
 
+func (p *PoissonDist) Params() []float64 {
+	return []float64{p.lambda}
+}
+
 // Lambda retorna o parâmetro de taxa (λ) da distribuição de Poisson.
 func (p *PoissonDist) Lambda() float64 {
 	return p.lambda
@@ -56,6 +60,27 @@ func (p *PoissonDist) Sample(rng *rand.Rand) float64 {
 	}
 	// Gera e retorna um número aleatório (inteiro, como float64) da distribuição.
 	return dist.Rand()
+}
+
+func (pd *PoissonDist) Percentile(p float64) float64 {
+	if p < 0 || p > 1 {
+		panic("Percentile must be in [0, 1]")
+	}
+
+	dist := distuv.Poisson{
+		Lambda: pd.lambda,
+	}
+
+	cdf := 0.0
+	k := 0.0
+
+	for {
+		cdf += dist.Prob(k)
+		if cdf >= p {
+			return k
+		}
+		k++
+	}
 }
 
 // String retorna uma representação textual da distribuição de Poisson,

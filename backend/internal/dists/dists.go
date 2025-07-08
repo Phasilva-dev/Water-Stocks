@@ -18,9 +18,13 @@ type Distribution interface {
 	// utilizando a fonte de números aleatórios (rng) fornecida.
 	Sample(rng *rand.Rand) float64
 
+	Percentile(p float64) float64
+
 	// String retorna uma representação textual da distribuição, geralmente
 	// incluindo seu tipo e os valores de seus parâmetros formatados.
 	String() string
+
+	Params() []float64
 }
 
 // CreateDistribution é uma função fábrica que cria e retorna uma instância de uma

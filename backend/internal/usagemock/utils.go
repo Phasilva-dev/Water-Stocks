@@ -5,8 +5,12 @@ import(
 
 // InverteHorarioCiclico inverte um horário mantendo a referência cíclica
 // Retorna o horário invertido podendo ser negativo para indicar dia anterior
-func inverteHorarioCiclico(horario int32) int32 {
+/*func inverteHorarioCiclico(horario int32) int32 {
 	const totalSegundosDia = 86400
+
+	if horario >= 86400 {
+		return horario - 86400
+	}
 	
 	// Se for positivo, inverte normalmente
 	if horario >= 0 {
@@ -27,4 +31,4 @@ func inverteHorarioCiclico(horario int32) int32 {
 	}
 	
 	return -invertidoPositivo
-}
+}*/

@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/resident/ds/behavioral"
 	"simulation/internal/entities/house/profile/sanitarydevice"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -26,42 +26,56 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
+	var d int
 
 	if sleepTime > returnHome { //Mas isso sempre é verdade .-.
-		if p < 0.05 {
-			dist, err = dists.UniformDistNew(float64(inverteHorarioCiclico(int32(sleepTime))), workTime)
+		if p < 0.025 {
+			min, max = sleepTime - 86400, 86400 //Se possivel, seria bom não usar valores fixos
+    		d = 1
+		} else if p < 0.05 {
+			min, max = 0, wakeUpTime //Se possivel, seria bom não usar valores fixos
+    		d = -1
 		} else if p < 0.3 {
-			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+			min, max = wakeUpTime, workTime
+			d = 2
 		} else {
-			dist, err = dists.UniformDistNew(returnHome, sleepTime)
+			min, max = returnHome, sleepTime
+			d = 3
 		}
 	} else { //Essa condição é sempre falsa
 		if p < 0.025 {
-			dist, err = dists.UniformDistNew(sleepTime, wakeUpTime) // Isso literalmente retorna erro, pois Min > Max
+			min, max = sleepTime, wakeUpTime // Isso literalmente retorna erro, pois Min > Max
+			d = 4
 		} else if p < 0.3 {
-			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+			min, max = wakeUpTime, workTime
+			d = 5
 		} else {
 			if sleepTime < returnHome { //Isso é literalmente impossivel
 				if p < ((86400-returnHome) / (86400-returnHome+sleepTime)) {
-					dist, err = dists.UniformDistNew(returnHome, sleepTime)
+					min, max = returnHome, sleepTime
+					d = 6
 				} else {
-					dist, err = dists.UniformDistNew(0, sleepTime) // Isso literalmente ignora a rotina
+					min, max = 0, sleepTime // Isso literalmente ignora a rotina
+					d = 7
 				}
 			} else {
-				dist, err = dists.UniformDistNew(returnHome, sleepTime)
+				min, max = returnHome, sleepTime
+				d = 8
 			}
 		}
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do dish_washer (p = %.4f), (decisão = %d): %w", p,d, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
 
 }

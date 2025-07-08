@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 /*get_up = WakeUpTime
@@ -19,40 +19,52 @@ type UsageToilet struct {
 
 func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.SanitaryDevice,
 	 rng *rand.Rand,) (*log.Usage, error) {
-	probDist, _ := dists.UniformDistNew(0, 1)
-	p := probDist.Sample(rng)
+	p := rng.Float64() //Isso é a mesma coisa que uma 0 a 1 uniform
 
 	workTime := routine.WorkTime()
 	wakeUpTime := routine.WakeupTime()
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 	
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
-	var startUsage int32
+	var d int
 	
 	switch {
+
+	case p < 0.025: 
+		min, max = sleepTime - 86400, 86400 //Se possivel, seria bom não usar valores fixos
+    	d = 1
 	case p < 0.05:
-		dist, err = dists.UniformDistNew(float64(inverteHorarioCiclico(int32(wakeUpTime))), 86400)
+		min, max = 0, wakeUpTime //Se possivel, seria bom não usar valores fixos
+    	d = -1
 	case p < 0.15:
-		dist, err = dists.UniformDistNew(wakeUpTime, wakeUpTime+1800)
+		min, max = wakeUpTime, wakeUpTime+1800
+		d = 2
 	case p < 0.20:
-		dist, err = dists.UniformDistNew(wakeUpTime+1800, workTime-1800)
+		min, max = wakeUpTime+900, workTime-900 //min, max = wakeUpTime+1800, workTime-1800
+		d = 3
 	case p < 0.325:
-		dist, err = dists.UniformDistNew(workTime-1800, workTime)
+		min, max = workTime-1800, workTime
+		d = 4
 	case p < 0.45:
-		dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+		min, max = returnHome, returnHome+1800
+		d = 5
 	case p < 0.55:
-		dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+		min, max = sleepTime-1800, sleepTime
+		d = 6
 	default:
-		dist, err = dists.UniformDistNew(returnHome, sleepTime-1800)
+		min, max = returnHome, sleepTime-1800
+		d = 7
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do toilet (p = %.4f), (decisao = %d): %w", p, d, err)
 	}
 
-	startUsage = int32(dist.Sample(rng))
+	startUsage := int32(dist.Sample(rng))
 
 	durationUsage := device.GenerateDuration(rng)
 
@@ -60,6 +72,6 @@ func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
 
 }

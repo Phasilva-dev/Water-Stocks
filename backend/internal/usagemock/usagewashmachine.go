@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -18,10 +18,13 @@ return_home = time_out + work_time = ReturnHome*/
 func GenerateWashMachineUsage(routine *behavioral.Routine, device sanitarydevice.SanitaryDevice,
 	 rng *rand.Rand,) (*log.Usage, error) {
 	
-	dist, err := dists.NewLogLogisticDist(10.448, 0.167418) //Problema, não entendi oq foi feito aqui
+
+	shape := 10.448
+	scale := 0.167418
+	dist, err := dists.NewLogLogisticDist(shape, scale) //Problema, não entendi oq foi feito aqui
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do wash_machine (shape = %.2f, scale = %.2f): %w", shape, scale, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))
@@ -32,7 +35,7 @@ func GenerateWashMachineUsage(routine *behavioral.Routine, device sanitarydevice
 
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
 
 
 }

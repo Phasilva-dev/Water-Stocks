@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -19,6 +18,10 @@ type UniformDist struct {
 	min float64
 	// max é o limite superior (exclusivo) do intervalo da distribuição.
 	max float64
+}
+
+func (u *UniformDist) Params() []float64 {
+	return []float64{u.min, u.max}
 }
 
 // Min retorna o limite inferior (min) da distribuição Uniforme.
@@ -39,9 +42,9 @@ func (u *UniformDist) Max() float64 {
 // A função NewUniformDist é a alternativa que retorna um ponteiro.
 func UniformDistNew(min, max float64) (UniformDist, error) {
 	// Verifica se min é menor que max.
-	if min >= max {
+	if min > max {
 		// Retorna erro se a condição min < max não for atendida.
-		return UniformDist{}, errors.New("parâmetro min deve ser menor que max")
+		return UniformDist{}, fmt.Errorf("parâmetro min deve ser menor que max: min=%.2f, max=%.2f", min, max)
 	}
 	// Cria e retorna a instância da distribuição pelo valor.
 	return UniformDist{
@@ -57,9 +60,9 @@ func UniformDistNew(min, max float64) (UniformDist, error) {
 // Este é o padrão mais comum em Go para construtores que podem falhar.
 func NewUniformDist(min, max float64) (*UniformDist, error) {
 	// Verifica se min é menor que max.
-	if min >= max {
+	if min > max {
 		// Retorna erro se a condição min < max não for atendida.
-		return nil, errors.New("parâmetro min deve ser menor que max")
+		return nil, fmt.Errorf("parâmetro min deve ser menor que max: min=%.2f, max=%.2f", min, max)
 	}
 	// Cria e retorna um ponteiro para a instância da distribuição.
 	return &UniformDist{
@@ -83,6 +86,15 @@ func (u *UniformDist) Sample(rng *rand.Rand) float64 {
 	// Gera e retorna um número aleatório da distribuição configurada.
 	return dist.Rand()
 }
+
+func (u *UniformDist) Percentile(p float64) float64 {
+	dist := distuv.Uniform{
+		Min: u.min, // Define o limite inferior.
+		Max: u.max, // Define o limite superior.
+	}
+	return dist.Quantile(p)
+}
+
 
 // String retorna uma representação textual da distribuição Uniforme,
 // formatada como "UniformDist{min: X.XX, max: Y.YY}".

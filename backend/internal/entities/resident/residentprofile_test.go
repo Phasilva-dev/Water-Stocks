@@ -35,7 +35,7 @@ var frequencyProfileMock, _ = frequency.NewFrequencyProfile(mockFreqDist, 0)
 
 var routineProfileMock, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockWakeUpDist, mockWorkTimeDist, mockReturnHomeDist, mockSleepTimeDist},
-	0,
+	0,0,
 )
 
 var rdp = habits.NewResidentDayProfile(routineProfileMock, frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyProfile{
@@ -76,7 +76,7 @@ func TestNewResidentProfile_NilWeeklyProfile(t *testing.T) {
 	if rp != nil {
 		t.Error("expected nil ResidentProfile, got non-nil")
 	}
-	expectedErr := "weekly profile cannot be nil"
+	expectedErr := "invalid ResidentProfile: weekly profile cannot be nil"
 	if err.Error() != expectedErr {
 		t.Errorf("expected error '%s', got '%s'", expectedErr, err.Error())
 	}

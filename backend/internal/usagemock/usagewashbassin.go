@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -26,46 +26,58 @@ func GenerateWashBassinUsage(routine *behavioral.Routine, device sanitarydevice.
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
+	var d int
 
 	if workTime-wakeUpTime < 3600 {
 		switch {
 		case p < ((workTime - wakeUpTime - float64(durationUsage)) / (workTime - wakeUpTime + 3600)):
-			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+			min, max = wakeUpTime, workTime
+			d = 1
 		case p < ((workTime - wakeUpTime + 1800) / (workTime - wakeUpTime + 3600)):
-			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+			min, max = returnHome, returnHome+1800
+			d = 2
 		default: // Esse bloco default está MUITO ERRADO
 			if sleepTime < 1800 { //Condição impossivel de ser atingida
 				switch {
 				case p < (sleepTime / 1800):
-					dist, err = dists.UniformDistNew(0, sleepTime) //Isso aqui literalmente diz que a pessoa pode lavar a mão mesmo fora de casa
+					min, max = 0, sleepTime //Isso aqui literalmente diz que a pessoa pode lavar a mão mesmo fora de casa
+					d = 3
 				default:
-					dist, err = dists.UniformDistNew(sleepTime-1800, 86400) 
+					min, max = sleepTime-1800, 86400
+					d = 4
 				}
 			} else {
-				dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+				min, max = sleepTime-1800, sleepTime
+				d = 5
 			}
 		}
 	} else {
 		switch {
 		case p < 0.15:
-			dist, err = dists.UniformDistNew(wakeUpTime, wakeUpTime+1800)
+			min, max = wakeUpTime, wakeUpTime+1800
+			d = 6
 		case p < 0.35:
-			dist, err = dists.UniformDistNew(workTime-1800, workTime)
+			min, max = workTime-1800, workTime
+			d = 7
 		case p < 0.75:
-			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+			min, max = returnHome, returnHome+1800
+			d = 8
 		default:
-			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			min, max = sleepTime-1800, sleepTime
+			d = 9
 		}
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do wash_bassin (p = %.4f), (decisao = %d): %w", p, d, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
 }

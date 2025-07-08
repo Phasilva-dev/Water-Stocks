@@ -1,7 +1,7 @@
 package habits
 
 import (
-	"errors"
+	"fmt"
 	"math/rand/v2"
 	"simulation/internal/entities/resident/ds/behavioral"
 )
@@ -14,7 +14,7 @@ type ResidentWeeklyProfile struct {
 
 func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProfile, error) {
 	if len(values) > 7 || len(values) == 0 {
-		return nil, errors.New("profile list must contain between 1 and 7 entries")
+		return nil, fmt.Errorf("invalid ResidentWeeklyProfile: 'values' slice must contain between 1 and 7 entries (got entries = %d) \n ", len(values))
 	}
 
 	return &ResidentWeeklyProfile{

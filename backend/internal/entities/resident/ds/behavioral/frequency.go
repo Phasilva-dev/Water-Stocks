@@ -2,37 +2,52 @@
 // por residentes, incluindo frequências diárias por tipo de ponto de consumo.
 package behavioral
 
-import () // Pode ser ajustado automaticamente por ferramentas como goimports.
+// (O import vazio foi removido, pois goimports ou o compilador o fariam de qualquer forma.
+//  É boa prática deixá-lo vazio se não houver imports reais para evitar warnings.)
 
-// Frequency armazena a frequência diária de uso de diferentes pontos de consumo
-// de água, divididos entre usos individuais e compartilhados.
-//
-// Use os métodos públicos para acessar os dados.
+// Frequency armazena a frequência diária de uso de diferentes pontos de consumo de água
+// dentro de uma residência. Os campos são privados para garantir acesso controlado via métodos.
 type Frequency struct {
 	// Uso individual
-	toilet     uint8 // Vaso sanitário
-	shower     uint8 // Chuveiro
-	washBassin uint8 // Pia do banheiro
+	toilet     uint8 // Frequência de uso do vaso sanitário.
+	shower     uint8 // Frequência de uso do chuveiro.
+	washBassin uint8 // Frequência de uso da pia do banheiro/lavatório.
 
-	// Uso compartilhado
-	washMachine uint8 // Máquina de lavar roupa
-	dishWasher  uint8 // Lava-louças
-	tanque      uint8 // Tanque
+	// Uso compartilhado (ex: entre membros da família ou para atividades coletivas)
+	washMachine uint8 // Frequência de uso da máquina de lavar roupa.
+	dishWasher  uint8 // Frequência de uso da lava-louças.
+	tanque      uint8 // Frequência de uso do tanque.
 }
 
-// Métodos de acesso às frequências de uso individual.
+// Toilet retorna a frequência de uso do vaso sanitário.
+func (f *Frequency) Toilet() uint8 { return f.toilet }
 
-func (f *Frequency) Toilet() uint8     { return f.toilet }
-func (f *Frequency) Shower() uint8     { return f.shower }
+// Shower retorna a frequência de uso do chuveiro.
+func (f *Frequency) Shower() uint8 { return f.shower }
+
+// WashBassin retorna a frequência de uso da pia do banheiro/lavatório.
 func (f *Frequency) WashBassin() uint8 { return f.washBassin }
 
-// Métodos de acesso às frequências de uso compartilhado.
-
+// WashMachine retorna a frequência de uso da máquina de lavar roupa.
 func (f *Frequency) WashMachine() uint8 { return f.washMachine }
-func (f *Frequency) DishWasher() uint8  { return f.dishWasher }
-func (f *Frequency) Tanque() uint8      { return f.tanque }
 
-// NewFrequency cria uma nova instância de Frequency com os valores fornecidos.
+// DishWasher retorna a frequência de uso da lava-louças.
+func (f *Frequency) DishWasher() uint8 { return f.dishWasher }
+
+// Tanque retorna a frequência de uso do tanque.
+func (f *Frequency) Tanque() uint8 { return f.tanque }
+
+// NewFrequency cria e retorna uma nova instância de Frequency.
+//
+// Recebe como parâmetros as frequências de uso para cada ponto de consumo:
+//   - toilet: Frequência para vaso sanitário.
+//   - shower: Frequência para chuveiro.
+//   - washBassin: Frequência para pia do banheiro/lavatório.
+//   - washMachine: Frequência para máquina de lavar roupa.
+//   - dishWasher: Frequência para lava-louças.
+//   - tanque: Frequência para tanque.
+//
+// Retorna um ponteiro para a estrutura Frequency preenchida com os valores fornecidos.
 func NewFrequency(
 	toilet, shower, washBassin, washMachine, dishWasher, tanque uint8,
 ) *Frequency {

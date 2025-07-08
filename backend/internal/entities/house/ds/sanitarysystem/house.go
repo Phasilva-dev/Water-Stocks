@@ -3,9 +3,7 @@ package sanitarysystem
 import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"errors"
-	//"globals"
 	"fmt"
-	//"interfaces" Caso eu for usar globals
 )
 
 type SanitaryHouse struct {

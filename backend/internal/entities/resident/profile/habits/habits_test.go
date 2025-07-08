@@ -35,7 +35,7 @@ var mockDist, _ = dists.CreateDistribution("normal", 1, 0) // Uma Normal(1, 0) s
 // Verifique a lógica exata de RoutineProfile.GenerateData se o teste falhar.
 var routineProfileMock, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockDist, mockDist, mockDist, mockDist},
-	1, // Shift de 1
+	1,0, // Shift de 1
 )
 
 var frequencyProfileMock, _ = frequency.NewFrequencyProfile(mockDist, 0) // Shift de 0
@@ -164,19 +164,19 @@ var frequencyProfileMock3, _ = frequency.NewFrequencyProfile(mockDist3, 0)
 
 var routineProfileMock1, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockDist1, mockDist1, mockDist1, mockDist1},
-	0,
+	0,0,
 )
 
 
 var routineProfileMock2, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockDist2, mockDist2, mockDist2, mockDist2},
-	0,
+	0,0,
 )
 
 
 var routineProfileMock3, _ = routine.NewRoutineProfile(
 	[]dists.Distribution{mockDist3, mockDist3, mockDist3, mockDist3},
-	0,
+	0,0,
 )
 
 

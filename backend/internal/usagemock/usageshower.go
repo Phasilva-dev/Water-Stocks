@@ -6,7 +6,7 @@ import (
 	"simulation/internal/entities/house/profile/sanitarydevice"
 	"simulation/internal/entities/resident/ds/behavioral"
 
-	//"errors"
+	"fmt"
 	"math/rand/v2"
 )
 
@@ -28,43 +28,54 @@ func GenerateShowerUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 	sleepTime := routine.SleepTime()
 	returnHome := routine.ReturnHome()
 
+	var min, max float64
 	var dist dists.UniformDist
 	var err error
+	var d int
 
 	if workTime-wakeUpTime < 3600 {
 		// período muito curto entre acordar e sair
 		switch {
 		case p < ((workTime-wakeUpTime) / (workTime-wakeUpTime+3600)):
-			dist, err = dists.UniformDistNew(wakeUpTime, workTime)
+			min, max = wakeUpTime, workTime
+			d = 1
 		case p < ((workTime-wakeUpTime+1800) / (workTime-wakeUpTime+3600)):
-			dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+			min, max = returnHome, returnHome+1800
+			d = 2
 		default:
-			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			min, max = sleepTime-1800, sleepTime
+			d = 3
 		}
 
 	} else {
 		switch {
 		case p < 0.5: //Caso mais comum 50%
 			if returnHome > 18*3600 {
-				dist, err = dists.UniformDistNew(returnHome, returnHome+1800)
+				min, max = returnHome, returnHome+1800
+				d = 4
 			} else {
-				dist, err = dists.UniformDistNew(returnHome, sleepTime-1800)
+				min, max = returnHome, sleepTime-1800
+				d = 5
 			}
 		case p < 0.8: // 30%
-			dist, err = dists.UniformDistNew(workTime-1800, workTime)
+			min, max = workTime-1800, workTime
+			d = 6
 		case p < 0.95: // 15%
-			dist, err = dists.UniformDistNew(wakeUpTime, wakeUpTime+1800)
+			min, max = wakeUpTime, wakeUpTime+1800
+			d = 7
 		default: //5%
-			dist, err = dists.UniformDistNew(sleepTime-1800, sleepTime)
+			min, max = sleepTime-1800, sleepTime
+			d = 8
 		}
 	}
 
+	dist, err = dists.UniformDistNew(min, max)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao gerar distribuição de uso do shower (p = %.4f) (decisao = %d): %w", p, d, err)
 	}
 
 	startUsage := int32(dist.Sample(rng))
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng)), nil
+	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
 }

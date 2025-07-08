@@ -40,20 +40,25 @@ func RunSimulation(size, day, toiletType, showerType int) {
 
 	setHouses(profile, houses, size, rng)
 
+	lines := []SanitaryUsageLine{}
+
 	for i := uint8(0); i < uint8(day); i++ {
 		for j := 0; j < size; j++ {
 			if err := houses[j].GenerateLogs(i, rng); err != nil {
 			log.Fatalf("Erro ao gerar logs da casa %d no dia %d: %v", j, i, err)
 		}
+
 			//fmt.Println(j)
+			usageLines := ToSanitaryUsageLines(houses[j])
+			lines = append(lines, usageLines...)
 		}
 	}
 
 	fmt.Println("Passou")
-	/*residents := houses[0].ResidentLogs()
-	if len(residents) == 0 || residents[0] == nil {
-    	log.Fatal("Erro: ResidentLogs vazio ou com valor nulo")
-	}
-	PrintLogLines(residents[0].ToLogLines())*/
+	agg := AggregateSanitaryUsage(lines)
+	PrintUsageByDevicePerHour(agg)
+	PrintTotalPerHour(agg)
+	PrintTotalPerDevice(agg)
+	PrintTotalUsage(agg)
 	
 }

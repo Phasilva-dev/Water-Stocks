@@ -32,7 +32,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	must(dists.CreateDistribution("normal", 7.5*3600, 1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 15.4*3600, 1.8*3600)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 22*3600, 1.8*3600)),   // Dormir
-}, 1800,0))
+}, 1800,0.999999))
 
 
 
@@ -55,7 +55,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	must(dists.CreateDistribution("normal", 7*60*60,1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 13*3600, 1800)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 21.5*3600, 1.8*3600)),   // Dormir
-}, 1800,0))
+}, 1800,0.999999))
 
 
 	// Perfil diário
@@ -101,7 +101,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	must(dists.CreateDistribution("normal", 12.5*3600,1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 18.5*3600, 1800)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 24.5*3600, 3600)),   // Dormir
-}, 1800,0))
+}, 1800,0.999999))
 
 	// Perfil diário
 	ChildrenAfternoonHabits := habits.NewResidentDayProfile(ChildrenAfternoonRoutine, freqProfile)
@@ -122,7 +122,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	must(dists.CreateDistribution("normal", 10*3600,10800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 14*3600,4*3600)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 24.5*3600, 3600)),   // Dormir
-}, 1800,0)) 
+}, 1800,0.999999)) 
 
 	// Perfil diário
 	AdultUnemployedHabits := habits.NewResidentDayProfile(AdultUnemployedRoutine, freqProfile)

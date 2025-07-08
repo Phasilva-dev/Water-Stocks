@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Definir as flags de entrada via terminal
-	size := flag.Int("size", 10, "Número de casas a simular")
+	size := flag.Int("size", 100000, "Número de casas a simular")
 	day := flag.Int("day", 1, "Dia da simulação")
 	toiletType := flag.Int("toiletType", 1, "Tipo de Toilet (1 a 4)")
 	showerType := flag.Int("showerType", 1, "Tipo de Shower (1 ou 2)")

@@ -34,7 +34,7 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	if sleepTime > returnHome { //Mas isso sempre é verdade .-.
 		if p < 0.025 {
 			min, max = sleepTime - 86400, 86400 //Se possivel, seria bom não usar valores fixos
-    		d = 1
+    		d = 1 //Causa 
 		} else if p < 0.05 {
 			min, max = 0, wakeUpTime //Se possivel, seria bom não usar valores fixos
     		d = -1
@@ -76,6 +76,10 @@ func GenerateDishWasherUsage(routine *behavioral.Routine, device sanitarydevice.
 	startUsage := int32(dist.Sample(rng))
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
+	usage, err := log.NewUsage(startUsage, endUsage, device.GenerateFlowLeak(rng))
+
+	//warningUsage(usage,"dish_washer",d,p, 0, 0)
+
+	return usage, err
 
 }

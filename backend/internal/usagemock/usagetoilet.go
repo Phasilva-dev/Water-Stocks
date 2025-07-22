@@ -72,6 +72,10 @@ func GenerateToiletUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
+	usage, err := log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
+
+	//warningUsage(usage,"toilet",d,p, 0, 0)
+
+	return usage, err
 
 }

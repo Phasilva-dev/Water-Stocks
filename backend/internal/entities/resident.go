@@ -172,7 +172,7 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) 
 
 	residentSanitarylog := log.NewResidentSanitary(toiletLog,showerLog,washBassinLog,washMachineLog,dishWasherLog,tanqueLog)
 
-	residentLog := log.NewResident(day+1, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
+	residentLog := log.NewResident(day, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
 
 	r.dayData.ClearData()
 	return residentLog,nil

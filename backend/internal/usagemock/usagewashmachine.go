@@ -35,7 +35,11 @@ func GenerateWashMachineUsage(routine *behavioral.Routine, device sanitarydevice
 
 	endUsage := startUsage + durationUsage
 
-	return log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
+	usage, err := log.NewUsage(startUsage,endUsage,device.GenerateFlowLeak(rng))
+
+	warningUsage(usage,"wash_machine", 0, 0, 0, 0)
+
+	return usage, err
 
 
 }

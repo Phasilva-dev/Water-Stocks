@@ -7,9 +7,9 @@ import (
 
 func warningUsage(usage *log.Usage, device string, decision int, percentil float64, min, max int32) {
 	if usage.StartUsage() < 3600 * (-min) {
-		fmt.Printf("[WARNING] dia anterior na distribuição de uso do %s (p = %.4f), (decisão = %d), (tempo = %d)\n", device, percentil, decision, usage.StartUsage())
+		fmt.Printf("[WARNING] dia anterior na distribuicao de uso do %s (p = %.4f), (decisao = %d), (tempo = %d)\n", device, percentil, decision, usage.StartUsage())
 	} else if usage.StartUsage() >= 3600 * (24 + max){
-		fmt.Printf("[WARNING] dia posterior na distribuição de uso do %s (p = %.4f), (decisão = %d), (tempo = %d)\n", device, percentil, decision, usage.StartUsage())
+		fmt.Printf("[WARNING] dia posterior na distribuicao de uso do %s (p = %.4f), (decisao = %d), (tempo = %d)\n", device, percentil, decision, usage.StartUsage())
 	}
 
 

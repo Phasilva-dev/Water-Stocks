@@ -54,6 +54,7 @@ func (p *populationData) ResidentsTypeCount() uint32 {
 	return uint32(len(p.residentsTypeCount))
 }*/
 
+/*
 // GetAllResidentCounts (Função Original) retorna um slice com todas as contagens de residentes (os valores do map).
 func (p *populationData) getAllResidentCounts() []uint32 {
 	if p.residentsTypeCount == nil {
@@ -65,7 +66,7 @@ func (p *populationData) getAllResidentCounts() []uint32 {
 		counts = append(counts, count)
 	}
 	return counts
-}
+}*/
 
 // GetAllResidentCountsFormatted printa todos os tipos de residentes e a sua quantidade
 // Os resultados são ordenados alfabeticamente pelo nome do tipo.

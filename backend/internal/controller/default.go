@@ -49,12 +49,12 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	adultProfile := must(resident.NewResidentProfile(adultWeeklyHabits, 1))
 
 
-	// Crianca Matutino Caso 1
+	// Crianca Matutino Caso 2
 	ChildrenMorningRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
-	must(dists.CreateDistribution("normal", 5.75*3600,3600)),      // Acordar
-	must(dists.CreateDistribution("normal", 7*60*60,1800)),      // Trabalhar
+	must(dists.CreateDistribution("normal", 5.75*3600, 3600)),      // Acordar
+	must(dists.CreateDistribution("normal", 7*60*60, 1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 13*3600, 1800)), // Voltar pra casa
-	must(dists.CreateDistribution("normal", 21.5*3600, 1.8*3600)),   // Dormir
+	must(dists.CreateDistribution("normal", 20.25*3600, 3600)),   // Dormir
 }, 1800,0.999999))
 
 
@@ -74,8 +74,8 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 
 		// Idoso Caso 3
 	AgedRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
-	must(dists.CreateDistribution("normal", 5.5*3600,3600)),      // Acordar
-	must(dists.CreateDistribution("normal", 10*3600,3*3600)),      // Trabalhar
+	must(dists.CreateDistribution("normal", 5.5*3600, 3600)),      // Acordar
+	must(dists.CreateDistribution("normal", 10*3600, 3*3600)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 14*3600, 4*3600)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 22*3600, 1800)),   // Dormir
 }, 1800,0.9772))
@@ -97,8 +97,8 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 
 	// Crianca Vespertino Caso 4
 	ChildrenAfternoonRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
-	must(dists.CreateDistribution("normal", 8*3600,3600)),      // Acordar
-	must(dists.CreateDistribution("normal", 12.5*3600,1800)),      // Trabalhar
+	must(dists.CreateDistribution("normal", 8*3600, 3600)),      // Acordar
+	must(dists.CreateDistribution("normal", 12.5*3600, 1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 18.5*3600, 1800)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 24.5*3600, 3600)),   // Dormir
 }, 1800,0.999999))
@@ -153,7 +153,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 func defaultHouseProfile(toiletType, showerType int) *house.HouseProfile {
 	residentCountProfile := count.NewResidentCount(must(dists.CreateDistribution("gamma",4.09588,0.636582)))
 	sanitaryCountProfile := count.NewSanitaryCount()
-	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull", 1.58364, 35.8311)))
+	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull", 35.8311, 1.58364)))
 
 
 
@@ -236,14 +236,14 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os showers
 	shower1 := must(sanitarydevice.NewShower(
-		must(dists.CreateDistribution("triangle", 3, 4, 5)),
-		must(dists.CreateDistribution("triangle", 2, 3.5, 5)),
+		must(dists.CreateDistribution("triangle", 3.0 / 60, 4.0 / 60, 5.0 / 60)),
+		must(dists.CreateDistribution("triangle", 2 * 60, 3.5 * 60, 5 * 60)),
 		1,
 	))
 
 	shower2 := must(sanitarydevice.NewShower(
 		must(dists.CreateDistribution("lognormal", -2.4205, 0.2014)),
-		must(dists.CreateDistribution("gamma", 6.5216, 0.7668)),
+		must(dists.CreateDistribution("gamma", 6.5216 * 60, 0.7668 * 60)),
 		2,
 	))
 
@@ -261,19 +261,19 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os outros dispositivos (sem múltiplas opções)
 	devices["wash_bassin"] = must(sanitarydevice.NewWashBassin(
-		must(dists.CreateDistribution("normal", 1, 0)),
+		must(dists.CreateDistribution("lognormal", -2.6677, 0.3275)), 
 		must(dists.CreateDistribution("lognormal", 3.3551, 0.8449)),
 		1,
 	))
 
 	devices["wash_machine"] = must(sanitarydevice.NewWashMachine(
 		0.1,
-		4*6*60,
+		4 * 6 * 60,
 		1,
 	))
 
 	devices["dish_washer"] = must(sanitarydevice.NewDishWasher(
-		must(dists.CreateDistribution("weibull", 1.5871, 0.0569)),
+		must(dists.CreateDistribution("weibull", 0.0569, 1.5871)),
 		must(dists.CreateDistribution("lognormal", 3.1763, 0.785)),
 		1,
 	))

@@ -41,7 +41,7 @@ type Distribution interface {
 //   - "gamma":       shape, scale (2 parâmetros: forma e escala)
 //   - "lognormal":   mean, std (2 parâmetros: média e desvio padrão da normal subjacente)
 //   - "triangle":    a, b, c (3 parâmetros: mínimo, moda e máximo)
-//   - "weibull":     shape, scale (2 parâmetros: forma k e escala λ)
+//   - "weibull":     scale, shape (2 parâmetros: escala λ e forma k)
 //   - "loglogistic": shape, scale (2 parâmetros: forma α e escala β)  // <-- ADICIONADO AQUI
 //
 // Retorna um valor que implementa a interface `Distribution` e um erro `nil` em caso

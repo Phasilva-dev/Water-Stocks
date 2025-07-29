@@ -1,7 +1,6 @@
 package controller
 
 import (
-	//"fmt"
 	"fmt"
 	"log"
 
@@ -25,7 +24,7 @@ func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, 
 		} 
 
 	}
-	fmt.Println("Casas criadas ")
+	//fmt.Println("Casas criadas ")
 
 }
 
@@ -57,14 +56,13 @@ func RunSimulation(size, day, toiletType, showerType int) {
 				log.Fatalf("Erro ao gerar logs da casa %d no dia %d: %v", j, i, err)
 			}
 			updateUsagesOverview(houses[j],dailyUsagesWindow, i+1)
-			
 			usageLines := ToSanitaryUsageLines(houses[j])
 			lines = append(lines, usageLines...)
 		}
 	}
 
 	
-	fmt.Println("Passou")
+	//fmt.Println("Passou")
 
 	populationData.viewPopulationData()
 	fmt.Println()

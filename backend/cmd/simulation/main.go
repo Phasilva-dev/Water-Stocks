@@ -19,7 +19,7 @@ func main() {
 	flag.Parse()
 
 	// Exibir os parâmetros recebidos
-	fmt.Printf("Executando simulação com %d casas, dia %d, toiletType %d, showerType %d\n", *size, *day, *toiletType, *showerType)
+	fmt.Printf("Executando simulacao com %d casas, dia %d, toiletType %d, showerType %d\n", *size, *day, *toiletType, *showerType)
 
 	start := time.Now()
 	// Executar a simulação
@@ -28,7 +28,7 @@ func main() {
 	// Calcular duração
 	elapsed := time.Since(start)
 
-	fmt.Println("Simulação concluída.")
+	fmt.Println("Simulacao concluida.")
 	fmt.Printf("Tempo total: %s\n", elapsed)
 	runtime.GC()
 }

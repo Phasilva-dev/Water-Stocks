@@ -26,13 +26,11 @@ type WeibullDist struct {
 //
 // Recebe os parâmetros de forma (shape, k) e escala (scale, λ).
 // Retorna um erro se shape ou scale não forem estritamente positivos (> 0).
-func NewWeibullDist(shape, scale float64) (*WeibullDist, error) {
+func NewWeibullDist(scale, shape float64) (*WeibullDist, error) {
 	// Verifica se ambos os parâmetros são positivos.
 	if shape <= 0 || scale <= 0 {
-		// Retorna erro se algum dos parâmetros for inválido.
 		return nil, errors.New("parâmetros shape (forma) e scale (escala) devem ser > 0")
 	}
-	// Cria e retorna um ponteiro para a instância da distribuição.
 	return &WeibullDist{
 		shape: shape,
 		scale: scale,

@@ -174,6 +174,6 @@ func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) 
 
 	residentLog := log.NewResident(day, r.house.houseClassID,r.occupationID,r.age,residentSanitarylog)
 
-	r.dayData.ClearData()
+	//r.dayData.ClearData()
 	return residentLog,nil
 }

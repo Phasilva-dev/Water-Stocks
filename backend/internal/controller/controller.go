@@ -12,6 +12,15 @@ import (
 	"time"
 )
 
+var devices = []string{
+	"toilet",
+	"shower",
+	"wash_bassin",
+	"wash_machine",
+	"dish_washer",
+	"tanque",
+}
+
 
 
 func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, rng *rand.Rand) {
@@ -42,12 +51,11 @@ func RunSimulation(size, day, toiletType, showerType int) {
 
 	
 	//Variaveis de dados
-	lines := []SanitaryUsageLine{}
 	populationData := newPopulationData(houses)
-	dailyUsagesWindow := make(map[uint8]*usagesOverview)
+	dailyUsagesDataWindow := make(map[uint8]*AccumulatorDay)
 
 	for i := uint8(0); i < uint8(day+2); i++ {
-		dailyUsagesWindow[uint8(i)] = newUsagesOverview(uint8(i))
+		dailyUsagesDataWindow[uint8(i)] = NewAccumulatorDay(uint8(i),devices)
 	}
 
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -55,26 +63,17 @@ func RunSimulation(size, day, toiletType, showerType int) {
 			if err := houses[j].GenerateLogs(i+1, rng); err != nil {
 				log.Fatalf("Erro ao gerar logs da casa %d no dia %d: %v", j, i, err)
 			}
-			updateUsagesOverview(houses[j],dailyUsagesWindow, i+1)
-			usageLines := ToSanitaryUsageLines(houses[j])
-			lines = append(lines, usageLines...)
+			dailyUsagesDataWindow[1].UpdateAccumulator(i+1,houses[j],dailyUsagesDataWindow)
 		}
 	}
 
 	
-	//fmt.Println("Passou")
+	fmt.Println("Passou")
 
 	populationData.viewPopulationData()
 	fmt.Println()
 
-	printUsagesOverview(dailyUsagesWindow)
+	printUsagesOverview(dailyUsagesDataWindow, devices)
 
-
-/*
-	agg := AggregateSanitaryUsage(lines)
-	PrintUsageByDevicePerHour(agg)
-	PrintTotalPerHour(agg)
-	PrintTotalPerDevice(agg)
-	PrintTotalUsage(agg)*/
 	
 }

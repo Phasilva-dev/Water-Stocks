@@ -1,11 +1,11 @@
 package controller
 
+
 import (
 	"fmt"
 	"log"
-	"simulation/internal/entities"
 	"sort"
-	logData "simulation/internal/log"
+	"simulation/internal/entities"
 )
 
 type populationData struct {
@@ -46,15 +46,15 @@ func (p *populationData) residentsTotalCount() uint32 {
 	return total
 }
 
-/*// ResidentsTypeCount retorna o número de tipos distintos de residentes registrados no mapa.
+// ResidentsTypeCount retorna o número de tipos distintos de residentes registrados no mapa.
 func (p *populationData) ResidentsTypeCount() uint32 {
 	if p.residentsTypeCount == nil {
 		return 0
 	}
 	return uint32(len(p.residentsTypeCount))
-}*/
+}
 
-/*
+
 // GetAllResidentCounts (Função Original) retorna um slice com todas as contagens de residentes (os valores do map).
 func (p *populationData) getAllResidentCounts() []uint32 {
 	if p.residentsTypeCount == nil {
@@ -66,7 +66,7 @@ func (p *populationData) getAllResidentCounts() []uint32 {
 		counts = append(counts, count)
 	}
 	return counts
-}*/
+}
 
 // GetAllResidentCountsFormatted printa todos os tipos de residentes e a sua quantidade
 // Os resultados são ordenados alfabeticamente pelo nome do tipo.
@@ -97,93 +97,50 @@ func (p *populationData) viewPopulationData() {
 }
 
 
-type usagesOverview struct {
-	day uint8
-	usagesCount map[string]uint32
-}
 
-func newUsagesOverview(day uint8) *usagesOverview {
-	
 
-	// 1. Inicializa o mapa com 'make'
-	usagesCount := make(map[string]uint32)
 
-	// 2. Adiciona as 6 chaves predefinidas e inicializa seus valores com 0
-	usagesCount["toilet"] = 0
-	usagesCount["shower"] = 0
-	usagesCount["wash_bassin"] = 0
-	usagesCount["wash_machine"] = 0
-	usagesCount["dish_washer"] = 0
-	usagesCount["tanque"] = 0
+// Supondo que os tipos são os mesmos usados anteriormente
+func printUsagesOverview(dayWindow map[uint8]*AccumulatorDay, sanitaryTypes []string) {
+	for day, overview := range dayWindow {
+		fmt.Printf("Usos no dia: %d\n", day)
 
-	return &usagesOverview{
-		usagesCount: usagesCount,
-		day: day,
-	}
-}
+		// Criar contador por dispositivo
+		countPerDevice := make(map[string]int)
 
-func (u *usagesOverview) updateCount(key string, value uint32) {
-	u.usagesCount[key] += value
-}
-
-func updateUsagesOverview (house *entities.House, dayWindow map[uint8]*usagesOverview, day uint8) {
-	residentLogs := house.ResidentLogs()
-	for i := 0; i < len(residentLogs); i++ {
-		toiletLogs, ok := residentLogs[i].SanitaryLogs().ToiletLog().UsageLogs()
-		if ok {
-			countUsages(toiletLogs, dayWindow, day, "toilet")
+		for _, hour := range overview.accumulatorHour {
+			for _, device := range sanitaryTypes {
+				countPerDevice[device] += hour.IndividualDeviceCounter(device)
+			}
 		}
 
-		showerLogs, ok := residentLogs[i].SanitaryLogs().ShowerLog().UsageLogs()
-		if ok {
-			countUsages(showerLogs, dayWindow, day, "shower")
+		// Imprimir os contadores
+		for _, device := range sanitaryTypes {
+			label := formatDeviceLabel(device)
+			fmt.Printf("  %s: %d\n", label, countPerDevice[device])
 		}
 
-		washBassinLogs, ok := residentLogs[i].SanitaryLogs().WashBassinLog().UsageLogs()
-		if ok {
-			countUsages(washBassinLogs, dayWindow, day, "wash_bassin")
-		}
-
-		washMachineLogs, ok := residentLogs[i].SanitaryLogs().WashMachineLog().UsageLogs()
-		if ok {
-			countUsages(washMachineLogs, dayWindow, day, "wash_machine")
-		}
-
-		dishWasherLogs, ok := residentLogs[i].SanitaryLogs().DishWasherLog().UsageLogs()
-		if ok {
-			countUsages(dishWasherLogs, dayWindow, day, "dish_washer")
-		}
-
-		tanqueLogs, ok := residentLogs[i].SanitaryLogs().TanqueLog().UsageLogs()
-		if ok {
-			countUsages(tanqueLogs, dayWindow, day, "tanque")
-		}
-	}
-	
-
-}
-
-func countUsages (usages []*logData.Usage, dayWindow map[uint8]*usagesOverview, day uint8, key string) {
-	for i := 0; i < len(usages); i++ {
-		if usages[i].StartUsage() >= 0 && usages[i].StartUsage() < 86400 {
-			dayWindow[day].updateCount(key, 1)
-		} else if usages[i].StartUsage() >= 86400 {
-			dayWindow[day+1].updateCount(key, 1)
-		} else {
-			dayWindow[day-1].updateCount(key, 1)
-		}
-	}
-}
-
-func printUsagesOverview(dayWindow map[uint8]*usagesOverview) {
-	for _, overview := range dayWindow {
-		fmt.Printf("Usos no dia: %d\n", overview.day)
-		fmt.Printf("  Toilet: %d\n", overview.usagesCount["toilet"])
-		fmt.Printf("  Shower: %d\n", overview.usagesCount["shower"])
-		fmt.Printf("  Wash Bassin: %d\n", overview.usagesCount["wash_bassin"])
-		fmt.Printf("  Wash Machine: %d\n", overview.usagesCount["wash_machine"])
-		fmt.Printf("  Dish Washer: %d\n", overview.usagesCount["dish_washer"])
-		fmt.Printf("  Tanque: %d\n", overview.usagesCount["tanque"])
 		fmt.Println()
 	}
+}
+
+// Apenas para deixar os nomes mais legíveis
+func formatDeviceLabel(key string) string {
+	switch key {
+	case "wash_bassin":
+		return "Wash Bassin"
+	case "wash_machine":
+		return "Wash Machine"
+	case "dish_washer":
+		return "Dish Washer"
+	default:
+		return capitalize(key)
+	}
+}
+
+func capitalize(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return string(s[0]-32) + s[1:]
 }

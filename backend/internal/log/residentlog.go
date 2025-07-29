@@ -50,6 +50,10 @@ func (r *Resident) SanitaryLogs() *ResidentSanitary {
 	return r.sanitaryLogs
 }
 
+
+
+
+
 func secondsToHHMMSS(seconds int32) string {
     h := seconds / 3600
     m := (seconds % 3600) / 60

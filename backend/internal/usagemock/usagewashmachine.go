@@ -27,7 +27,7 @@ func GenerateWashMachineUsage(routine *behavioral.Routine, device sanitarydevice
 		return nil, fmt.Errorf("erro ao gerar distribuição de uso do wash_machine (shape = %.2f, scale = %.2f): %w", shape, scale, err)
 	}
 
-	startUsage := int32(dist.Sample(rng))
+	startUsage := int32(dist.Sample(rng) * 86400) //É necessario a multiplicação para dar sentido
 
 	durationUsage := device.GenerateDuration(rng)
 

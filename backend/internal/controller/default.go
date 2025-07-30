@@ -12,8 +12,26 @@ import (
 	"simulation/internal/entities/resident/profile/habits"
 	"simulation/internal/entities/resident/profile/routine"
 	"simulation/internal/misc"
+	"simulation/internal/entities"
+
+		"log"
+	"math/rand/v2"
 
 )
+
+func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, rng *rand.Rand) {
+
+	for i := 0; i < size; i++ {
+
+		houses[i] = entities.NewHouse(1,profile)
+		if err := houses[i].GenerateHouseData(rng); err != nil {
+			log.Fatalf("Erro ao criar a casa %d : %v", i, err)
+		} 
+
+	}
+	//fmt.Println("Casas criadas ")
+
+}
 
 func defaultResidentProfiles()  map[uint32]*resident.ResidentProfile{
 
@@ -101,7 +119,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 	must(dists.CreateDistribution("normal", 12.5*3600, 1800)),      // Trabalhar
 	must(dists.CreateDistribution("normal", 18.5*3600, 1800)), // Voltar pra casa
 	must(dists.CreateDistribution("normal", 24.5*3600, 3600)),   // Dormir
-}, 1800,0.999999))
+}, 1800,0.9772))
 
 	// Perfil diário
 	ChildrenAfternoonHabits := habits.NewResidentDayProfile(ChildrenAfternoonRoutine, freqProfile)

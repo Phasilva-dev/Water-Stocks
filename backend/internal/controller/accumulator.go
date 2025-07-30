@@ -4,6 +4,7 @@ import (
 	"log"
 	"simulation/internal/entities"
 	logData "simulation/internal/log"
+	"fmt"
 )
 
 type AccumulatorInterface interface {
@@ -18,7 +19,6 @@ type AccumulatorUnit struct {
 	WaterConsumption    float64
 	counter int
 }
-
 
 func (a *AccumulatorUnit) AddConsumption(liters float64) {
 	a.WaterConsumption += liters
@@ -45,8 +45,6 @@ func (a *AccumulatorUnit) Total() float64 {
 func (a *AccumulatorUnit) Counter() int {
 	return a.counter
 }
-
-
 
 
 
@@ -129,6 +127,7 @@ func (a *AccumulatorHour) FlowRate() float64 {
 	return totalFlow
 
 }
+
 
 
 type AccumulatorDay struct {
@@ -243,4 +242,49 @@ func (a *AccumulatorDay) GetHourDay(usage *logData.Usage, day uint8,house *entit
 		return hour, day - 1
 	}
 		
+}
+
+
+func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
+	// Mapeia tipos de dispositivos e inicializa totais
+	deviceTotals := make(map[string]float64)
+	var totalPerHour [24]float64
+	var grandTotal float64
+
+	if len(a.accumulatorHour) != 24 {
+		log.Println("Dados incompletos: esperados 24 acumuladores de hora.")
+		return
+	}
+
+	fmt.Println("Consumo por dispositivo:")
+
+	// Primeiro, descobrimos todos os tipos de dispositivos existentes
+	// Pegando do primeiro acumulador (hora 0), pois todos têm as mesmas chaves
+	deviceTypes := make([]string, 0)
+	for device := range a.accumulatorHour[0].sanitaryDevice {
+		deviceTypes = append(deviceTypes, device)
+	}
+
+	// Para cada tipo de dispositivo, printar hora a hora
+	for _, device := range deviceTypes {
+		fmt.Printf("\nDispositivo: %s\n", device)
+		for hour := 0; hour < 24; hour++ {
+			value := a.accumulatorHour[hour].IndividualDeviceTotal(device)
+			fmt.Printf("Hora %02d: %.2f Litros\n", hour, value)
+
+			// Acumula para total por hora e total por dispositivo
+			totalPerHour[hour] += value
+			deviceTotals[device] += value
+			grandTotal += value
+		}
+	}
+
+	// Total por hora
+	fmt.Println("\nTotal por hora:")
+	for hour := 0; hour < 24; hour++ {
+		fmt.Printf("Hora %02d: %.2f Litros\n", hour, totalPerHour[hour])
+	}
+
+	// Total geral
+	fmt.Printf("\nTotal completo do dia: %.2f Litros\n", grandTotal)
 }

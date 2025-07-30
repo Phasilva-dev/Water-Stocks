@@ -7,6 +7,7 @@ import (
 	"math/rand/v2"
 	"simulation/internal/dists"
 	"simulation/internal/entities/resident/ds/behavioral"
+	"log"
 )
 
 // RoutineProfile representa um perfil de rotina diária.
@@ -118,18 +119,43 @@ func (r *RoutineProfile) enforceMaxValue(dist dists.Distribution, sample float64
 // em um gerador de números aleatórios fornecido.
 // Os tempos são amostrados, limitados por maxPercent e ajustados para respeitar minShift.
 func (r *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
-	times := make([]float64, len(r.events))
 	dists := r.events // Renomeado para evitar conflito com 'dist' no loop
+	times := make([]float64, len(dists))
 
-	// Amostra e aplica o limite de valor máximo a cada evento
-	for i, dist := range r.events {
-		times[i] = generateTime(dist, rng)
-		times[i] = r.enforceMaxValue(dists[i], times[i])
-	}
+	const maxAttempts = 10
+	const maxTimeValue = 172799.0
+	const minTimeValue = 0.0
+	attempts := 0
 
-	// Aplica o shift mínimo entre eventos sequencialmente
-	for i := 1; i < len(times); i++ {
-		times[i] = r.enforceMinShift(times[i-1], times[i])
+	for {
+
+		// Amostra e aplica o limite de valor máximo a cada evento
+		for i, dist := range dists {
+			times[i] = generateTime(dist, rng)
+			times[i] = r.enforceMaxValue(dists[i], times[i])
+		}
+		// Aplica o shift mínimo entre eventos sequencialmente
+		for i := 1; i < len(times); i++ {
+			times[i] = r.enforceMinShift(times[i-1], times[i])
+			times[i] = math.Trunc(times[i])
+		}
+		// Verificar se todos os tempos estão no intervalo válido
+		valid := true
+		for i := 0; i < len(times); i++ {
+			if times[i] < minTimeValue || times[i] > maxTimeValue {
+				valid = false
+				break
+			}
+		}
+
+		if valid {
+			break // Todos os valores estão dentro do intervalo, sair do loop
+		}
+
+		attempts++
+		if attempts >= maxAttempts {
+			log.Fatalf("Não foi possível gerar tempos válidos após %d tentativas", attempts)
+		}
 	}
 
 	return behavioral.NewRoutine(times)

@@ -3,11 +3,7 @@ package controller
 import (
 	"fmt"
 	"log"
-
 	"simulation/internal/entities"
-	"simulation/internal/entities/house"
-
-
 	"math/rand/v2"
 	"time"
 )
@@ -20,23 +16,6 @@ var devices = []string{
 	"dish_washer",
 	"tanque",
 }
-
-
-
-func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, rng *rand.Rand) {
-
-	for i := 0; i < size; i++ {
-
-		houses[i] = entities.NewHouse(1,profile)
-		if err := houses[i].GenerateHouseData(rng); err != nil {
-			log.Fatalf("Erro ao criar a casa %d : %v", i, err)
-		} 
-
-	}
-	//fmt.Println("Casas criadas ")
-
-}
-
 
 func RunSimulation(size, day, toiletType, showerType int) {
 
@@ -74,6 +53,12 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	fmt.Println()
 
 	printUsagesOverview(dailyUsagesDataWindow, devices)
+
+	for k := uint8(1); k < uint8(day+2); k++ {
+		fmt.Println("Consumo do dia ",k)
+		dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
+
+	}
 
 	
 }

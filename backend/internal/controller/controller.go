@@ -6,6 +6,7 @@ import (
 	"simulation/internal/entities"
 	"math/rand/v2"
 	"time"
+	"simulation/internal/accumulator"
 )
 
 var devices = []string{
@@ -30,11 +31,11 @@ func RunSimulation(size, day, toiletType, showerType int) {
 
 	
 	//Variaveis de dados
-	populationData := newPopulationData(houses)
-	dailyUsagesDataWindow := make(map[uint8]*AccumulatorDay)
+	populationData := accumulator.NewPopulationData(houses)
+	dailyUsagesDataWindow := make(map[uint8]*accumulator.AccumulatorDay)
 
 	for i := uint8(0); i < uint8(day+2); i++ {
-		dailyUsagesDataWindow[uint8(i)] = NewAccumulatorDay(uint8(i),devices)
+		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),devices)
 	}
 
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -49,15 +50,20 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	
 	fmt.Println("Passou")
 
-	populationData.viewPopulationData()
+	populationData.ViewPopulationData()
 	fmt.Println()
 
-	printUsagesOverview(dailyUsagesDataWindow, devices)
+	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, devices)
 
 	for k := uint8(1); k < uint8(day+2); k++ {
+		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()
 		fmt.Println("Consumo do dia ",k)
 		dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
+	}
 
+	err := dailyUsagesDataWindow[1].ExportToExcel("consumo_diario.xlsx")
+		if err != nil {
+	log.Fatalf("Erro exportando Excel: %v", err)
 	}
 
 	

@@ -1,10 +1,11 @@
-package controller
+package accumulator
 
 import (
 	"log"
 	"simulation/internal/entities"
 	logData "simulation/internal/log"
 	"fmt"
+	"math"
 )
 
 type AccumulatorInterface interface {
@@ -242,6 +243,22 @@ func (a *AccumulatorDay) GetHourDay(usage *logData.Usage, day uint8,house *entit
 		return hour, day - 1
 	}
 		
+}
+
+// RoundFloat2 arredonda float64 para 2 casas decimais
+func RoundFloat2(f float64) float64 {
+	return math.Round(f*100) / 100
+}
+
+// RoundAccumulatorDayValues percorre todos os valores do dia e arredonda os litros
+func (a *AccumulatorDay) RoundAccumulatorDayValues() {
+	for _, hour := range a.accumulatorHour {
+		for _, device := range hour.sanitaryDevice {
+			if unit, ok := device.(*AccumulatorUnit); ok {
+				unit.WaterConsumption = RoundFloat2(unit.WaterConsumption)
+			}
+		}
+	}
 }
 
 

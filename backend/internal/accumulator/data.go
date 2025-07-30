@@ -1,4 +1,4 @@
-package controller
+package accumulator
 
 
 import (
@@ -13,7 +13,7 @@ type populationData struct {
 	residentsTypeCount map[string]uint32
 }
 
-func newPopulationData(houses []*entities.House) *populationData{
+func NewPopulationData(houses []*entities.House) *populationData{
 
 	pData := &populationData{
 		residentsTypeCount: make(map[string]uint32),
@@ -34,6 +34,7 @@ func newPopulationData(houses []*entities.House) *populationData{
 
 }
 
+
 // ResidentsTotalCount retorna a soma de todos os residentes de todos os tipos.
 func (p *populationData) residentsTotalCount() uint32 {
 	var total uint32 // Inicializa o acumulador
@@ -46,15 +47,9 @@ func (p *populationData) residentsTotalCount() uint32 {
 	return total
 }
 
-// ResidentsTypeCount retorna o número de tipos distintos de residentes registrados no mapa.
-func (p *populationData) ResidentsTypeCount() uint32 {
-	if p.residentsTypeCount == nil {
-		return 0
-	}
-	return uint32(len(p.residentsTypeCount))
-}
 
 
+/*
 // GetAllResidentCounts (Função Original) retorna um slice com todas as contagens de residentes (os valores do map).
 func (p *populationData) getAllResidentCounts() []uint32 {
 	if p.residentsTypeCount == nil {
@@ -66,6 +61,14 @@ func (p *populationData) getAllResidentCounts() []uint32 {
 		counts = append(counts, count)
 	}
 	return counts
+}*/
+
+// ResidentsTypeCount retorna o número de tipos distintos de residentes registrados no mapa.
+func (p *populationData) ResidentsTypeCount() uint32 {
+	if p.residentsTypeCount == nil {
+		return 0
+	}
+	return uint32(len(p.residentsTypeCount))
 }
 
 // GetAllResidentCountsFormatted printa todos os tipos de residentes e a sua quantidade
@@ -91,7 +94,7 @@ func (p *populationData) printAllResidentsCounts()  { //[]string
 	}
 }
 
-func (p *populationData) viewPopulationData() {
+func (p *populationData) ViewPopulationData() {
 	fmt.Println("O total de Residents é: ", p.residentsTotalCount())
 	p.printAllResidentsCounts()
 }
@@ -101,7 +104,7 @@ func (p *populationData) viewPopulationData() {
 
 
 // Supondo que os tipos são os mesmos usados anteriormente
-func printUsagesOverview(dayWindow map[uint8]*AccumulatorDay, sanitaryTypes []string) {
+func PrintUsagesOverview(dayWindow map[uint8]*AccumulatorDay, sanitaryTypes []string) {
 	for day, overview := range dayWindow {
 		fmt.Printf("Usos no dia: %d\n", day)
 

@@ -11,11 +11,7 @@ func (a *AccumulatorDay) ExportToExcel(filename string) error {
 	f := excelize.NewFile()
 
 	// Pegamos os dispositivos do primeiro acumulador (hora 0)
-	deviceTypes := make([]string, 0)
-	for device := range a.accumulatorHour[0].sanitaryDevice {
-		deviceTypes = append(deviceTypes, device)
-	}
-
+	deviceTypes := OrderedDeviceKeys()
 	// Cabeçalho
 	f.SetCellValue("Sheet1", "A1", "Hour")
 	for i, device := range deviceTypes {

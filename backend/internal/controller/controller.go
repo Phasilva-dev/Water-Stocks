@@ -9,14 +9,6 @@ import (
 	"simulation/internal/accumulator"
 )
 
-var devices = []string{
-	"toilet",
-	"shower",
-	"wash_bassin",
-	"wash_machine",
-	"dish_washer",
-	"tanque",
-}
 
 func RunSimulation(size, day, toiletType, showerType int) {
 
@@ -35,7 +27,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	dailyUsagesDataWindow := make(map[uint8]*accumulator.AccumulatorDay)
 
 	for i := uint8(0); i < uint8(day+2); i++ {
-		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),devices)
+		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),accumulator.OrderedDeviceKeys())
 	}
 
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -53,7 +45,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	populationData.ViewPopulationData()
 	fmt.Println()
 
-	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, devices)
+	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, accumulator.OrderedDeviceKeys())
 
 	for k := uint8(1); k < uint8(day+2); k++ {
 		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()

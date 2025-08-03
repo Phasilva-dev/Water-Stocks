@@ -261,6 +261,17 @@ func (a *AccumulatorDay) RoundAccumulatorDayValues() {
 	}
 }
 
+func OrderedDeviceKeys() []string {
+	return []string{
+		"toilet",
+		"shower",
+		"wash_bassin",
+		"wash_machine",
+		"dish_washer",
+		"tanque",
+	}
+}
+
 
 func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
 	// Mapeia tipos de dispositivos e inicializa totais
@@ -277,10 +288,7 @@ func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
 
 	// Primeiro, descobrimos todos os tipos de dispositivos existentes
 	// Pegando do primeiro acumulador (hora 0), pois todos têm as mesmas chaves
-	deviceTypes := make([]string, 0)
-	for device := range a.accumulatorHour[0].sanitaryDevice {
-		deviceTypes = append(deviceTypes, device)
-	}
+	deviceTypes := OrderedDeviceKeys()
 
 	// Para cada tipo de dispositivo, printar hora a hora
 	for _, device := range deviceTypes {

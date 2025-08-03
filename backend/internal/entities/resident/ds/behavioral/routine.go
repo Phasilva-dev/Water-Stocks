@@ -27,6 +27,14 @@ func (r *Routine) Times() []float64 {
 	return r.times
 }
 
+func (r *Routine) EventTime(index int) float64 {
+	if index >= 0 && index < len(r.times) {
+		return r.times[index]
+	}
+	return 0
+
+}
+
 // WakeupTime retorna o horário do primeiro evento na rotina, tipicamente o horário de acordar.
 //
 // Pré-condição: O slice 'times' deve conter ao menos um elemento.

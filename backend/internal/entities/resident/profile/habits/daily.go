@@ -11,8 +11,8 @@ import (
 // de aparelhos para um residente.
 // Ele serve como um agregador para gerar os dados de comportamento diários.
 type ResidentDayProfile struct {
-	routineProfile      *routine.RoutineProfile
-	frequencyProfileDay *frequency.FrequencyProfileDay
+	routineProfile      *routine.DayProfile
+	frequencyProfileDay *frequency.ResidentDeviceProfiles
 }
 
 // NewResidentDayProfile cria uma nova instância de ResidentDayProfile.
@@ -21,7 +21,7 @@ type ResidentDayProfile struct {
 // frequency: O perfil de frequência de uso de aparelhos do residente.
 //
 // Retorna um ponteiro para o ResidentDayProfile recém-criado.
-func NewResidentDayProfile(routine *routine.RoutineProfile, frequency *frequency.FrequencyProfileDay) *ResidentDayProfile {
+func NewResidentDayProfile(routine *routine.DayProfile, frequency *frequency.ResidentDeviceProfiles) *ResidentDayProfile {
 	return &ResidentDayProfile{
 		routineProfile:      routine,
 		frequencyProfileDay: frequency,
@@ -29,13 +29,13 @@ func NewResidentDayProfile(routine *routine.RoutineProfile, frequency *frequency
 }
 
 // RoutineProfile retorna o perfil de rotina diária associado a este ResidentDayProfile.
-func (r *ResidentDayProfile) RoutineProfile() *routine.RoutineProfile {
+func (r *ResidentDayProfile) RoutineProfile() *routine.DayProfile {
 	return r.routineProfile
 }
 
 // FrequencyProfileDay retorna o perfil de frequência de uso de aparelhos
 // associado a este ResidentDayProfile.
-func (r *ResidentDayProfile) FrequencyProfileDay() *frequency.FrequencyProfileDay {
+func (r *ResidentDayProfile) FrequencyProfileDay() *frequency.ResidentDeviceProfiles {
 	return r.frequencyProfileDay
 }
 
@@ -45,7 +45,7 @@ func (r *ResidentDayProfile) FrequencyProfileDay() *frequency.FrequencyProfileDa
 // rng: O gerador de números aleatórios a ser usado para a geração dos dados.
 //
 // Retorna um ponteiro para a estrutura behavioral.Routine gerada.
-func (r *ResidentDayProfile) GenerateRoutine(rng *rand.Rand) *behavioral.Routine {
+func (r *ResidentDayProfile) GenerateRoutine(rng *rand.Rand) (*behavioral.Routine, error) {
 	return r.routineProfile.GenerateData(rng)
 }
 
@@ -55,6 +55,6 @@ func (r *ResidentDayProfile) GenerateRoutine(rng *rand.Rand) *behavioral.Routine
 // rng: O gerador de números aleatórios a ser usado para a geração dos dados.
 //
 // Retorna um ponteiro para a estrutura behavioral.Frequency gerada.
-func (r *ResidentDayProfile) GenerateFrequency(rng *rand.Rand) *behavioral.Frequency {
+func (r *ResidentDayProfile) GenerateFrequency(rng *rand.Rand) (*behavioral.Frequency, error) {
 	return r.frequencyProfileDay.GenerateData(rng)
 }

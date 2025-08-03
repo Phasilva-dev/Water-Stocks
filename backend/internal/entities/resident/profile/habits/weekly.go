@@ -26,12 +26,12 @@ func (r *ResidentWeeklyProfile) Profiles() []*ResidentDayProfile{
 	return r.profiles
 }
 
-func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) *behavioral.Frequency {
+func (r *ResidentWeeklyProfile) GenerateFrequency(day uint8, rng *rand.Rand) (*behavioral.Frequency, error) {
 	day = r.normalizeDay(day)
 	return r.profiles[day].GenerateFrequency(rng)
 }
 
-func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) *behavioral.Routine {
+func (r *ResidentWeeklyProfile) GenerateRoutine(day uint8, rng *rand.Rand) (*behavioral.Routine, error) {
 	day = r.normalizeDay(day)
 	return r.profiles[day].GenerateRoutine(rng)
 }

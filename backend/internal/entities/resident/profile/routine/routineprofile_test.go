@@ -347,3 +347,82 @@ func TestGenerateDataReal(t *testing.T) {
 		fmt.Printf("%d: %s (%.0f segundos)\n", i+1, dateTime.Format("02/01/2006 15:04:05"), timeSec)
 	}
 }
+
+func TestEnforceMinShiftBehavior(t *testing.T) {
+	profile := &DayProfile{
+		minShift: 10.0,
+	}
+
+	tests := []struct {
+		prev      float64
+		current   float64
+		expected  float64
+		testLabel string
+	}{
+		{prev: 100, current: 90, expected: 100 + 10, testLabel: "current < prev (ajuste com diff + minShift)"},
+		{prev: 100, current: 105, expected: 100 + 5 + 10, testLabel: "current dentro do minShift (ajuste com diff + minShift)"},
+		{prev: 100, current: 120, expected: 120, testLabel: "current suficientemente distante (sem ajuste)"},
+	}
+
+	for _, tt := range tests {
+		result := enforceMinShift(tt.prev, tt.current, profile.minShift)
+		if result != tt.expected {
+			t.Errorf("%s: esperado %.2f, obtido %.2f", tt.testLabel, tt.expected, result)
+		}
+	}
+}
+
+func TestEnforceMaxValue_NoCapWhenMaxPercentInvalid(t *testing.T) {
+	mock := &MockDistribution{
+		SampleValue:    300,
+		PercentileValue: 100, // Ignorado
+	}
+
+	cases := []float64{0.0, 1.0, -0.1, 1.1}
+	for _, maxP := range cases {
+		profile := &DayProfile{
+			maxPercent: maxP,
+		}
+		got := enforceMaxValue(mock, mock.SampleValue, profile.maxPercent)
+		if got != mock.SampleValue {
+			t.Errorf("maxPercent = %.2f: esperado valor original %.2f, obtido %.2f", maxP, mock.SampleValue, got)
+		}
+	}
+}
+
+func TestGenerateDataFailsWhenSamplesAlwaysExceedMax(t *testing.T) {
+	const (
+		sampleTooHigh   = 200000.0      // Sempre fora do intervalo permitido
+		minShift        = 0.0
+		maxPercent      = 1.0           // Sem truncamento via percentil
+		expectedErrSub  = "should be between 0 and 172799.0"
+	)
+
+	// Mock que sempre retorna valor fora do intervalo
+	mock := &MockDistribution{
+		SampleValue:    sampleTooHigh,
+		PercentileValue: sampleTooHigh,
+	}
+
+	profile, err := NewDayProfile(
+		[]dists.Distribution{mock, mock},
+		minShift,
+		maxPercent,
+	)
+	if err != nil {
+		t.Fatalf("Erro ao criar perfil: %v", err)
+	}
+
+	rng := rand.New(rand.NewPCG(42, 1)) // Qualquer gerador, o mock ignora
+
+	_, err = profile.GenerateData(rng)
+	if err == nil {
+		t.Fatalf("Esperava erro ao gerar rotina com valores fora do intervalo, mas não ocorreu erro")
+	}
+	if !strings.Contains(err.Error(), expectedErrSub) {
+		t.Errorf("Mensagem de erro incorreta.\nEsperado conter: %q\nObtido: %q", expectedErrSub, err.Error())
+	}
+}
+
+
+

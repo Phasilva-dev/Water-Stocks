@@ -74,40 +74,68 @@ func NewDayProfile(events []dists.Distribution, minShift, maxPercent float64) (*
 }
 
 // generateTime amostra um valor de uma distribuição e o trunca para um número inteiro.
+//
+// Parâmetros:
+//   - dist: Distribuição da qual o valor será amostrado.
+//   - rng: Gerador de números aleatórios.
+//
+// Retorna um valor truncado da distribuição.
 func generateTime(dist dists.Distribution, rng *rand.Rand) float64 {
 	return math.Trunc(dist.Sample(rng))
 }
 
-// enforceMinShift ajusta o tempo 'current' para garantir que haja um espaçamento mínimo de 'minShift'
-// em relação ao tempo 'prev'.
-// Se 'current' for menor que 'prev + minShift', ele é ajustado para um valor que respeite o mínimo,
-// considerando a diferença original entre 'prev' e 'current'.
-func (r *DayProfile) enforceMinShift(prev, current float64) float64 {
-	if r.minShift == 0 {
+// enforceMinShift ajusta o tempo 'current' para garantir que haja um espaçamento mínimo
+// de 'minShift' em relação ao tempo 'prev'.
+//
+// A função tenta preservar a diferença original entre os tempos amostrados,
+// mas, se necessário, empurra 'current' para frente a fim de respeitar o intervalo mínimo.
+//
+// Regras:
+//   - Se minShift for 0, retorna 'current' sem alterações.
+//   - Se 'current' for menor que 'prev + minShift', calcula a diferença absoluta entre eles:
+//       - Se essa diferença for menor que minShift, retorna 'prev + diff + minShift'.
+//         (empurra o evento ainda mais para evitar sobreposição)
+//       - Caso contrário, retorna 'prev + diff'.
+//   - Se 'current' já respeita o espaçamento mínimo, retorna o valor original.
+//
+// Parâmetros:
+//   - prev: Tempo do evento anterior (em segundos).
+//   - current: Tempo amostrado para o próximo evento (em segundos).
+//   - minShift: Espaçamento mínimo entre eventos consecutivos (em segundos).
+//
+// Retorna:
+//   - O tempo ajustado de 'current' que respeita o espaçamento mínimo.
+func enforceMinShift(prev, current, minShift float64) float64 {
+	if minShift == 0 {
 		return current
 	}
-	if current < prev+r.minShift {
+
+	limit := prev + minShift
+
+	if current < limit {
 		diff := math.Abs(current - prev)
-		if diff < r.minShift {
-			// Se a diferença é pequena, adiciona a diferença e o shift mínimo
-			return prev + diff + r.minShift
+		if diff < minShift {
+			return prev + diff + minShift
 		}
-		// Se a diferença é maior ou igual ao shift, apenas garante que current é pelo menos prev + diff
 		return prev + diff
 	}
+
 	return current
 }
 
 // enforceMaxValue limita o valor 'sample' ao percentil 'maxPercent' da distribuição.
-// Se r.maxPercent for 0 ou 1, ou fora do intervalo (0, 1), nenhum limite de percentil é aplicado,
-// e o valor 'sample' original é retornado.
-// Caso contrário, 'sample' é truncado para o valor do percentil se for maior.
-func (r *DayProfile) enforceMaxValue(dist dists.Distribution, sample float64) float64 {
-	if r.maxPercent >= 1 || r.maxPercent <= 0 {
+//
+// Parâmetros:
+//   - dist: Distribuição associada ao evento.
+//   - sample: Valor amostrado a ser verificado.
+//
+// Retorna o valor original ou limitado pelo percentil da distribuição.
+func enforceMaxValue(dist dists.Distribution, sample, maxPercent float64) float64 {
+	if maxPercent >= 1 || maxPercent <= 0 {
 		return sample
 	}
 
-	max := dist.Percentile(r.maxPercent)
+	max := dist.Percentile(maxPercent)
 	if sample > max {
 		return max
 	}
@@ -117,27 +145,33 @@ func (r *DayProfile) enforceMaxValue(dist dists.Distribution, sample float64) fl
 // GenerateData gera uma nova rotina comportamental com base no perfil atual e
 // em um gerador de números aleatórios fornecido.
 // Os tempos são amostrados, limitados por maxPercent e ajustados para respeitar minShift.
+//
+// Parâmetros:
+//   - rng: Gerador de números aleatórios.
+//
+// Retorna um ponteiro para Routine com os tempos gerados, ou um erro se a geração falhar após múltiplas tentativas.
 func (r *DayProfile) GenerateData(rng *rand.Rand) (*behavioral.Routine, error) {
 	dists := r.events // Renomeado para evitar conflito com 'dist' no loop
 	times := make([]float64, len(dists))
 
 	const maxAttempts = 10
-	const maxTimeValue = 172799.0
+	const maxTimeValue = 172799.0 // Último segundo do dia (23h59m59s)
 	const minTimeValue = 0.0
 	attempts := 0
 
 	for {
-
 		// Amostra e aplica o limite de valor máximo a cada evento
 		for i, dist := range dists {
 			times[i] = generateTime(dist, rng)
-			times[i] = r.enforceMaxValue(dists[i], times[i])
+			times[i] = enforceMaxValue(dists[i], times[i], r.maxPercent)
 		}
+
 		// Aplica o shift mínimo entre eventos sequencialmente
 		for i := 1; i < len(times); i++ {
-			times[i] = r.enforceMinShift(times[i-1], times[i])
+			times[i] = enforceMinShift(times[i-1], times[i],r.minShift)
 			times[i] = math.Trunc(times[i])
 		}
+
 		// Verificar se todos os tempos estão no intervalo válido
 		valid := true
 		for i := 0; i < len(times); i++ {

@@ -7,34 +7,33 @@ import (
 	"math/rand/v2"
 	"simulation/internal/dists"
 	"simulation/internal/entities/resident/ds/behavioral"
-	"log"
 )
 
-// RoutineProfile representa um perfil de rotina diária.
+// DayProfile representa um perfil de rotina diária.
 // Contém as distribuições para os eventos da rotina, um tempo mínimo entre eventos
 // e um percentil máximo para limitar os valores amostrados das distribuições.
-type RoutineProfile struct {
+type DayProfile struct {
 	events     []dists.Distribution
 	minShift   float64
 	maxPercent float64 // Percentil máximo (entre 0 e 1, ex.: 0.99) para limitar os valores amostrados.
 }
 
 // Events retorna as distribuições dos eventos da rotina.
-func (p *RoutineProfile) Events() []dists.Distribution {
+func (p *DayProfile) Events() []dists.Distribution {
 	return p.events
 }
 
 // MinShift retorna o tempo mínimo obrigatório entre eventos consecutivos.
-func (p *RoutineProfile) MinShift() float64 {
+func (p *DayProfile) MinShift() float64 {
 	return p.minShift
 }
 
 // MaxPercent retorna o percentil máximo usado para limitar os valores amostrados dos eventos.
-func (p *RoutineProfile) MaxPercent() float64 {
+func (p *DayProfile) MaxPercent() float64 {
 	return p.maxPercent
 }
 
-// NewRoutineProfile cria um novo perfil de rotina.
+// NewDayProfile cria um novo perfil de rotina.
 //
 // Parâmetros:
 //   - events: Lista de distribuições que definem os horários dos eventos da rotina.
@@ -43,8 +42,8 @@ func (p *RoutineProfile) MaxPercent() float64 {
 //   - maxPercent: O percentil (entre 0 e 1) usado para limitar o valor máximo de cada evento amostrado.
 //     Um valor de 1.0 ou 0.0 (ou fora do intervalo (0,1)) significa que nenhum limite de percentil é aplicado (o valor amostrado é mantido).
 //
-// Retorna um ponteiro para RoutineProfile ou um erro se a validação falhar.
-func NewRoutineProfile(events []dists.Distribution, minShift, maxPercent float64) (*RoutineProfile, error) {
+// Retorna um ponteiro para DayProfile ou um erro se a validação falhar.
+func NewDayProfile(events []dists.Distribution, minShift, maxPercent float64) (*DayProfile, error) {
 	if len(events) == 0 {
 		return nil, fmt.Errorf("invalid routine profile: events must not be empty (got length %d)", len(events))
 	}
@@ -67,7 +66,7 @@ func NewRoutineProfile(events []dists.Distribution, minShift, maxPercent float64
 		}
 	}
 
-	return &RoutineProfile{
+	return &DayProfile{
 		events:     eventsCopy,
 		minShift:   minShift,
 		maxPercent: maxPercent,
@@ -83,7 +82,7 @@ func generateTime(dist dists.Distribution, rng *rand.Rand) float64 {
 // em relação ao tempo 'prev'.
 // Se 'current' for menor que 'prev + minShift', ele é ajustado para um valor que respeite o mínimo,
 // considerando a diferença original entre 'prev' e 'current'.
-func (r *RoutineProfile) enforceMinShift(prev, current float64) float64 {
+func (r *DayProfile) enforceMinShift(prev, current float64) float64 {
 	if r.minShift == 0 {
 		return current
 	}
@@ -103,7 +102,7 @@ func (r *RoutineProfile) enforceMinShift(prev, current float64) float64 {
 // Se r.maxPercent for 0 ou 1, ou fora do intervalo (0, 1), nenhum limite de percentil é aplicado,
 // e o valor 'sample' original é retornado.
 // Caso contrário, 'sample' é truncado para o valor do percentil se for maior.
-func (r *RoutineProfile) enforceMaxValue(dist dists.Distribution, sample float64) float64 {
+func (r *DayProfile) enforceMaxValue(dist dists.Distribution, sample float64) float64 {
 	if r.maxPercent >= 1 || r.maxPercent <= 0 {
 		return sample
 	}
@@ -118,7 +117,7 @@ func (r *RoutineProfile) enforceMaxValue(dist dists.Distribution, sample float64
 // GenerateData gera uma nova rotina comportamental com base no perfil atual e
 // em um gerador de números aleatórios fornecido.
 // Os tempos são amostrados, limitados por maxPercent e ajustados para respeitar minShift.
-func (r *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
+func (r *DayProfile) GenerateData(rng *rand.Rand) (*behavioral.Routine, error) {
 	dists := r.events // Renomeado para evitar conflito com 'dist' no loop
 	times := make([]float64, len(dists))
 
@@ -154,9 +153,9 @@ func (r *RoutineProfile) GenerateData(rng *rand.Rand) *behavioral.Routine {
 
 		attempts++
 		if attempts >= maxAttempts {
-			log.Fatalf("Não foi possível gerar tempos válidos após %d tentativas", attempts)
+			return nil, fmt.Errorf("invalid routine profile simulation: time should be between 0 and 172799.0 in at least 1 out of 10 attempts")
 		}
 	}
 
-	return behavioral.NewRoutine(times)
+	return behavioral.NewRoutine(times), nil
 }

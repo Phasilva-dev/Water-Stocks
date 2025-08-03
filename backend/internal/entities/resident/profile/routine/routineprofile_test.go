@@ -47,7 +47,7 @@ func (m *MockDistribution) String() string {
 	return m.StringValue
 }
 
-func TestNewRoutineProfile(t *testing.T) {
+func TestNewDayProfile(t *testing.T) {
 	// mockDist para casos válidos e de erro de nil
 	mockDist, _ := dists.NewNormalDist(20, 4)
 
@@ -129,7 +129,7 @@ func TestNewRoutineProfile(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewRoutineProfile(tt.events, tt.minShift, tt.maxPercent)
+			got, err := NewDayProfile(tt.events, tt.minShift, tt.maxPercent)
 
 			if tt.wantErr {
 				if err == nil {
@@ -176,17 +176,17 @@ func TestEnforceMaxValueIsRespected(t *testing.T) {
 		PercentileValue: expectedCap, // Qualquer percentil retornará 100.0 para este mock
 	}
 
-	profile, err := NewRoutineProfile(
+	profile, err := NewDayProfile(
 		[]dists.Distribution{mock, mock}, // Usar duas vezes para ter dois eventos
 		minShift,
 		maxPercentValue,
 	)
 	if err != nil {
-		t.Fatalf("Erro ao criar RoutineProfile: %v", err)
+		t.Fatalf("Erro ao criar DayProfile: %v", err)
 	}
 
 	rng := rand.New(rand.NewPCG(42, 1)) // Gerador determinístico
-	routine := profile.GenerateData(rng)
+	routine, _ := profile.GenerateData(rng)
 
 	// Verificar se todos os tempos gerados estão dentro do limite.
 	// Como minShift é 0, enforceMinShift não deve empurrar os valores além do limite.
@@ -211,7 +211,7 @@ func TestGenerateDataDeterministic(t *testing.T) {
 	// Uma distribuição com stddev=0 sempre amostrará a média.
 	mockDist, _ := dists.NewNormalDist(10, 0)
 
-	profile, err := NewRoutineProfile(
+	profile, err := NewDayProfile(
 		[]dists.Distribution{mockDist, mockDist},
 		minShift,
 		maxPercentTest,
@@ -224,7 +224,7 @@ func TestGenerateDataDeterministic(t *testing.T) {
 	routines := make([]*behavioral.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
-		routine := profile.GenerateData(rng)
+		routine, _ := profile.GenerateData(rng)
 		routines = append(routines, routine)
 	}
 
@@ -275,7 +275,7 @@ func TestGenerateDataReal(t *testing.T) {
 	returnDist, _ := dists.NewNormalDist(18*60*60, 30*60) // 6:00 PM, stddev 30min
 	sleepDist, _ := dists.NewNormalDist(22*60*60, 30*60) // 10:00 PM, stddev 30min
 
-	profile, err := NewRoutineProfile(
+	profile, err := NewDayProfile(
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},
 		minShift,
 		maxPercentTest,
@@ -288,7 +288,7 @@ func TestGenerateDataReal(t *testing.T) {
 	routines := make([]*behavioral.Routine, 0, numRoutines)
 
 	for i := 0; i < numRoutines; i++ {
-		routine := profile.GenerateData(rng)
+		routine, _ := profile.GenerateData(rng)
 		routines = append(routines, routine)
 	}
 

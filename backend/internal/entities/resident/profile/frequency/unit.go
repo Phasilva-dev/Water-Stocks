@@ -9,35 +9,35 @@ import (
 	"simulation/internal/dists" // Interface para distribuições estatísticas.
 )
 
-// FrequencyProfile representa um perfil estatístico usado para gerar valores de frequência.
+// DeviceProfile representa um perfil estatístico usado para gerar valores de frequência.
 // Ele inclui uma distribuição base e um valor mínimo (shift) a ser aplicado ao resultado.
-type FrequencyProfile struct {
+type DeviceProfile struct {
 	statDist dists.Distribution // A distribuição estatística base para amostrar frequências.
 	shift    uint8              // O valor mínimo (inclusive) que uma frequência gerada pode ter.
 }
 
 // Shift retorna o valor mínimo (shift) configurado no perfil.
-func (f *FrequencyProfile) Shift() uint8 {
+func (f *DeviceProfile) Shift() uint8 {
 	return f.shift
 }
 
 // StatDist retorna a distribuição estatística base usada pelo perfil.
-func (f *FrequencyProfile) StatDist() dists.Distribution {
+func (f *DeviceProfile) StatDist() dists.Distribution {
 	return f.statDist
 }
 
-// NewFrequencyProfile cria um novo perfil de frequência.
+// NewDeviceProfile cria um novo perfil de frequência.
 //
 // dist: A distribuição estatística base para o perfil. Não pode ser nula.
 // shift: O valor mínimo que as frequências geradas devem ter.
 //
-// Retorna um ponteiro para o FrequencyProfile ou um erro se a distribuição for nula.
-func NewFrequencyProfile(dist dists.Distribution, shift uint8) (*FrequencyProfile, error) {
+// Retorna um ponteiro para o DeviceProfile ou um erro se a distribuição for nula.
+func NewDeviceProfile(dist dists.Distribution, shift uint8) (*DeviceProfile, error) {
 	if dist == nil {
-		return nil, errors.New("invalid FrequencyProfile: distribution cannot be nil \n ")
+		return nil, errors.New("invalid DeviceProfile: distribution cannot be nil \n ")
 	}
 
-	return &FrequencyProfile{
+	return &DeviceProfile{
 		statDist: dist,
 		shift:    shift,
 	}, nil
@@ -76,6 +76,6 @@ func generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution)
 //
 // Retorna um valor de frequência uint8 que respeita o shift mínimo do perfil
 // e está dentro dos limites de 0 a 255.
-func (f *FrequencyProfile) GenerateData(rng *rand.Rand) uint8 {
+func (f *DeviceProfile) GenerateData(rng *rand.Rand) uint8 {
 	return generateFrequency(rng, f.shift, f.statDist)
 }

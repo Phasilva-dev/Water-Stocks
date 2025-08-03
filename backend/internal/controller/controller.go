@@ -25,9 +25,11 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	//Variaveis de dados
 	populationData := accumulator.NewPopulationData(houses)
 	dailyUsagesDataWindow := make(map[uint8]*accumulator.AccumulatorDay)
+	dailyPulseDataWindow := make(map[uint8]*accumulator.PulseHouse)
 
 	for i := uint8(0); i < uint8(day+2); i++ {
 		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),accumulator.OrderedDeviceKeys())
+		dailyPulseDataWindow[uint8(i)] = accumulator.NewPulseHouse(uint8(i),accumulator.OrderedDeviceKeys())
 	}
 
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -36,6 +38,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 				log.Fatalf("Erro ao gerar logs da casa %d no dia %d: %v", j, i, err)
 			}
 			dailyUsagesDataWindow[1].UpdateAccumulator(i+1,houses[j],dailyUsagesDataWindow)
+			dailyPulseDataWindow[1].UpdatePulseWithWindow(i+1, houses[j],dailyPulseDataWindow)
 		}
 	}
 
@@ -55,7 +58,11 @@ func RunSimulation(size, day, toiletType, showerType int) {
 
 	err := dailyUsagesDataWindow[1].ExportToExcel("consumo_diario.xlsx")
 		if err != nil {
-	log.Fatalf("Erro exportando Excel: %v", err)
+		log.Fatalf("Erro exportando Excel: %v", err)
+	}
+	err = dailyPulseDataWindow[1].ExportPulsesToCSV("pulsos_retangulares.csv")
+		if err != nil {
+		log.Fatalf("Erro exportando csv: %v", err)
 	}
 
 	

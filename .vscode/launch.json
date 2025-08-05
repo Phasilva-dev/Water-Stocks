@@ -13,6 +13,14 @@
                 "-toiletType", "2",
                 "-showerType", "1"
             ]
+        },
+        {
+            "name": "Debug Test EnforceMinShiftUnderstanding",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/backend/internal/entities/resident/profile/routine",
+            "args": [""]
         }
     ]
 }

@@ -14,7 +14,7 @@ import (
 	"simulation/internal/misc"
 	"simulation/internal/entities"
 
-		"log"
+	"log"
 	"math/rand/v2"
 
 )

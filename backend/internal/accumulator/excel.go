@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"simulation/internal/configs"
+
 	"github.com/xuri/excelize/v2"
 )
 
@@ -11,7 +13,7 @@ func (a *AccumulatorDay) ExportToExcel(filename string) error {
 	f := excelize.NewFile()
 
 	// Pegamos os dispositivos do primeiro acumulador (hora 0)
-	deviceTypes := OrderedDeviceKeys()
+	deviceTypes := configs.OrderedDeviceKeys()
 	// Cabeçalho
 	f.SetCellValue("Sheet1", "A1", "Hour")
 	for i, device := range deviceTypes {

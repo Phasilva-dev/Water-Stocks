@@ -6,6 +6,7 @@ import (
 	logData "simulation/internal/log"
 	"fmt"
 	"math"
+	"simulation/internal/configs"
 )
 
 type AccumulatorInterface interface {
@@ -261,16 +262,7 @@ func (a *AccumulatorDay) RoundAccumulatorDayValues() {
 	}
 }
 
-func OrderedDeviceKeys() []string {
-	return []string{
-		"toilet",
-		"shower",
-		"wash_bassin",
-		"wash_machine",
-		"dish_washer",
-		"tanque",
-	}
-}
+
 
 
 func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
@@ -288,7 +280,7 @@ func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
 
 	// Primeiro, descobrimos todos os tipos de dispositivos existentes
 	// Pegando do primeiro acumulador (hora 0), pois todos têm as mesmas chaves
-	deviceTypes := OrderedDeviceKeys()
+	deviceTypes := configs.OrderedDeviceKeys()
 
 	// Para cada tipo de dispositivo, printar hora a hora
 	for _, device := range deviceTypes {

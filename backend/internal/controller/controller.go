@@ -7,6 +7,7 @@ import (
 	"math/rand/v2"
 	"time"
 	"simulation/internal/accumulator"
+	"simulation/internal/configs"
 )
 
 
@@ -28,8 +29,8 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	dailyPulseDataWindow := make(map[uint8]*accumulator.PulseHouse)
 
 	for i := uint8(0); i < uint8(day+2); i++ {
-		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),accumulator.OrderedDeviceKeys())
-		dailyPulseDataWindow[uint8(i)] = accumulator.NewPulseHouse(uint8(i),accumulator.OrderedDeviceKeys())
+		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),configs.OrderedDeviceKeys())
+		dailyPulseDataWindow[uint8(i)] = accumulator.NewPulseHouse(uint8(i),configs.OrderedDeviceKeys())
 	}
 
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -48,7 +49,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	populationData.ViewPopulationData()
 	fmt.Println()
 
-	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, accumulator.OrderedDeviceKeys())
+	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, configs.OrderedDeviceKeys())
 
 	for k := uint8(1); k < uint8(day+2); k++ {
 		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()

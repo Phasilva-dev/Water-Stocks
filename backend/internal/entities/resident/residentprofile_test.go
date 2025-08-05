@@ -14,14 +14,7 @@ import (
 	"simulation/internal/entities/resident/profile/routine"
 )
 
-const (
-	freqToilet      = "toilet"
-	freqShower      = "shower"
-	freqWashBassin  = "washBassin"
-	freqWashMachine = "washMachine"
-	freqDishWasher  = "dishWasher"
-	freqTanque      = "tanque"
-)
+
 //Variaveis para testar weekly
 
 var mockFreqDist, _ = dists.CreateDistribution("normal", 1, 0)

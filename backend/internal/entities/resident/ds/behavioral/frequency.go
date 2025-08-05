@@ -7,12 +7,16 @@ import "fmt"
 // Frequency armazena a frequência diária de uso de diferentes pontos de consumo de água
 // dentro de uma residência. Os campos são privados para garantir acesso controlado via métodos.
 type Frequency struct {
-	deviceFrequency map[string]uint8
+	devicesFrequency map[string]uint8
+}
+
+func (f *Frequency) DevicesFrequency() map[string]uint8 { 
+	return f.devicesFrequency
 }
 
 // DeviceFrequency retorna o valor referente ao dispositivo sanitario.
 func (f *Frequency) DeviceFrequency(deviceType string) uint8 { 
-	if freq, ok := f.deviceFrequency[deviceType]; ok {
+	if freq, ok := f.devicesFrequency[deviceType]; ok {
 		return freq
 	}
 	return 0
@@ -24,6 +28,6 @@ func NewFrequency(frequencyDevices map[string]uint8) (*Frequency, error) {
 		return nil, fmt.Errorf("invalid frequency behavioral: frequency values map cannot be nil")
 	}
 	return &Frequency{
-		deviceFrequency: frequencyDevices,
+		devicesFrequency: frequencyDevices,
 	}, nil
 }

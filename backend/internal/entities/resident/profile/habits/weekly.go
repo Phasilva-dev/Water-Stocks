@@ -7,12 +7,12 @@ import (
 )
 
 type ResidentWeeklyProfile struct {
-	profiles []*ResidentDayProfile
+	profiles []*ResidentDailyProfile
 }
 
 
 
-func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProfile, error) {
+func NewResidentWeeklyProfile(values []*ResidentDailyProfile) (*ResidentWeeklyProfile, error) {
 	if len(values) > 7 || len(values) == 0 {
 		return nil, fmt.Errorf("invalid ResidentWeeklyProfile: 'values' slice must contain between 1 and 7 entries (got entries = %d) \n ", len(values))
 	}
@@ -22,7 +22,7 @@ func NewResidentWeeklyProfile(values []*ResidentDayProfile) (*ResidentWeeklyProf
 	}, nil
 }
 
-func (r *ResidentWeeklyProfile) Profiles() []*ResidentDayProfile{
+func (r *ResidentWeeklyProfile) Profiles() []*ResidentDailyProfile{
 	return r.profiles
 }
 

@@ -3,15 +3,15 @@ package resident
 import (
 	"math/rand/v2"
 
+	"reflect"
+	"simulation/internal/configs"
 	"simulation/internal/dists"
 	"testing"
-	"reflect"
 
 	"simulation/internal/entities/resident/ds/behavioral"
 	"simulation/internal/entities/resident/profile/frequency"
-	"simulation/internal/entities/resident/profile/routine"
 	"simulation/internal/entities/resident/profile/habits"
-
+	"simulation/internal/entities/resident/profile/routine"
 )
 
 const (
@@ -30,27 +30,32 @@ var mockWorkTimeDist, _ = dists.CreateDistribution("normal", 8 * 3600, 0)
 var mockReturnHomeDist, _ = dists.CreateDistribution("normal", 18 * 3600, 0)
 var mockSleepTimeDist, _ = dists.CreateDistribution("normal", 22 * 3600, 0)
 
-var frequencyProfileMock, _ = frequency.NewFrequencyProfile(mockFreqDist, 0)
+var frequencyProfileMock, _ = frequency.NewDeviceProfile(mockFreqDist, 0)
 
 
-var routineProfileMock, _ = routine.NewRoutineProfile(
+var routineProfileMock, _ = routine.NewDayProfile(
 	[]dists.Distribution{mockWakeUpDist, mockWorkTimeDist, mockReturnHomeDist, mockSleepTimeDist},
 	0,0,
 )
 
-var rdp = habits.NewResidentDayProfile(routineProfileMock, frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyProfile{
-	freqToilet:     frequencyProfileMock,
-	freqShower:     frequencyProfileMock,
-	freqWashBassin: frequencyProfileMock,
-	freqWashMachine: frequencyProfileMock,
-	freqDishWasher: frequencyProfileMock,
-	freqTanque:     frequencyProfileMock,
-}))
+func buildFrequencyProfileDay(profile *frequency.DeviceProfile) *frequency.ResidentDeviceProfiles {
+	m := make(map[string]*frequency.DeviceProfile)
+	for _, key := range configs.OrderedDeviceKeys() {
+		m[key] = profile
+	}
+	profiles, _ := frequency.NewResidentDeviceProfiles(m)
+	return profiles
+}
+
+var rdp = habits.NewResidentDailyProfile(routineProfileMock,
+	buildFrequencyProfileDay(frequencyProfileMock))
 
 var expectedRoutine = behavioral.NewRoutine([]float64{6 * 3600, 8 * 3600, 18 * 3600, 22 * 3600})
-var expectedFrequency = behavioral.NewFrequency(1,1,1,1,1,1)
+var expectedFrequency, _ = behavioral.NewFrequency(map[string]uint8{
+		"toilet": 1, "shower": 1, "wash_bassin": 1, "wash_machine": 1, "dish_washer": 1, "tanque": 1,
+	})
 
-var profiles = []*habits.ResidentDayProfile{rdp}
+var profiles = []*habits.ResidentDailyProfile{rdp}
 var wp, _ = habits.NewResidentWeeklyProfile(profiles)
 var id uint32 = 1
 
@@ -86,7 +91,7 @@ func TestGenerateRoutine(t *testing.T) {
 	rp, _ := NewResidentProfile(wp, id)
 	rng := rand.New(rand.NewPCG(42, 54)) // determinístico
 
-	routine := rp.GenerateRoutine(0, rng)
+	routine, _ := rp.GenerateRoutine(0, rng)
 	if routine == nil {
 		t.Fatal("expected non-nil Routine")
 	}
@@ -100,7 +105,7 @@ func TestGenerateFrequency(t *testing.T) {
 	rp, _ := NewResidentProfile(wp, id)
 	rng := rand.New(rand.NewPCG(42, 54))
 
-	freq := rp.GenerateFrequency(0, rng)
+	freq, _ := rp.GenerateFrequency(0, rng)
 	if freq == nil {
 		t.Fatal("expected non-nil Frequency")
 	}
@@ -111,10 +116,10 @@ func TestGenerateFrequency(t *testing.T) {
 		}
 	}
 
-	compareFrequency("Toilet", freq.Toilet(), expectedFrequency.Toilet())
-	compareFrequency("Shower", freq.Shower(), expectedFrequency.Shower())
-	compareFrequency("WashBassin", freq.WashBassin(), expectedFrequency.WashBassin())
-	compareFrequency("WashMachine", freq.WashMachine(), expectedFrequency.WashMachine())
-	compareFrequency("DishWasher", freq.DishWasher(), expectedFrequency.DishWasher())
-	compareFrequency("Tanque", freq.Tanque(), expectedFrequency.Tanque())
+	compareFrequency("Toilet", freq.DeviceFrequency("toilet"), expectedFrequency.DeviceFrequency("toilet"))
+	compareFrequency("Shower", freq.DeviceFrequency("shower"), expectedFrequency.DeviceFrequency("shower"))
+	compareFrequency("WashBassin", freq.DeviceFrequency("wash_bassin"), expectedFrequency.DeviceFrequency("wash_bassin"))
+	compareFrequency("WashMachine", freq.DeviceFrequency("wash_machine"), expectedFrequency.DeviceFrequency("wash_machine"))
+	compareFrequency("DishWasher", freq.DeviceFrequency("dish_washer"), expectedFrequency.DeviceFrequency("dish_washer"))
+	compareFrequency("Tanque", freq.DeviceFrequency("tanque"), expectedFrequency.DeviceFrequency("tanque"))
 }

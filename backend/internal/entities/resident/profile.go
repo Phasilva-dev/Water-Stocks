@@ -43,7 +43,7 @@ func NewResidentProfile(profile *habits.ResidentWeeklyProfile, id uint32) (*Resi
 //   - rng: O gerador de números aleatórios a ser usado.
 //
 // Retorna um ponteiro para a estrutura behavioral.Frequency com os dados gerados.
-func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) *behavioral.Frequency {
+func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) (*behavioral.Frequency, error) {
 	// A responsabilidade de verificar se o 'day' é válido para o weeklyProfile
 	// (e se o perfil para aquele dia existe) está dentro de weeklyProfile.GenerateFrequency.
 	return r.weeklyProfile.GenerateFrequency(day, rng)
@@ -57,7 +57,7 @@ func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) *behavior
 //   - rng: O gerador de números aleatórios a ser usado.
 //
 // Retorna um ponteiro para a estrutura behavioral.Routine com os dados gerados.
-func (r *ResidentProfile) GenerateRoutine(day uint8, rng *rand.Rand) *behavioral.Routine {
+func (r *ResidentProfile) GenerateRoutine(day uint8, rng *rand.Rand) (*behavioral.Routine, error) {
 	// A responsabilidade de verificar se o 'day' é válido para o weeklyProfile
 	// (e se o perfil para aquele dia existe) está dentro de weeklyProfile.GenerateRoutine.
 	return r.weeklyProfile.GenerateRoutine(day, rng)

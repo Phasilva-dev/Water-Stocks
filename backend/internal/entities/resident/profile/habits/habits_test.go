@@ -41,12 +41,12 @@ func buildFrequencyProfileDay(profile *frequency.DeviceProfile) *frequency.Resid
 var frequencyDayProfileMock = buildFrequencyProfileDay(frequencyProfileMock)
 
 
-// --- Testes para ResidentDayProfile ---
+// --- Testes para ResidentDailyProfile ---
 
-func TestResidentDayProfile(t *testing.T) {
+func TestResidentDailyProfile(t *testing.T) {
 
 	t.Run("ConstructorAndGetters", func(t *testing.T) {
-		rdp := NewResidentDayProfile(routineProfileMock, frequencyDayProfileMock)
+		rdp := NewResidentDailyProfile(routineProfileMock, frequencyDayProfileMock)
 
 		if rdp.routineProfile != routineProfileMock {
 			t.Errorf("routineProfile incorreto. Esperado %v, obtido %v", routineProfileMock, rdp.routineProfile)
@@ -65,7 +65,7 @@ func TestResidentDayProfile(t *testing.T) {
 
 	t.Run("GenerateRoutineDelegation", func(t *testing.T) {
 		expectedRoutine := behavioral.NewRoutine([]float64{1.0, 2.0, 3.0, 5.0})
-		rdp := NewResidentDayProfile(routineProfileMock, frequencyDayProfileMock)
+		rdp := NewResidentDailyProfile(routineProfileMock, frequencyDayProfileMock)
 		rng := rand.New(rand.NewPCG(123, 456))
 
 		routine, _ := rdp.GenerateRoutine(rng)
@@ -79,7 +79,7 @@ func TestResidentDayProfile(t *testing.T) {
 			"toilet": 1, "shower": 1, "wash_bassin": 1,
 			"wash_machine": 1, "dish_washer": 1, "tanque": 1,
 		})
-		rdp := NewResidentDayProfile(routineProfileMock, frequencyDayProfileMock)
+		rdp := NewResidentDailyProfile(routineProfileMock, frequencyDayProfileMock)
 		rng := rand.New(rand.NewPCG(789, 1011))
 
 		freq, _ := rdp.GenerateFrequency(rng)
@@ -123,9 +123,9 @@ var (
 
 // Perfis diários mockados com distribuições diferentes
 var (
-	rdp1 = NewResidentDayProfile(routineProfileMock1, buildFrequencyProfileDay(frequencyProfileMock1))
-	rdp2 = NewResidentDayProfile(routineProfileMock2, buildFrequencyProfileDay(frequencyProfileMock2))
-	rdp3 = NewResidentDayProfile(routineProfileMock3, buildFrequencyProfileDay(frequencyProfileMock3))
+	rdp1 = NewResidentDailyProfile(routineProfileMock1, buildFrequencyProfileDay(frequencyProfileMock1))
+	rdp2 = NewResidentDailyProfile(routineProfileMock2, buildFrequencyProfileDay(frequencyProfileMock2))
+	rdp3 = NewResidentDailyProfile(routineProfileMock3, buildFrequencyProfileDay(frequencyProfileMock3))
 )
 
 // --- Testes para ResidentWeeklyProfile ---
@@ -135,12 +135,12 @@ func TestResidentWeeklyProfile(t *testing.T) {
 	t.Run("NewResidentWeeklyProfile", func(t *testing.T) {
 		// Testes válidos com 1, 3 e 7 perfis
 		validCases := []struct {
-			profiles []*ResidentDayProfile
+			profiles []*ResidentDailyProfile
 			wantLen  int
 		}{
-			{[]*ResidentDayProfile{rdp1}, 1},
-			{[]*ResidentDayProfile{rdp1, rdp2, rdp3}, 3},
-			{[]*ResidentDayProfile{rdp1, rdp2, rdp3, rdp1, rdp2, rdp3, rdp1}, 7},
+			{[]*ResidentDailyProfile{rdp1}, 1},
+			{[]*ResidentDailyProfile{rdp1, rdp2, rdp3}, 3},
+			{[]*ResidentDailyProfile{rdp1, rdp2, rdp3, rdp1, rdp2, rdp3, rdp1}, 7},
 		}
 
 		for _, tc := range validCases {
@@ -151,16 +151,16 @@ func TestResidentWeeklyProfile(t *testing.T) {
 		}
 
 		// Casos inválidos: 0 e 8 perfis
-		if wp, err := NewResidentWeeklyProfile([]*ResidentDayProfile{}); err == nil || wp != nil {
+		if wp, err := NewResidentWeeklyProfile([]*ResidentDailyProfile{}); err == nil || wp != nil {
 			t.Error("Esperado erro para 0 perfis, mas foi aceito")
 		}
-		if wp, err := NewResidentWeeklyProfile(make([]*ResidentDayProfile, 8)); err == nil || wp != nil {
+		if wp, err := NewResidentWeeklyProfile(make([]*ResidentDailyProfile, 8)); err == nil || wp != nil {
 			t.Error("Esperado erro para 8 perfis, mas foi aceito")
 		}
 	})
 
 	t.Run("GenerateRoutine", func(t *testing.T) {
-		wp, _ := NewResidentWeeklyProfile([]*ResidentDayProfile{rdp1, rdp2, rdp3})
+		wp, _ := NewResidentWeeklyProfile([]*ResidentDailyProfile{rdp1, rdp2, rdp3})
 		rng := rand.New(rand.NewPCG(2023, 11))
 
 		tests := []struct {
@@ -188,7 +188,7 @@ func TestResidentWeeklyProfile(t *testing.T) {
 	})
 
 	t.Run("GenerateFrequency", func(t *testing.T) {
-		wp, _ := NewResidentWeeklyProfile([]*ResidentDayProfile{rdp1, rdp2, rdp3})
+		wp, _ := NewResidentWeeklyProfile([]*ResidentDailyProfile{rdp1, rdp2, rdp3})
 		rng := rand.New(rand.NewPCG(2023, 11))
 
 		tests := []struct {

@@ -9,27 +9,27 @@ import (
 	"simulation/internal/entities/resident/profile/habits"
 )
 
-// ResidentProfile representa o perfil completo de um residente, incluindo sua
+// Profile representa o perfil completo de um residente, incluindo sua
 // ID de ocupação e seu perfil de hábitos comportamentais semanais.
-type ResidentProfile struct {
+type Profile struct {
 	OccupationID  uint32
 	weeklyProfile *habits.ResidentWeeklyProfile
 }
 
-// NewResidentProfile cria uma nova instância de ResidentProfile.
+// NewProfile cria uma nova instância de Profile.
 //
 // Parâmetros:
 //   - profile: O perfil de hábitos semanais do residente. Não pode ser nil.
 //   - id: A ID de ocupação do residente. Não pode ser zero.
 //
-// Retorna um ponteiro para o ResidentProfile recém-criado ou um erro se os
+// Retorna um ponteiro para o Profile recém-criado ou um erro se os
 // parâmetros forem inválidos.
-func NewResidentProfile(profile *habits.ResidentWeeklyProfile, id uint32) (*ResidentProfile, error) {
+func NewProfile(profile *habits.ResidentWeeklyProfile, id uint32) (*Profile, error) {
 	if profile == nil {
 		return nil, errors.New("invalid ResidentProfile: weekly profile cannot be nil")
 	}
 
-	return &ResidentProfile{
+	return &Profile{
 		OccupationID:  id,
 		weeklyProfile: profile,
 	}, nil
@@ -43,7 +43,7 @@ func NewResidentProfile(profile *habits.ResidentWeeklyProfile, id uint32) (*Resi
 //   - rng: O gerador de números aleatórios a ser usado.
 //
 // Retorna um ponteiro para a estrutura behavioral.Frequency com os dados gerados.
-func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) (*behavioral.Frequency, error) {
+func (r *Profile) GenerateFrequency(day uint8, rng *rand.Rand) (*behavioral.Frequency, error) {
 	// A responsabilidade de verificar se o 'day' é válido para o weeklyProfile
 	// (e se o perfil para aquele dia existe) está dentro de weeklyProfile.GenerateFrequency.
 	return r.weeklyProfile.GenerateFrequency(day, rng)
@@ -57,7 +57,7 @@ func (r *ResidentProfile) GenerateFrequency(day uint8, rng *rand.Rand) (*behavio
 //   - rng: O gerador de números aleatórios a ser usado.
 //
 // Retorna um ponteiro para a estrutura behavioral.Routine com os dados gerados.
-func (r *ResidentProfile) GenerateRoutine(day uint8, rng *rand.Rand) (*behavioral.Routine, error) {
+func (r *Profile) GenerateRoutine(day uint8, rng *rand.Rand) (*behavioral.Routine, error) {
 	// A responsabilidade de verificar se o 'day' é válido para o weeklyProfile
 	// (e se o perfil para aquele dia existe) está dentro de weeklyProfile.GenerateRoutine.
 	return r.weeklyProfile.GenerateRoutine(day, rng)

@@ -54,7 +54,7 @@ var id uint32 = 1
 
 
 func TestNewResidentProfile_Success(t *testing.T) {
-	rp, err := NewResidentProfile(wp, id)
+	rp, err := NewProfile(wp, id)
 	if err != nil {
 		t.Errorf("expected no error, got %v", err)
 	}
@@ -67,7 +67,7 @@ func TestNewResidentProfile_Success(t *testing.T) {
 }
 
 func TestNewResidentProfile_NilWeeklyProfile(t *testing.T) {
-	rp, err := NewResidentProfile(nil, id)
+	rp, err := NewProfile(nil, id)
 	if err == nil {
 		t.Error("expected error when weekly profile is nil, got nil")
 	}
@@ -81,7 +81,7 @@ func TestNewResidentProfile_NilWeeklyProfile(t *testing.T) {
 }
 
 func TestGenerateRoutine(t *testing.T) {
-	rp, _ := NewResidentProfile(wp, id)
+	rp, _ := NewProfile(wp, id)
 	rng := rand.New(rand.NewPCG(42, 54)) // determinístico
 
 	routine, _ := rp.GenerateRoutine(0, rng)
@@ -95,7 +95,7 @@ func TestGenerateRoutine(t *testing.T) {
 }
 
 func TestGenerateFrequency(t *testing.T) {
-	rp, _ := NewResidentProfile(wp, id)
+	rp, _ := NewProfile(wp, id)
 	rng := rand.New(rand.NewPCG(42, 54))
 
 	freq, _ := rp.GenerateFrequency(0, rng)

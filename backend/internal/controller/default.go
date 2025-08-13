@@ -40,7 +40,7 @@ freqProfile := frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyP
 	"shower":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 1.08)), 0)),
 	"washBassin":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 5.93)), 0)),
 	"washMachine": must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 0.37)), 0)),
-	"dishWasher":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 2.488)), 0)),
+	"dishWasher":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 24.88)), 0)),
 	"tanque":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 1.15)), 0)),
 })
 

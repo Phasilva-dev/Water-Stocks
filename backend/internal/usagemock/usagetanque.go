@@ -36,7 +36,7 @@ func GenerateTanqueUsage(routine *behavioral.Routine, device sanitarydevice.Sani
 		if sleepTime > returnHome { // OUTRA CONDIÇÃO QUE É SEMPRE VERADE 
 			min, max = returnHome+1800, sleepTime-1800
 			d = 1
-		} else {
+		} else { //Isso é uma condoção impossivel
 			min, max = returnHome+1800, 86400
 			d = 2
 			// Isso permite a pessao lavar roupa enquanto dorme

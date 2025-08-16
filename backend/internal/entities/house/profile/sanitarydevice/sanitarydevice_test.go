@@ -2,32 +2,10 @@
 package sanitarydevice // O pacote de teste é o mesmo do código sendo testado
 
 import (
-	"testing"
 	"math/rand/v2"
-	//"errors" 
+	"simulation/internal/dists"
+	"testing"
 )
-
-// Estrutura Mock (Simulada) que implementa a interface SanitaryDevice.
-// Continua sendo usada para testar a estrutura SanitaryDeviceInstance de forma isolada.
-type mockSanitaryDevice struct {
-	id           uint32
-	flowLeakVal  float64
-	durationVal  int32
-}
-
-// Implementa os métodos da interface SanitaryDevice para o mock.
-func (m *mockSanitaryDevice) GenerateFlowLeak(rng *rand.Rand) float64 {
-	return m.flowLeakVal
-}
-
-func (m *mockSanitaryDevice) GenerateDuration(rng *rand.Rand) int32 {
-	return m.durationVal
-}
-
-func (m *mockSanitaryDevice) SanitaryDeviceID() uint32 {
-	return m.id
-}
-
 
 // Teste para a função construtora NewSanitaryDeviceInstance - Caso de Sucesso.
 // Verifica se a instância é criada corretamente quando um dispositivo não-nil é passado,
@@ -35,9 +13,9 @@ func (m *mockSanitaryDevice) SanitaryDeviceID() uint32 {
 func TestNewSanitaryDeviceInstance_Success(t *testing.T) {
     // Configura um dispositivo mock com valores de exemplo
     mockID := uint32(123)
-    mockFlow := 7.7
+    mockFlow := dists.New
     mockDuration := int32(180)
-    mockDev := &mockSanitaryDevice{
+    mockDev := &SanitaryDeviceInstance{
         id: mockID,
         flowLeakVal: mockFlow,
         durationVal: mockDuration,

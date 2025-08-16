@@ -1,7 +1,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/rand/v2"
@@ -27,13 +26,19 @@ func (ll *LogLogisticDist) Scale() float64 {
 	return ll.scale
 }
 
-// NewLogLogisticDist cria uma nova instância de LogLogisticDist.
-func NewLogLogisticDist(shape, scale float64) (*LogLogisticDist, error) {
+// newLogLogisticDist cria uma nova instância de LogLogisticDist.
+func newLogLogisticDist(shape, scale float64) (*LogLogisticDist, error) {
 	if shape <= 0 {
-		return nil, errors.New("parâmetro shape (forma) deve ser > 0")
+		return nil, fmt.Errorf(
+			"invalid LogLogistic Distribution Parameters: shape (forma) must be > 0 (shape=%.2f)",
+			shape,
+		)
 	}
 	if scale <= 0 {
-		return nil, errors.New("parâmetro scale (escala) deve ser > 0")
+		return nil, fmt.Errorf(
+			"invalid LogLogistic Distribution Parameters: scale (escala) must be > 0 (scale=%.2f)",
+			scale,
+		)
 	}
 	return &LogLogisticDist{
 		shape: shape,

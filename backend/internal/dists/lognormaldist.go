@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -38,20 +37,22 @@ func (l *LogNormalDist) StdDev() float64 {
 	return l.stdDev
 }
 
-// NewLogNormalDist cria e retorna uma nova instância de LogNormalDist.
+// newLogNormalDist cria e retorna uma nova instância de LogNormalDist.
 //
 // Recebe a média (mean) e o desvio padrão (std) da distribuição Normal
 // subjacente como parâmetros.
 // Retorna um erro se o desvio padrão (std) não for positivo (> 0).
-func NewLogNormalDist(mean, std float64) (*LogNormalDist, error) {
-	if std <= 0 {
-		// Retorna erro se o desvio padrão for inválido.
-		return nil, errors.New("parâmetro std (desvio padrão) deve ser > 0")
+func newLogNormalDist(mean, stdDev float64) (*LogNormalDist, error) {
+	if stdDev < 0 {
+	return nil, fmt.Errorf(
+		"invalid LogNormal Distribution Parameters: stdDev (desvio padrão) cannot be negative (stdDev=%.2f)",
+		stdDev,
+		)
 	}
 	// Cria e retorna a instância da distribuição se os parâmetros são válidos.
 	return &LogNormalDist{
 		mean: mean,
-		stdDev:  std,
+		stdDev:  stdDev,
 	}, nil
 }
 

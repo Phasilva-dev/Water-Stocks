@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -42,21 +41,26 @@ func (t *TriangleDist) C() float64 {
 	return t.c
 }
 
-// NewTriangleDist cria e retorna uma nova instância de TriangleDist.
+// newTriangleDist cria e retorna uma nova instância de TriangleDist.
 //
 // Recebe o limite inferior (a), a moda (b) e o limite superior (c)
 // como parâmetros.
 // Retorna um erro se a condição a ≤ b ≤ c não for satisfeita, ou se a == c.
-func NewTriangleDist(a, b, c float64) (*TriangleDist, error) {
+func newTriangleDist(a, b, c float64) (*TriangleDist, error) {
 	// Verifica a ordem dos parâmetros.
 	if a > b || b > c {
-		// Retorna erro se a ordem a ≤ b ≤ c não for válida.
-		return nil, errors.New("parâmetros inválidos: deve satisfazer a ≤ b ≤ c")
+		return nil, fmt.Errorf(
+			"invalid Triangle Distribution Parameters: must satisfy a ≤ b ≤ c (a=%.2f, b=%.2f, c=%.2f)",
+			a, b, c,
+		)
 	}
+
 	// Verifica se os limites inferior e superior são iguais.
 	if a == c {
-		// Retorna erro se a distribuição for degenerada (linha única).
-		return nil, errors.New("parâmetros a (mínimo) e c (máximo) devem ser diferentes")
+		return nil, fmt.Errorf(
+			"invalid Triangle Distribution Parameters: a (mínimo) and c (máximo) must be different (a=%.2f, c=%.2f)",
+			a, c,
+		)
 	}
 	// Cria e retorna a instância da distribuição se os parâmetros são válidos.
 	return &TriangleDist{

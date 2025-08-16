@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -34,18 +33,23 @@ func (g *GammaDist) Scale() float64 {
 	return g.scale
 }
 
-// NewGammaDist cria e retorna uma nova instância de GammaDist com os
+// newGammaDist cria e retorna uma nova instância de GammaDist com os
 // parâmetros shape (forma) e scale (escala) fornecidos.
 //
 // Retorna um erro se shape ou scale não forem valores positivos (> 0).
-func NewGammaDist(shape, scale float64) (*GammaDist, error) {
+func newGammaDist(shape, scale float64) (*GammaDist, error) {
+
 	if shape <= 0 {
-		// Retorna erro específico se a forma for inválida.
-		return nil, errors.New("parâmetro shape (forma) deve ser > 0")
+		return nil, fmt.Errorf(
+			"invalid Gamma Distribution Parameters: shape (forma) must be > 0 (shape=%.2f)",
+			shape,
+		)
 	}
 	if scale <= 0 {
-		// Retorna erro específico se a escala for inválida.
-		return nil, errors.New("parâmetro scale (escala) deve ser > 0")
+		return nil, fmt.Errorf(
+			"invalid Gamma Distribution Parameters: scale (escala) must be > 0 (scale=%.2f)",
+			scale,
+		)
 	}
 	// Cria e retorna a instância da distribuição se os parâmetros são válidos.
 	return &GammaDist{

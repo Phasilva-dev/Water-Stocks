@@ -4,7 +4,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt" // Usado para formatar mensagens de erro.
 	"math/rand/v2" // Usado para geração de números aleatórios.
 )
@@ -42,80 +41,74 @@ type Distribution interface {
 //   - "lognormal":   mean, std (2 parâmetros: média e desvio padrão da normal subjacente)
 //   - "triangle":    a, b, c (3 parâmetros: mínimo, moda e máximo)
 //   - "weibull":     scale, shape (2 parâmetros: escala λ e forma k)
-//   - "loglogistic": shape, scale (2 parâmetros: forma α e escala β)  // <-- ADICIONADO AQUI
+//   - "loglogistic": shape, scale (2 parâmetros: forma α e escala β)
+//   - "deterministic": value (1 parâmetro)
 //
 // Retorna um valor que implementa a interface `Distribution` e um erro `nil` em caso
 // de sucesso. Se `distType` for desconhecido ou o número de `params` estiver
 // incorreto para o tipo solicitado, retorna `nil` para a distribuição e um
 // erro descritivo.
 func CreateDistribution(distType string, params ...float64) (Distribution, error) {
-	// Seleciona a lógica de criação com base no tipo de distribuição.
 	switch distType {
+
 	case "normal":
-		// Verifica o número correto de parâmetros para a distribuição Normal.
 		if len(params) != 2 {
-			return nil, errors.New("distribuição normal requer exatamente 2 parâmetros: mean (média) e stdDev (desvio padrão)")
+			return nil, fmt.Errorf("invalid Distribution Factory: normal requires exactly 2 parameters: mean (média) e stdDev (desvio padrão)")
 		}
-		// Chama o construtor específico da NormalDist (assumido existir).
-		return NewNormalDist(params[0], params[1]) // Assume que NewNormalDist existe
+		return newNormalDist(params[0], params[1])
+
 	case "poisson":
-		// Verifica o número correto de parâmetros para a distribuição de Poisson.
 		if len(params) != 1 {
-			return nil, errors.New("distribuição poisson requer exatamente 1 parâmetro: lambda (taxa)")
+			return nil, fmt.Errorf("invalid Distribution Factory: poisson requires exactly 1 parameter: lambda (taxa)")
 		}
-		// Chama o construtor específico da PoissonDist (assumido existir).
-		return NewPoissonDist(params[0]) // Assume que NewPoissonDist existe
+		return newPoissonDist(params[0])
+
 	case "uniform":
-		// Verifica o número correto de parâmetros para a distribuição Uniforme.
 		if len(params) != 2 {
-			return nil, errors.New("distribuição uniforme requer exatamente 2 parâmetros: min (mínimo) e max (máximo)")
+			return nil, fmt.Errorf("invalid Distribution Factory: uniform requires exactly 2 parameters: min (mínimo) e max (máximo)")
 		}
-		// Chama o construtor específico da UniformDist (assumido existir).
-		return NewUniformDist(params[0], params[1]) // Assume que NewUniformDist existe
+		return newUniformDist(params[0], params[1])
+
 	case "gamma":
-		// Verifica o número correto de parâmetros para a distribuição Gamma.
 		if len(params) != 2 {
-			return nil, errors.New("distribuição gamma requer exatamente 2 parâmetros: shape (forma) e scale (escala)")
+			return nil, fmt.Errorf("invalid Distribution Factory: gamma requires exactly 2 parameters: shape (forma) e scale (escala)")
 		}
-		// Chama o construtor específico da GammaDist (assumido existir).
-		return NewGammaDist(params[0], params[1]) // Assume que NewGammaDist existe
+		return newGammaDist(params[0], params[1])
+
 	case "lognormal":
-		// Verifica o número correto de parâmetros para a distribuição LogNormal.
 		if len(params) != 2 {
-			return nil, errors.New("distribuição lognormal requer exatamente 2 parâmetros: mean (média normal subjacente) e std (desvio padrão normal subjacente)")
+			return nil, fmt.Errorf("invalid Distribution Factory: lognormal requires exactly 2 parameters: mean (média normal subjacente) e std (desvio padrão normal subjacente)")
 		}
-		// Chama o construtor específico da LogNormalDist (assumido existir).
-		return NewLogNormalDist(params[0], params[1]) // Assume que NewLogNormalDist existe
+		return newLogNormalDist(params[0], params[1])
+
 	case "triangle":
-		// Verifica o número correto de parâmetros para a distribuição Triangular.
 		if len(params) != 3 {
-			return nil, errors.New("distribuição triangular requer exatamente 3 parâmetros: a (mínimo), b (moda) e c (máximo)")
+			return nil, fmt.Errorf("invalid Distribution Factory: triangle requires exactly 3 parameters: a (mínimo), b (moda) e c (máximo)")
 		}
-		// Chama o construtor específico da TriangleDist (assumido existir).
-		return NewTriangleDist(params[0], params[1], params[2]) // Assume que NewTriangleDist existe
+		return newTriangleDist(params[0], params[1], params[2])
+
 	case "weibull":
-		// Verifica o número correto de parâmetros para a distribuição Weibull.
 		if len(params) != 2 {
-			return nil, errors.New("distribuição weibull requer exatamente 2 parâmetros: shape (forma, k) e scale (escala, lambda)")
+			return nil, fmt.Errorf("invalid Distribution Factory: weibull requires exactly 2 parameters: shape (forma, k) e scale (escala, lambda)")
 		}
-		// Chama o construtor específico da WeibullDist (assumido existir).
-		return NewWeibullDist(params[0], params[1]) // Assume que NewWeibullDist existe
-	case "loglogistic": // <-- NOVO CASE ADICIONADO
-		// Verifica o número correto de parâmetros para a distribuição LogLogistic.
+		return newWeibullDist(params[0], params[1])
+
+	case "loglogistic":
 		if len(params) != 2 {
-			return nil, errors.New("distribuição loglogistic requer exatamente 2 parâmetros: shape (forma, α) e scale (escala, β)")
+			return nil, fmt.Errorf("invalid Distribution Factory: loglogistic requires exactly 2 parameters: shape (forma, α) e scale (escala, β)")
 		}
-		// Chama o construtor específico da LogLogisticDist.
-		return NewLogLogisticDist(params[0], params[1])
+		return newLogLogisticDist(params[0], params[1])
+
+	case "deterministic":
+		if len(params) != 1 {
+			return nil, fmt.Errorf("invalid Distribution Factory: deterministic requires exactly 1 parameter: value (valor fixo)")
+		}
+		return newDeterministicDist(params[0])
+
 	default:
-		// Caso o distType fornecido não corresponda a nenhuma distribuição conhecida.
-		return nil, fmt.Errorf("tipo de distribuição desconhecido: %s", distType)
+		return nil, fmt.Errorf("invalid Distribution Factory: unknown distribution type '%s'", distType)
 	}
 }
 
-// --- NOTA: Este código assume que as funções construtoras ---
-// --- (NewNormalDist, NewPoissonDist, NewUniformDist,     ---
-// --- NewGammaDist, NewLogNormalDist, NewTriangleDist,    ---
-// --- NewWeibullDist,NewLogLogisticDist) e as respectivas structs que         ---
-// --- implementam a interface Distribution estão definidas ---
-// --- neste mesmo pacote 'dists'.                          ---
+// --- NOTA: Este código assume que as funções construtoras e as respectivas structs
+// --- que implementam a interface Distribution estão definidas neste mesmo pacote 'dists'.                          ---

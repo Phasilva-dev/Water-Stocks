@@ -4,7 +4,7 @@ import (
 	"simulation/internal/dists"
 	"math/rand/v2"
 	"math"
-	"errors"
+	"fmt"
 
 )
 
@@ -12,38 +12,47 @@ type Shower struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
+	amount uint8
+	
 
 }
-
-func NewShower(flowLeakDist, durationDist dists.Distribution, id uint32) (*Shower,error) {
+func NewShower(flowLeakDist, durationDist dists.Distribution,
+	amount uint8, id uint32) (*Shower, error) {
 	if flowLeakDist == nil || durationDist == nil {
-		return nil, errors.New("distributions cannot be nil")
+		return nil, fmt.Errorf("distributions cannot be nil")
 	}
 	if id == 0 {
-		return nil, errors.New("zero is invalid id")
+		return nil, fmt.Errorf("zero is invalid id")
+	}
+	if amount <= 0 {
+		return nil, fmt.Errorf("")
 	}
 	return &Shower{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-	},nil
+		amount: amount,
+	}, nil
 }
 
-func (t *Shower) SanitaryDeviceID() uint32 {
-	return t.sanitaryDeviceID
+func (sdi *Shower) SanitaryDeviceID() uint32 {
+	return sdi.sanitaryDeviceID
 }
 
-func (t *Shower) FlowLeakDist() dists.Distribution {
-	return t.flowLeakDist
+func (d *Shower) Amount() uint8 {
+	return d.amount
 }
 
-func (t *Shower) DurationDist() dists.Distribution {
-	return t.durationDist
+func (sdi *Shower) FlowLeakDist() dists.Distribution {
+	return sdi.flowLeakDist
 }
 
+func (sdi *Shower) DurationDist() dists.Distribution {
+	return sdi.durationDist
+}
 
-func (t *Shower) GenerateDuration(rng *rand.Rand) int32 {
-	sample := t.durationDist.Sample(rng)
+func (sdi *Shower) GenerateDuration(rng *rand.Rand) int32 {
+	sample := sdi.durationDist.Sample(rng)
 	absSample := math.Abs(sample)
 
 	if absSample > math.MaxInt32 {
@@ -53,8 +62,8 @@ func (t *Shower) GenerateDuration(rng *rand.Rand) int32 {
 	return int32(absSample)
 }
 
-func (t *Shower) GenerateFlowLeak(rng *rand.Rand) float64 {
-	sample := t.flowLeakDist.Sample(rng)
+func (sdi *Shower) GenerateFlowLeak(rng *rand.Rand) float64 {
+	sample := sdi.flowLeakDist.Sample(rng)
 	absSample := math.Abs(sample)
 
 	return absSample

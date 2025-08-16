@@ -34,35 +34,39 @@ func (u *UniformDist) Max() float64 {
 	return u.max
 }
 
-// UniformDistNew cria e retorna uma nova instância de UniformDist *pelo valor*.
+// UniformDistnew cria e retorna uma nova instância de UniformDist *pelo valor*.
 //
 // Recebe o limite inferior (min) e o limite superior (max) como parâmetros.
 // Retorna um erro se min for maior ou igual a max.
 // Note: Esta função retorna a struct diretamente, não um ponteiro.
 // A função NewUniformDist é a alternativa que retorna um ponteiro.
 func UniformDistNew(min, max float64) (UniformDist, error) {
-	// Verifica se min é menor que max.
+
 	if min > max {
-		// Retorna erro se a condição min < max não for atendida.
-		return UniformDist{}, fmt.Errorf("parâmetro min deve ser menor que max: min=%.2f, max=%.2f", min, max)
+		return UniformDist{}, fmt.Errorf(
+		"invalid Uniform Distribution Parameters: min must be less than max (min=%.2f, max=%.2f)",
+		min, max,
+	)
 	}
-	// Cria e retorna a instância da distribuição pelo valor.
+
 	return UniformDist{
 		min: min,
 		max: max,
 	}, nil
 }
 
-// NewUniformDist cria e retorna um *ponteiro* para uma nova instância de UniformDist.
+// newUniformDist cria e retorna um *ponteiro* para uma nova instância de UniformDist.
 //
 // Recebe o limite inferior (min) e o limite superior (max) como parâmetros.
 // Retorna um erro se min for maior ou igual a max.
 // Este é o padrão mais comum em Go para construtores que podem falhar.
-func NewUniformDist(min, max float64) (*UniformDist, error) {
+func newUniformDist(min, max float64) (*UniformDist, error) {
 	// Verifica se min é menor que max.
 	if min > max {
-		// Retorna erro se a condição min < max não for atendida.
-		return nil, fmt.Errorf("parâmetro min deve ser menor que max: min=%.2f, max=%.2f", min, max)
+		return nil, fmt.Errorf(
+		"invalid Uniform Distribution Parameters: min must be less than max (min=%.2f, max=%.2f)",
+		min, max,
+	)
 	}
 	// Cria e retorna um ponteiro para a instância da distribuição.
 	return &UniformDist{

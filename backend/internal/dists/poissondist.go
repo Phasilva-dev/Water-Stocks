@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -28,16 +27,18 @@ func (p *PoissonDist) Lambda() float64 {
 	return p.lambda
 }
 
-// NewPoissonDist cria e retorna uma nova instância de PoissonDist.
+// newPoissonDist cria e retorna uma nova instância de PoissonDist.
 //
 // Recebe o parâmetro de taxa (lambda, λ) como argumento.
 // Retorna um erro se lambda não for estritamente positivo (> 0).
-func NewPoissonDist(lambda float64) (*PoissonDist, error) {
+func newPoissonDist(lambda float64) (*PoissonDist, error) {
 	// Verifica se o parâmetro lambda é positivo.
 	if lambda <= 0 {
-		// Retorna erro se lambda for inválido (não positivo).
-		return nil, errors.New("parâmetro lambda (taxa) deve ser > 0")
-	}
+	return nil, fmt.Errorf(
+		"invalid Poisson Distribution Parameters: lambda (taxa) must be > 0 (lambda=%.2f)",
+		lambda,
+	)
+}
 	// Cria e retorna a instância da distribuição se o parâmetro é válido.
 	return &PoissonDist{
 		lambda: lambda,

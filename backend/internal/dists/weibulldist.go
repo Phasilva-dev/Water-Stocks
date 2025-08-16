@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -22,14 +21,16 @@ type WeibullDist struct {
 	scale float64 // lambda
 }
 
-// NewWeibullDist cria e retorna um ponteiro para uma nova instância de WeibullDist.
+// newWeibullDist cria e retorna um ponteiro para uma nova instância de WeibullDist.
 //
 // Recebe os parâmetros de forma (shape, k) e escala (scale, λ).
 // Retorna um erro se shape ou scale não forem estritamente positivos (> 0).
-func NewWeibullDist(scale, shape float64) (*WeibullDist, error) {
-	// Verifica se ambos os parâmetros são positivos.
-	if shape <= 0 || scale <= 0 {
-		return nil, errors.New("parâmetros shape (forma) e scale (escala) devem ser > 0")
+func newWeibullDist(scale, shape float64) (*WeibullDist, error) {
+	if shape <= 0 {
+		return nil, fmt.Errorf("invalid Weibull Distribution Parameters: shape (forma) must be > 0")
+	}
+	if scale <= 0 {
+		return nil, fmt.Errorf("invalid Weibull Distribution Parameters: scale (escala) must be > 0")
 	}
 	return &WeibullDist{
 		shape: shape,

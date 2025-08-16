@@ -7,7 +7,7 @@ import (
 	"fmt"
 )
 
-type Toilet struct {
+type WashBasin struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
@@ -15,8 +15,8 @@ type Toilet struct {
 	
 
 }
-func NewToilet(flowLeakDist, durationDist dists.Distribution,
-	amount uint8, id uint32) (*Toilet, error) {
+func NewWashBasin(flowLeakDist, durationDist dists.Distribution,
+	amount uint8, id uint32) (*WashBasin, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")
 	}
@@ -26,7 +26,7 @@ func NewToilet(flowLeakDist, durationDist dists.Distribution,
 	if amount <= 0 {
 		return nil, fmt.Errorf("")
 	}
-	return &Toilet{
+	return &WashBasin{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
@@ -34,23 +34,23 @@ func NewToilet(flowLeakDist, durationDist dists.Distribution,
 	}, nil
 }
 
-func (sdi *Toilet) SanitaryDeviceID() uint32 {
+func (sdi *WashBasin) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
 }
 
-func (d *Toilet) Amount() uint8 {
+func (d *WashBasin) Amount() uint8 {
 	return d.amount
 }
 
-func (sdi *Toilet) FlowLeakDist() dists.Distribution {
+func (sdi *WashBasin) FlowLeakDist() dists.Distribution {
 	return sdi.flowLeakDist
 }
 
-func (sdi *Toilet) DurationDist() dists.Distribution {
+func (sdi *WashBasin) DurationDist() dists.Distribution {
 	return sdi.durationDist
 }
 
-func (sdi *Toilet) GenerateDuration(rng *rand.Rand) int32 {
+func (sdi *WashBasin) GenerateDuration(rng *rand.Rand) int32 {
 	sample := sdi.durationDist.Sample(rng)
 	absSample := math.Abs(sample)
 
@@ -61,7 +61,7 @@ func (sdi *Toilet) GenerateDuration(rng *rand.Rand) int32 {
 	return int32(absSample)
 }
 
-func (sdi *Toilet) GenerateFlowLeak(rng *rand.Rand) float64 {
+func (sdi *WashBasin) GenerateFlowLeak(rng *rand.Rand) float64 {
 	sample := sdi.flowLeakDist.Sample(rng)
 	absSample := math.Abs(sample)
 

@@ -7,6 +7,10 @@ import (
 )
 
 type SanitaryHouse struct {
+	devices map[string]*sanitarydevice.SanitaryDeviceInstance
+}
+
+type SanitaryHouse struct {
 	toilet *sanitarydevice.SanitaryDeviceInstance
 	shower *sanitarydevice.SanitaryDeviceInstance
 	washbassin *sanitarydevice.SanitaryDeviceInstance

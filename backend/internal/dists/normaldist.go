@@ -3,7 +3,6 @@
 package dists
 
 import (
-	"errors"
 	"fmt"
 	"math/rand/v2" // Utiliza a versão 2 do pacote math/rand
 
@@ -35,19 +34,19 @@ func (n *NormalDist) Params() []float64 {
 	return []float64{n.mean, n.stdDev}
 }
 
-// NewNormalDist cria e retorna uma nova instância de NormalDist.
+// newNormalDist cria e retorna uma nova instância de NormalDist.
 //
 // Recebe a média (mean) e o desvio padrão (stdDev) como parâmetros.
 // Retorna um erro se o desvio padrão (stdDev) for negativo (< 0).
 // Note que um stdDev igual a 0 é permitido, resultando em uma
 // distribuição degenerada.
-func NewNormalDist(mean, stdDev float64) (*NormalDist, error) {
+func newNormalDist(mean, stdDev float64) (*NormalDist, error) {
 	// Verifica se o desvio padrão é negativo.
 	if stdDev < 0 {
-		// Retorna erro se o desvio padrão for inválido.
-		// A mensagem de erro original menciona "> 0", mas o código verifica "< 0".
-		// Documentando a verificação feita no código.
-		return nil, errors.New("parâmetro stdDev (desvio padrão) não pode ser negativo")
+	return nil, fmt.Errorf(
+		"invalid Normal Distribution Parameters: stdDev (desvio padrão) cannot be negative (stdDev=%.2f)",
+		stdDev,
+		)
 	}
 	// Cria e retorna a instância da distribuição se os parâmetros são válidos.
 	return &NormalDist{

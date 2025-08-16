@@ -4,9 +4,9 @@ func OrderedDeviceKeys() []string {
 	return []string{
 		"toilet",
 		"shower",
-		"wash_bassin",
+		"wash_basin",
 		"wash_machine",
-		"dish_washer",
-		"tanque",
+		"kitchen_sink",
+		"laundry_sink",
 	}
 }

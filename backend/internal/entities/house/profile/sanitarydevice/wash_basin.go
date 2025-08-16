@@ -15,7 +15,7 @@ type WashBasin struct {
 	
 
 }
-func NewWashBasin(flowLeakDist, durationDist dists.Distribution,
+func newWashBasin(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*WashBasin, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

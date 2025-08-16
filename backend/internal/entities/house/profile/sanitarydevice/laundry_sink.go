@@ -15,7 +15,7 @@ type LaundrySink struct {
 	
 
 }
-func NewLaundrySink(flowLeakDist, durationDist dists.Distribution,
+func newLaundrySink(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*LaundrySink, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

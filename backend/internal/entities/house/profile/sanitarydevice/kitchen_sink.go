@@ -15,7 +15,7 @@ type KitchenSink struct {
 	
 
 }
-func NewKitchenSink(flowLeakDist, durationDist dists.Distribution,
+func newKitchenSink(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*KitchenSink, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

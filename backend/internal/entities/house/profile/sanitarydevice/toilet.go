@@ -15,7 +15,7 @@ type Toilet struct {
 	
 
 }
-func NewToilet(flowLeakDist, durationDist dists.Distribution,
+func newToilet(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*Toilet, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

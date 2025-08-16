@@ -16,7 +16,7 @@ type Shower struct {
 	
 
 }
-func NewShower(flowLeakDist, durationDist dists.Distribution,
+func newShower(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*Shower, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

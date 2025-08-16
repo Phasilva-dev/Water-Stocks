@@ -17,7 +17,7 @@ type SanitaryDevice interface {
 }
 
 // DeviceFactory cria qualquer dispositivo sanitário com base no tipo
-func DeviceFactory(deviceType string, flowLeakDist,
+func CreateSanitaryDevice(deviceType string, flowLeakDist,
 	 durationDist dists.Distribution, amount uint8, id uint32) (SanitaryDevice, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")
@@ -31,19 +31,19 @@ func DeviceFactory(deviceType string, flowLeakDist,
 
 	switch deviceType {
 	case "toilet":
-		return NewToilet(flowLeakDist, durationDist, amount, id)
+		return newToilet(flowLeakDist, durationDist, amount, id)
 	case "shower":
-		return NewShower(flowLeakDist, durationDist, amount, id)
+		return newShower(flowLeakDist, durationDist, amount, id)
 	case "wash_basin":
-		return NewWashBasin(flowLeakDist, durationDist, amount, id)
+		return newWashBasin(flowLeakDist, durationDist, amount, id)
 	case "wash_machine":
-		return NewWashMachine(flowLeakDist, durationDist, amount, id)
+		return newWashMachine(flowLeakDist, durationDist, amount, id)
 	case "kitchen_sink":
-		return NewKitchenSink(flowLeakDist, durationDist, amount, id)
+		return newKitchenSink(flowLeakDist, durationDist, amount, id)
 	case "laundry_sink":
-		return NewLaundrySink(flowLeakDist, durationDist, amount, id)
+		return newLaundrySink(flowLeakDist, durationDist, amount, id)
 	case "generic":
-		return NewSanitaryDeviceInstance(flowLeakDist, durationDist, amount, id)
+		return newSanitaryDeviceInstance(flowLeakDist, durationDist, amount, id)
 	default:
 		return nil, fmt.Errorf("unknown device type: %s", deviceType)
 	}
@@ -57,7 +57,7 @@ type SanitaryDeviceInstance struct {
 	
 
 }
-func NewSanitaryDeviceInstance(flowLeakDist, durationDist dists.Distribution,
+func newSanitaryDeviceInstance(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*SanitaryDeviceInstance, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

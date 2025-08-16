@@ -15,7 +15,7 @@ type WashMachine struct {
 	
 
 }
-func NewWashMachine(flowLeakDist, durationDist dists.Distribution,
+func newWashMachine(flowLeakDist, durationDist dists.Distribution,
 	amount uint8, id uint32) (*WashMachine, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")

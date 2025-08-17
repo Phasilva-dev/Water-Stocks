@@ -11,35 +11,26 @@ type Toilet struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
-	amount uint8
-	
 
 }
 func newToilet(flowLeakDist, durationDist dists.Distribution,
-	amount uint8, id uint32) (*Toilet, error) {
+	 id uint32) (*Toilet, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")
 	}
 	if id == 0 {
 		return nil, fmt.Errorf("zero is invalid id")
 	}
-	if amount <= 0 {
-		return nil, fmt.Errorf("")
-	}
+
 	return &Toilet{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-		amount: amount,
 	}, nil
 }
 
 func (sdi *Toilet) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
-}
-
-func (d *Toilet) Amount() uint8 {
-	return d.amount
 }
 
 func (sdi *Toilet) FlowLeakDist() dists.Distribution {

@@ -15,19 +15,14 @@ func TestNewSanitaryDeviceInstance_Success(t *testing.T) {
 	mockID := uint32(123)
 	mockFlow, _ := dists.CreateDistribution("deterministic", 1)
 	mockDuration, _ := dists.CreateDistribution("deterministic", 2)
-	mockAmount := uint8(1)
 
-	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockAmount, mockID)
+	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockID)
 
 	if err != nil {
 		t.Fatalf("CreateSanitaryDevice retornou erro inesperado para entrada válida: %v", err)
 	}
 	if instance == nil {
 		t.Fatal("CreateSanitaryDevice retornou nil para entrada válida")
-	}
-
-	if instance.Amount() != mockAmount {
-		t.Errorf("Amount incorreto. Esperado: %v, Obtido: %v", mockAmount, instance.Amount())
 	}
 	if instance.DurationDist() != mockDuration {
 		t.Errorf("DurationDist incorreto. Esperado: %v, Obtido: %v", mockDuration, instance.DurationDist())
@@ -45,11 +40,10 @@ func TestCreateSanitaryDevice_WrongDeviceType(t *testing.T) {
 	mockTypo := "p" // tipo desconhecido
 	mockFlow, _ := dists.CreateDistribution("deterministic", 1)
 	mockDuration, _ := dists.CreateDistribution("deterministic", 2)
-	mockAmount := uint8(10)
 	mockID := uint32(1)
-	expectedErrorMsg := "unknown device type: p"
+	expectedErrorMsg := "invalid SanitaryDevice Factory: unknown device type: p"
 
-	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockAmount, mockID)
+	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockID)
 
 	if err == nil {
 		t.Fatal("CreateSanitaryDevice não retornou erro para deviceType inválido")
@@ -69,9 +63,8 @@ func TestNewSanitaryDeviceInstance_GenerateDist(t *testing.T) {
 	mockID := uint32(123)
 	mockFlow, _ := dists.CreateDistribution("deterministic", 1)
 	mockDuration, _ := dists.CreateDistribution("deterministic", 2)
-	mockAmount := uint8(1)
 
-	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockAmount, mockID)
+	instance, err := CreateSanitaryDevice(mockTypo, mockFlow, mockDuration, mockID)
 	if err != nil {
 		t.Fatalf("CreateSanitaryDevice retornou erro inesperado: %v", err)
 	}

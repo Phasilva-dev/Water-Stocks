@@ -7,10 +7,12 @@ import (
 )
 
 type SanitaryHouse struct {
-	devices map[string]*sanitarydevice.SanitaryDeviceInstance
+	devices map[string]*sanitarydevice.SanitaryDevice
 }
 
-type SanitaryHouse struct {
+func NewSanitaryHouse(devices map[string]sanitarydevice.SanitaryDevice,)
+
+type SanitaryHousee struct { 
 	toilet *sanitarydevice.SanitaryDeviceInstance
 	shower *sanitarydevice.SanitaryDeviceInstance
 	washbassin *sanitarydevice.SanitaryDeviceInstance
@@ -21,7 +23,7 @@ type SanitaryHouse struct {
 	amount uint8
 }
 
-func NewSanitaryHouse(
+func newSanitaryHouse(
 	devices map[string]sanitarydevice.SanitaryDevice, amount uint8) (*SanitaryHouse, error) {
 
 	// --- Recupera e cria instâncias para cada tipo de dispositivo, verificando erros ---

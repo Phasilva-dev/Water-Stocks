@@ -16,30 +16,23 @@ type WashMachine struct {
 
 }
 func newWashMachine(flowLeakDist, durationDist dists.Distribution,
-	amount uint8, id uint32) (*WashMachine, error) {
+	 id uint32) (*WashMachine, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")
 	}
 	if id == 0 {
 		return nil, fmt.Errorf("zero is invalid id")
 	}
-	if amount <= 0 {
-		return nil, fmt.Errorf("")
-	}
+
 	return &WashMachine{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-		amount: amount,
 	}, nil
 }
 
 func (sdi *WashMachine) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
-}
-
-func (d *WashMachine) Amount() uint8 {
-	return d.amount
 }
 
 func (sdi *WashMachine) FlowLeakDist() dists.Distribution {

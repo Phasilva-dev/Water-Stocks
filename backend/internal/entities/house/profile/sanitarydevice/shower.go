@@ -12,35 +12,25 @@ type Shower struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
-	amount uint8
-	
 
 }
 func newShower(flowLeakDist, durationDist dists.Distribution,
-	amount uint8, id uint32) (*Shower, error) {
+	 id uint32) (*Shower, error) {
 	if flowLeakDist == nil || durationDist == nil {
 		return nil, fmt.Errorf("distributions cannot be nil")
 	}
 	if id == 0 {
 		return nil, fmt.Errorf("zero is invalid id")
 	}
-	if amount <= 0 {
-		return nil, fmt.Errorf("")
-	}
 	return &Shower{
 		sanitaryDeviceID: id,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
-		amount: amount,
 	}, nil
 }
 
 func (sdi *Shower) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
-}
-
-func (d *Shower) Amount() uint8 {
-	return d.amount
 }
 
 func (sdi *Shower) FlowLeakDist() dists.Distribution {

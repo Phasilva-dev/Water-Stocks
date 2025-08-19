@@ -12,8 +12,6 @@ type BaseDevice struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
-	amount uint8
-	
 
 }
 func newBaseDevice(flowLeakDist, durationDist dists.Distribution,
@@ -29,6 +27,10 @@ func newBaseDevice(flowLeakDist, durationDist dists.Distribution,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}, nil
+}
+
+func (ks *BaseDevice) IsCountable() bool {
+	return false
 }
 
 func (g *BaseDevice) SanitaryDeviceID() uint32 {

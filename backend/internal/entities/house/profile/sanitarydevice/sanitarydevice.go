@@ -12,6 +12,7 @@ type SanitaryDevice interface {
 	SanitaryDeviceID() uint32
 	FlowLeakDist() dists.Distribution
 	DurationDist() dists.Distribution
+	IsCountable() bool
 }
 
 // DeviceFactory cria qualquer dispositivo sanitário com base no tipo

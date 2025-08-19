@@ -30,7 +30,7 @@ type HouseProfile struct {
 	occupationProfile *demographics.Occupation
 	numSanitarysDevice *count.SanitaryCount
 	
-	residentprofiles map[uint32]*resident.ResidentProfile
+	residentprofiles map[uint32]*resident.Profile
 
 	sanitaryDevices map[string]sanitarydevice.SanitaryDevice
 
@@ -44,7 +44,7 @@ func NewHouseProfile(
 	ageProfile *demographics.Age,
 	occupationProfile *demographics.Occupation,
 	numSanitarysDevice *count.SanitaryCount,
-	residentProfiles map[uint32]*resident.ResidentProfile,
+	residentProfiles map[uint32]*resident.Profile,
 	sanitaryDevices map[string]sanitarydevice.SanitaryDevice,
 
 ) (*HouseProfile, error) {
@@ -106,7 +106,7 @@ func (h *HouseProfile) SanitaryDevices() map[string]sanitarydevice.SanitaryDevic
 	return h.sanitaryDevices
 }
 
-func (h *HouseProfile) ResidentProfile(ID uint32) (*resident.ResidentProfile, error) {
+func (h *HouseProfile) ResidentProfile(ID uint32) (*resident.Profile, error) {
 	p := h.residentprofiles[ID]
 	if p != nil {
 		return p,nil

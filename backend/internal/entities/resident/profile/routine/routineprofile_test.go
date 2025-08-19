@@ -49,7 +49,7 @@ func (m *MockDistribution) String() string {
 
 func TestNewDayProfile(t *testing.T) {
 	// mockDist para casos válidos e de erro de nil
-	mockDist, _ := dists.NewNormalDist(20, 4)
+	mockDist, _ := dists.CreateDistribution("normal", 20, 4)
 
 	tests := []struct {
 		name        string
@@ -209,7 +209,7 @@ func TestGenerateDataDeterministic(t *testing.T) {
 	)
 
 	// Uma distribuição com stddev=0 sempre amostrará a média.
-	mockDist, _ := dists.NewNormalDist(10, 0)
+	mockDist, _ := dists.CreateDistribution("normal", 10, 0)
 
 	profile, err := NewDayProfile(
 		[]dists.Distribution{mockDist, mockDist},
@@ -270,10 +270,10 @@ func TestGenerateDataReal(t *testing.T) {
 		maxPercentTest = 1.0     // Definir maxPercent para 1.0 para desabilitar o efeito de limite de percentil neste teste
 	)
 
-	wakeUpDist, _ := dists.NewNormalDist(5*60*60, 30*60) // 5:00 AM, stddev 30min
-	leaveDist, _ := dists.NewNormalDist(7*60*60, 30*60)  // 7:00 AM, stddev 30min
-	returnDist, _ := dists.NewNormalDist(18*60*60, 30*60) // 6:00 PM, stddev 30min
-	sleepDist, _ := dists.NewNormalDist(22*60*60, 30*60) // 10:00 PM, stddev 30min
+	wakeUpDist, _ := dists.CreateDistribution("normal", 5*60*60, 30*60) // 5:00 AM, stddev 30min
+	leaveDist, _ := dists.CreateDistribution("normal", 7*60*60, 30*60)  // 7:00 AM, stddev 30min
+	returnDist, _ := dists.CreateDistribution("normal", 18*60*60, 30*60) // 6:00 PM, stddev 30min
+	sleepDist, _ := dists.CreateDistribution("normal", 22*60*60, 30*60) // 10:00 PM, stddev 30min
 
 	profile, err := NewDayProfile(
 		[]dists.Distribution{wakeUpDist, leaveDist, returnDist, sleepDist},

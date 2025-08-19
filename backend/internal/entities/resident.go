@@ -15,11 +15,11 @@ type Resident struct {
 	age uint8
 	occupationID uint32 //Ocupação, exemplo, estudante
 	dayData *temporal.DailyData
-	residentProfile *resident.ResidentProfile
+	residentProfile *resident.Profile
 	house *House
 }
 
-func NewResident(age uint8, occupation uint32, profile *resident.ResidentProfile, house *House) (*Resident, error) {
+func NewResident(age uint8, occupation uint32, profile *resident.Profile, house *House) (*Resident, error) {
 	if occupation == 0 {
 		return nil, errors.New("ocupação não pode ser zero")
 	}
@@ -49,7 +49,7 @@ func (r *Resident) DayData() *temporal.DailyData {
 	return r.dayData
 }
 
-func (r *Resident) ResidentProfile() *resident.ResidentProfile {
+func (r *Resident) ResidentProfile() *resident.Profile {
 	return r.residentProfile
 }
 
@@ -58,12 +58,26 @@ func (r *Resident) House() *House {
 }
 
 
-func (r *Resident) GenerateFrequency(day uint8, rng *rand.Rand) {
-	r.dayData.SetFrequency(r.residentProfile.GenerateFrequency(day,rng))
+func (r *Resident) GenerateFrequency(day uint8, rng *rand.Rand) (error) {
+	freq, err := r.residentProfile.GenerateFrequency(day, rng)
+	if err != nil {
+		return fmt.Errorf("failed to generate frequency for resident %d on day %d: %w", r.occupationID, day, err) // Supondo que r tenha um ID
+	}
+
+	r.dayData.SetFrequency(freq)
+
+	return nil
 }
 
-func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) {
-	r.dayData.SetRoutine(r.residentProfile.GenerateRoutine(day,rng))
+func (r *Resident) GenerateRoutine(day uint8, rng *rand.Rand) (error) {
+	routine, err := r.residentProfile.GenerateRoutine(day, rng)
+	if err != nil {
+		return fmt.Errorf("failed to generate routine for resident %d on day %d: %w", r.occupationID, day, err) // Supondo que r tenha um ID
+	}
+
+	r.dayData.SetRoutine(routine)
+
+	return nil
 }
 
 func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
@@ -73,12 +87,12 @@ func (r *Resident) GenerateDailyData(day uint8, rng *rand.Rand) {
 
 func (r *Resident) GenerateLogs(day uint8,rng *rand.Rand) (*log.Resident,error) {
 
-	// ✅ Checagem 1: Resident.House não pode ser nil
+	//Checagem 1: Resident.House não pode ser nil
 	if r.house == nil {
 		return nil, errors.New("resident.house is nil")
 	}
 
-	// ✅ Checagem 2: SanitaryHouse da House não pode ser nil
+	//Checagem 2: SanitaryHouse da House não pode ser nil
 	sanitaryHouse := r.house.SanitaryHouse()
 	if sanitaryHouse == nil {
 		return nil, errors.New("resident.house.SanitaryHouse() returned nil")

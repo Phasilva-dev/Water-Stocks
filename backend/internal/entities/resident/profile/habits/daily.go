@@ -13,6 +13,7 @@ import (
 type ResidentDailyProfile struct {
 	routineProfile      *routine.DayProfile
 	frequencyProfileDay *frequency.ResidentDeviceProfiles
+	usageProfile map[string]*usage.UsageProfile
 }
 
 // NewResidentDailyProfile cria uma nova instância de ResidentDailyProfile.

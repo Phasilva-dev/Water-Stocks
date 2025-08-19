@@ -28,6 +28,10 @@ func newKitchenSink(flowLeakDist, durationDist dists.Distribution,
 	}, nil
 }
 
+func (ks *KitchenSink) IsCountable() bool {
+	return false
+}
+
 func (sdi *KitchenSink) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
 }

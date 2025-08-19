@@ -29,6 +29,10 @@ func newToilet(flowLeakDist, durationDist dists.Distribution,
 	}, nil
 }
 
+func (ks *Toilet) IsCountable() bool {
+	return true
+}
+
 func (sdi *Toilet) SanitaryDeviceID() uint32 {
 	return sdi.sanitaryDeviceID
 }

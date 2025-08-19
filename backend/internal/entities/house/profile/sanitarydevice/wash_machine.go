@@ -11,8 +11,6 @@ type WashMachine struct {
 	sanitaryDeviceID uint32
 	flowLeakDist dists.Distribution
 	durationDist dists.Distribution
-	amount uint8
-	
 
 }
 func newWashMachine(flowLeakDist, durationDist dists.Distribution,
@@ -29,6 +27,10 @@ func newWashMachine(flowLeakDist, durationDist dists.Distribution,
 		flowLeakDist: flowLeakDist,
 		durationDist: durationDist,
 	}, nil
+}
+
+func (ks *WashMachine) IsCountable() bool {
+	return false
 }
 
 func (sdi *WashMachine) SanitaryDeviceID() uint32 {

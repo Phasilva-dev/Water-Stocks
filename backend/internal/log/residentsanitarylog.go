@@ -48,3 +48,15 @@ func (r *ResidentSanitary) DishWasherLog() *Sanitary {
 func (r *ResidentSanitary) TanqueLog() *Sanitary {
 	return r.tanqueLog
 }
+
+func (r *ResidentSanitary) SetWashMachineLog(log *Sanitary) {
+	r.washMachineLog = log
+}
+
+func (r *ResidentSanitary) SetDishWasherLog(log *Sanitary) {
+	r.dishWasherLog = log
+}
+
+func (r *ResidentSanitary) SetTanqueLog(log *Sanitary) {
+	r.tanqueLog = log
+}

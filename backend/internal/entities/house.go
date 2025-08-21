@@ -3,6 +3,7 @@ package entities
 import (
 	"fmt"
 	"math/rand/v2"
+	"simulation/internal/dists"
 	"simulation/internal/entities/house"
 	"simulation/internal/entities/house/ds/sanitarysystem"
 	"simulation/internal/log"
@@ -14,6 +15,7 @@ type House struct {
 	sanitaryHouse *sanitarysystem.SanitaryHouse
 	houseProfile *house.HouseProfile
 	residentLogs []*log.Resident
+	//householdLogs []*log.Usage
 }
 
 func (h *House) SanitaryHouse() *sanitarysystem.SanitaryHouse {
@@ -39,6 +41,7 @@ func NewHouse(houseClassID uint32, houseProfile *house.HouseProfile) *House {
 		sanitaryHouse: nil,
 		houseProfile:  houseProfile,
 		residentLogs: nil,
+		//householdLogs: nil,
 	}
 }
 
@@ -114,6 +117,27 @@ func (h *House) GenerateHouseData (rng *rand.Rand) error {
 	return nil
 }
 
+func (h *House) GenerateHouseholdLog (day uint8, rng *rand.Rand) error {
+	var freqWashMachine, freqWashDishWasher, freqTanque uint8
+	for i := 0; i < len(h.residents); i++ {
+		resident := h.residents[i]
+		freqWashMachine += resident.dayData.Frequency().WashMachine()
+		freqWashDishWasher += resident.dayData.Frequency().DishWasher()
+		freqTanque += resident.dayData.Frequency().Tanque()
+	}
+	dist, _ := dists.CreateDistribution("uniform", 0, 100)
+	p := dist.Sample(rng)
+	resident := h.residents[0]
+	if p >= 66.66 {
+		resident.GenerateWashMachineLogs(freqWashMachine, day, rng)
+	}
+	resident.GenerateDishWasherLogs(freqWashDishWasher, day, rng)
+	resident.GenerateTanqueLogs(freqTanque, day, rng)
+
+	return nil
+	
+}
+
 func (h *House) GenerateLogs (day uint8,rng *rand.Rand) error {
 
 	
@@ -125,6 +149,7 @@ func (h *House) GenerateLogs (day uint8,rng *rand.Rand) error {
 		}
 		h.residentLogs[i] = residentLog
 	}
+	h.GenerateHouseholdLog(day,rng)
 	return nil
 
 }

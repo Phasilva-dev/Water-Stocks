@@ -8,39 +8,7 @@ import (
 	"testing"
 )
 
-// mockDistribution é uma implementação da interface dists.Distribution para testes.
-// Sendo simples, nos permite controlar a saída do método Sample.
-type mockDistribution struct {
-	SampleValue    float64
-	PercentileValue float64
-	MeanValue       float64
-	StdDevValue     float64
-	StringValue     string
-}
 
-func (m *mockDistribution) Params() []float64 {
-	return []float64 {m.MeanValue}
-}
-
-func (m *mockDistribution) Sample(rng *rand.Rand) float64 {
-	return m.SampleValue
-}
-
-func (m *mockDistribution) Percentile(p float64) float64 {
-	return m.PercentileValue
-}
-
-func (m *mockDistribution) Mean() float64 {
-	return m.MeanValue
-}
-
-func (m *mockDistribution) StdDev() float64 {
-	return m.StdDevValue
-}
-
-func (m *mockDistribution) String() string {
-	return m.StringValue
-}
 
 // --- Testes para a Unidade (unit.go) ---
 

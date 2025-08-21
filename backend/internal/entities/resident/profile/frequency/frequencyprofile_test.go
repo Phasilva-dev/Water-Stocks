@@ -4,7 +4,6 @@ import (
 	"math"
 	"math/rand/v2"
 	"simulation/internal/dists"
-	//"simulation/internal/entities/resident/ds/behavioral"
 	"strings"
 	"testing"
 )
@@ -48,7 +47,7 @@ func (m *mockDistribution) String() string {
 // TestNewDeviceProfile consolida os testes de criação do DeviceProfile,
 // incluindo a validação dos getters Shift() e StatDist().
 func TestNewDeviceProfile(t *testing.T) {
-	dist := &mockDistribution{SampleValue: 50.0}
+	dist, _ := dists.CreateDistribution("deterministic", 50.0)
 
 	testCases := []struct {
 		name        string
@@ -72,7 +71,7 @@ func TestNewDeviceProfile(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			profile, err := NewDeviceProfile(tc.dist, tc.shift)
+			profile, err := CreateDeviceProfile("individual",tc.dist, tc.shift)
 
 			if tc.expectError {
 				if err == nil {
@@ -92,7 +91,7 @@ func TestNewDeviceProfile(t *testing.T) {
 				if profile == nil {
 					t.Fatal("Profile should not be nil on success")
 				}
-				if gotShift := profile.Shift(); gotShift != tc.shift {
+				if gotShift := profile.MinValue(); gotShift != tc.shift {
 					t.Errorf("Shift() got = %d, want = %d", gotShift, tc.shift)
 				}
 				if gotDist := profile.StatDist(); gotDist != tc.dist {
@@ -123,8 +122,9 @@ func TestGenerateFrequency(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockDist := &mockDistribution{SampleValue: tc.sampleValue}
-			got := generateFrequency(rng, tc.shift, mockDist)
+			mockDist, _ := dists.CreateDistribution("deterministic", tc.sampleValue)
+			dp := individualDeviceProfile{}
+			got := dp.generateFrequency(rng, tc.shift, mockDist)
 
 			if got != tc.expectedFreq {
 				t.Errorf("generateFrequency() with sample %.1f and shift %d: got = %d, want = %d", tc.sampleValue, tc.shift, got, tc.expectedFreq)
@@ -138,16 +138,17 @@ func TestGenerateFrequency(t *testing.T) {
 // TestNewResidentDeviceProfiles testa o construtor do agregador de perfis.
 func TestNewResidentDeviceProfiles(t *testing.T) {
 	// Um perfil válido para ser reutilizado nos casos de teste
-	validProfile, _ := NewDeviceProfile(&mockDistribution{}, 0)
+	dist, _ := dists.CreateDistribution("deterministic", 0)
+	validProfile, _ := CreateDeviceProfile("individual", dist, 0)
 
 	testCases := []struct {
 		name        string
-		inputMap    map[string]*DeviceProfile
+		inputMap    map[string]DeviceProfile
 		expectError bool
 	}{
 		{
 			name: "Success: All profiles provided",
-			inputMap: map[string]*DeviceProfile{
+			inputMap: map[string]DeviceProfile{
 				"toilet": validProfile,
 				"shower": validProfile,
 			},
@@ -155,19 +156,19 @@ func TestNewResidentDeviceProfiles(t *testing.T) {
 		},
 		{
 			name: "Failure: A profile is nil",
-			inputMap: map[string]*DeviceProfile{
+			inputMap: map[string]DeviceProfile{
 				"toilet": validProfile,
 				"shower": nil, // O perfil inválido
 			},
 			expectError: true,
 		},
-		{"Success: Empty map", map[string]*DeviceProfile{}, false},
+		{"Success: Empty map", map[string]DeviceProfile{}, false},
 		{"Success: Nil map", nil, false},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			profiles, err := NewResidentDeviceProfiles(tc.inputMap)
+			profiles, err := CreateResidentDeviceProfile("normal", tc.inputMap)
 
 			if tc.expectError {
 				if err == nil {
@@ -187,8 +188,8 @@ func TestNewResidentDeviceProfiles(t *testing.T) {
 					t.Fatal("Profiles object should not be nil on success")
 				}
 				// Como estamos no mesmo pacote, podemos verificar o campo interno
-				if len(profiles.freqDevices) != len(tc.inputMap) {
-					t.Errorf("Internal map length mismatch. got = %d, want = %d", len(profiles.freqDevices), len(tc.inputMap))
+				if len(profiles.freqDevice()) != len(tc.inputMap) {
+					t.Errorf("Internal map length mismatch. got = %d, want = %d", len(profiles.freqDevice()), len(tc.inputMap))
 				}
 			}
 		})
@@ -200,19 +201,23 @@ func TestResidentDeviceProfiles_GenerateData(t *testing.T) {
 	rng := rand.New(rand.NewPCG(1, 0))
 
 	// Arrange: Cria perfis com mocks previsíveis
-	profileToilet, _ := NewDeviceProfile(&mockDistribution{SampleValue: 5.0}, 0)
-	profileShower, _ := NewDeviceProfile(&mockDistribution{SampleValue: 2.0}, 0)
-	profileFaucetOver, _ := NewDeviceProfile(&mockDistribution{SampleValue: 300.0}, 0)
-	profileTanqueShift, _ := NewDeviceProfile(&mockDistribution{SampleValue: 5.0}, 10)
+	dist1, _ := dists.CreateDistribution("deterministic", 5.0)
+	dist2, _ := dists.CreateDistribution("deterministic", 2.0)
+	dist3, _ := dists.CreateDistribution("deterministic", 300.0)
+	dist4, _ := dists.CreateDistribution("deterministic", 5.0)
+	profileToilet, _ := CreateDeviceProfile("individual", dist1, 0)
+	profileShower, _ := CreateDeviceProfile("individual", dist2, 0)
+	profileFaucetOver, _ := CreateDeviceProfile("individual", dist3, 0)
+	profileTanqueShift, _ := CreateDeviceProfile("individual", dist4, 10)
 
 	testCases := []struct {
 		name         string
-		profiles     map[string]*DeviceProfile
+		profiles     map[string]DeviceProfile
 		expectedData map[string]uint8
 	}{
 		{
 			name: "All profiles present",
-			profiles: map[string]*DeviceProfile{
+			profiles: map[string]DeviceProfile{
 				"toilet": profileToilet,
 				"shower": profileShower,
 			},
@@ -220,12 +225,12 @@ func TestResidentDeviceProfiles_GenerateData(t *testing.T) {
 		},
 		{
 			name:         "Empty map of profiles",
-			profiles:     map[string]*DeviceProfile{},
+			profiles:     map[string]DeviceProfile{},
 			expectedData: map[string]uint8{},
 		},
 		{
 			name: "Edge cases (clamping and shift)",
-			profiles: map[string]*DeviceProfile{
+			profiles: map[string]DeviceProfile{
 				"faucet": profileFaucetOver,
 				"tanque": profileTanqueShift,
 			},
@@ -236,7 +241,7 @@ func TestResidentDeviceProfiles_GenerateData(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Arrange
-			residentProfiles, err := NewResidentDeviceProfiles(tc.profiles)
+			residentProfiles, err := CreateResidentDeviceProfile("normal", tc.profiles)
 			if err != nil {
 				t.Fatalf("Test setup failed, could not create ResidentDeviceProfiles: %v", err)
 			}
@@ -279,7 +284,7 @@ func TestDeviceProfile_GenerateData_Statistical(t *testing.T) {
 		t.Fatalf("Failed to create Poisson distribution: %v", err)
 	}
 
-	profile, err := NewDeviceProfile(poissonDist, 0)
+	profile, err := CreateDeviceProfile("individual", poissonDist, 0)
 	if err != nil {
 		t.Fatalf("Failed to create DeviceProfile: %v", err)
 	}

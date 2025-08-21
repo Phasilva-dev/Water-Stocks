@@ -12,40 +12,40 @@ import (
 // DeviceProfile representa um perfil estatístico usado para gerar valores de frequência.
 // Ele combina uma distribuição estatística com um valor mínimo (shift), 
 // garantindo que as amostras geradas respeitem uma frequência mínima.
-type DeviceProfile struct {
+type individualDeviceProfile struct {
 	statDist dists.Distribution // A distribuição estatística utilizada para gerar os valores.
-	shift    uint8              // O valor mínimo (inclusive) que as amostras podem assumir.
+	minValue    uint8              // O valor mínimo (inclusive) que as amostras podem assumir.
 }
 
 // Shift retorna o valor mínimo de frequência (shift) configurado no perfil.
 // Esse getter permite acessar o shift de forma segura e encapsulada.
-func (f *DeviceProfile) Shift() uint8 {
-	return f.shift
+func (idp *individualDeviceProfile) MinValue() uint8 {
+	return idp.minValue
 }
 
 // StatDist retorna a distribuição estatística associada ao perfil.
 // Permite acessar a distribuição usada internamente, útil para diagnósticos ou reutilização.
-func (f *DeviceProfile) StatDist() dists.Distribution {
-	return f.statDist
+func (idp *individualDeviceProfile) StatDist() dists.Distribution {
+	return idp.statDist
 }
 
-// NewDeviceProfile cria uma nova instância de DeviceProfile, validando se a distribuição é válida.
+// NewindividualDeviceProfile cria uma nova instância de individualDeviceProfile, validando se a distribuição é válida.
 //
 // Parâmetros:
 // - dist: distribuição estatística usada para gerar valores. Não pode ser nil.
 // - shift: valor mínimo permitido para a frequência gerada.
 //
 // Retorna:
-// - Um ponteiro para uma nova instância de DeviceProfile.
+// - Um ponteiro para uma nova instância de individualDeviceProfile.
 // - Um erro, caso a distribuição seja nil.
-func NewDeviceProfile(dist dists.Distribution, shift uint8) (*DeviceProfile, error) {
+func newindividualDeviceProfile(dist dists.Distribution, minValue uint8) (DeviceProfile, error) {
 	if dist == nil {
-		return nil, errors.New("invalid DeviceProfile: distribution cannot be nil \n ")
+		return nil, errors.New("invalid individualDeviceProfile: distribution cannot be nil \n ")
 	}
 
-	return &DeviceProfile{
+	return &individualDeviceProfile{
 		statDist: dist,
-		shift:    shift,
+		minValue:    minValue,
 	}, nil
 }
 
@@ -61,7 +61,7 @@ func NewDeviceProfile(dist dists.Distribution, shift uint8) (*DeviceProfile, err
 // - Garante que o valor seja não-negativo.
 // - Limita o valor máximo a 255 para caber no tipo uint8.
 // - Aplica o shift mínimo, retornando pelo menos esse valor.
-func generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution) uint8 {
+func (idp *individualDeviceProfile)generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution) uint8 {
 	val := statDist.Sample(rng) // Amostra um valor da distribuição
 
 	// Transforma valores negativos em positivos
@@ -81,7 +81,7 @@ func generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution)
 	return freq
 }
 
-// GenerateData é o método público da struct DeviceProfile para gerar
+// GenerateData é o método público da struct individualDeviceProfile para gerar
 // uma frequência usando a distribuição e o shift configurados.
 //
 // Parâmetros:
@@ -89,6 +89,10 @@ func generateFrequency(rng *rand.Rand, shift uint8, statDist dists.Distribution)
 //
 // Retorna:
 // - Um valor uint8 de frequência, respeitando o shift e limitado a 255.
-func (f *DeviceProfile) GenerateData(rng *rand.Rand) uint8 {
-	return generateFrequency(rng, f.shift, f.statDist)
+func (idp *individualDeviceProfile) GenerateData(rng *rand.Rand) uint8 {
+	return idp.generateFrequency(rng, idp.minValue, idp.statDist)
+}
+
+func (idp *individualDeviceProfile) IsIndividual() bool {
+	return true
 }

@@ -33,7 +33,7 @@ func (d *DeterministicDist) Params() []float64 {
 //
 // Recebe o valor fixo como parâmetro. Não há restrições de validade,
 // qualquer valor float64 é aceito (incluindo negativos, zero, infinitos ou NaN).
-func newDeterministicDist(value float64) (*DeterministicDist, error) {
+func newDeterministicDist(value float64) (Distribution, error) {
 	// Nenhuma validação necessária, sempre válido.
 	return &DeterministicDist{
 		value: value,

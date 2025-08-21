@@ -40,7 +40,7 @@ func (n *NormalDist) Params() []float64 {
 // Retorna um erro se o desvio padrão (stdDev) for negativo (< 0).
 // Note que um stdDev igual a 0 é permitido, resultando em uma
 // distribuição degenerada.
-func newNormalDist(mean, stdDev float64) (*NormalDist, error) {
+func newNormalDist(mean, stdDev float64) (Distribution, error) {
 	// Verifica se o desvio padrão é negativo.
 	if stdDev < 0 {
 	return nil, fmt.Errorf(

@@ -42,7 +42,7 @@ func (l *LogNormalDist) StdDev() float64 {
 // Recebe a média (mean) e o desvio padrão (std) da distribuição Normal
 // subjacente como parâmetros.
 // Retorna um erro se o desvio padrão (std) não for positivo (> 0).
-func newLogNormalDist(mean, stdDev float64) (*LogNormalDist, error) {
+func newLogNormalDist(mean, stdDev float64) (Distribution, error) {
 	if stdDev < 0 {
 	return nil, fmt.Errorf(
 		"invalid LogNormal Distribution Parameters: stdDev (desvio padrão) cannot be negative (stdDev=%.2f)",

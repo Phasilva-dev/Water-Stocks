@@ -46,7 +46,7 @@ func (t *TriangleDist) C() float64 {
 // Recebe o limite inferior (a), a moda (b) e o limite superior (c)
 // como parâmetros.
 // Retorna um erro se a condição a ≤ b ≤ c não for satisfeita, ou se a == c.
-func newTriangleDist(a, b, c float64) (*TriangleDist, error) {
+func newTriangleDist(a, b, c float64) (Distribution, error) {
 	// Verifica a ordem dos parâmetros.
 	if a > b || b > c {
 		return nil, fmt.Errorf(

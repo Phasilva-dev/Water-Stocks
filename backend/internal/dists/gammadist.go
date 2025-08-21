@@ -37,7 +37,7 @@ func (g *GammaDist) Scale() float64 {
 // parâmetros shape (forma) e scale (escala) fornecidos.
 //
 // Retorna um erro se shape ou scale não forem valores positivos (> 0).
-func newGammaDist(shape, scale float64) (*GammaDist, error) {
+func newGammaDist(shape, scale float64) (Distribution, error) {
 
 	if shape <= 0 {
 		return nil, fmt.Errorf(

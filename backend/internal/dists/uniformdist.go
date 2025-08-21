@@ -60,7 +60,7 @@ func UniformDistNew(min, max float64) (UniformDist, error) {
 // Recebe o limite inferior (min) e o limite superior (max) como parâmetros.
 // Retorna um erro se min for maior ou igual a max.
 // Este é o padrão mais comum em Go para construtores que podem falhar.
-func newUniformDist(min, max float64) (*UniformDist, error) {
+func newUniformDist(min, max float64) (Distribution, error) {
 	// Verifica se min é menor que max.
 	if min > max {
 		return nil, fmt.Errorf(

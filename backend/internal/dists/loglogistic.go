@@ -27,7 +27,7 @@ func (ll *LogLogisticDist) Scale() float64 {
 }
 
 // newLogLogisticDist cria uma nova instância de LogLogisticDist.
-func newLogLogisticDist(shape, scale float64) (*LogLogisticDist, error) {
+func newLogLogisticDist(shape, scale float64) (Distribution, error) {
 	if shape <= 0 {
 		return nil, fmt.Errorf(
 			"invalid LogLogistic Distribution Parameters: shape (forma) must be > 0 (shape=%.2f)",

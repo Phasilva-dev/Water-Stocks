@@ -31,7 +31,7 @@ func (p *PoissonDist) Lambda() float64 {
 //
 // Recebe o parâmetro de taxa (lambda, λ) como argumento.
 // Retorna um erro se lambda não for estritamente positivo (> 0).
-func newPoissonDist(lambda float64) (*PoissonDist, error) {
+func newPoissonDist(lambda float64) (Distribution, error) {
 	// Verifica se o parâmetro lambda é positivo.
 	if lambda <= 0 {
 	return nil, fmt.Errorf(

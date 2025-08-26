@@ -53,7 +53,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	for k := uint8(1); k < uint8(day+2); k++ {
 		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()
 		fmt.Println("Consumo do dia ",k)
-		//dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
+		dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
 	}
 
 	err := dailyUsagesDataWindow[1].ExportToExcel("consumo_diario.xlsx")

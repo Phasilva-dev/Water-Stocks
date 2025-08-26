@@ -39,7 +39,7 @@ freqProfile := frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyP
 	"toilet":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 2.75)), 0)),
 	"shower":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 1.08)), 0)),
 	"washBassin":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 5.93)), 0)),
-	"washMachine": must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 0.07)), 0)),
+	"washMachine": must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 0.37)), 0)),
 	"dishWasher":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 24.88)), 0)),
 	"tanque":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 1.15)), 0)),
 })
@@ -171,7 +171,7 @@ adultDailyRoutine := must(routine.NewRoutineProfile([]dists.Distribution{
 func defaultHouseProfile(toiletType, showerType int) *house.HouseProfile {
 	residentCountProfile := count.NewResidentCount(must(dists.CreateDistribution("gamma",4.09588,0.636582)))
 	sanitaryCountProfile := count.NewSanitaryCount()
-	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull", 35.8311, 1.58364)))
+	residentAgeProfile := demographics.NewAge(must(dists.CreateDistribution("weibull", 1.58364, 35.8311)))
 
 
 
@@ -254,14 +254,14 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os showers
 	shower1 := must(sanitarydevice.NewShower(
-		must(dists.CreateDistribution("triangle", 3.0 / 60, 4.0 / 60, 5.0 / 60)),
+		must(dists.CreateDistribution("triangle", 0.05, 0.06666, 0.08333)), //3.0 / 60, 4.0 / 60, 5.0 / 60
 		must(dists.CreateDistribution("triangle", 2 * 60, 3.5 * 60, 5 * 60)),
 		1,
 	))
 
 	shower2 := must(sanitarydevice.NewShower(
 		must(dists.CreateDistribution("lognormal", -2.4205, 0.2014)),
-		must(dists.CreateDistribution("gamma", 6.5216 * 60, 0.7668 * 60)),
+		must(dists.CreateDistribution("gamma", 391.296, 36.008 )), //6.5216 * 60, 0.7668 * 60
 		2,
 	))
 
@@ -290,8 +290,9 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 		1,
 	))
 
+	//("exponential", 0.07534)),
 	devices["dish_washer"] = must(sanitarydevice.NewDishWasher(
-		must(dists.CreateDistribution("weibull", 0.0569, 1.5871)),
+		must(dists.CreateDistribution("weibull", 1.5871, 0.0569)),  
 		must(dists.CreateDistribution("lognormal", 3.1763, 0.785)),
 		1,
 	))

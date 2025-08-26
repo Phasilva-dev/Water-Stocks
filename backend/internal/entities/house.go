@@ -15,7 +15,9 @@ type House struct {
 	sanitaryHouse *sanitarysystem.SanitaryHouse
 	houseProfile *house.HouseProfile
 	residentLogs []*log.Resident
-	//householdLogs []*log.Usage
+	wash_machineFreq uint8
+	dish_washerFreq uint8
+	tanqueFreq uint8
 }
 
 func (h *House) SanitaryHouse() *sanitarysystem.SanitaryHouse {
@@ -41,7 +43,9 @@ func NewHouse(houseClassID uint32, houseProfile *house.HouseProfile) *House {
 		sanitaryHouse: nil,
 		houseProfile:  houseProfile,
 		residentLogs: nil,
-		//householdLogs: nil,
+		wash_machineFreq: 0,
+		dish_washerFreq: 0,
+		tanqueFreq: 0,
 	}
 }
 
@@ -118,21 +122,27 @@ func (h *House) GenerateHouseData (rng *rand.Rand) error {
 }
 
 func (h *House) GenerateHouseholdLog (day uint8, rng *rand.Rand) error {
-	var freqWashMachine, freqWashDishWasher, freqTanque uint8
+	var freqWashMachine, freqDishWasher, freqTanque uint8
 	for i := 0; i < len(h.residents); i++ {
 		resident := h.residents[i]
 		freqWashMachine += resident.dayData.Frequency().WashMachine()
-		freqWashDishWasher += resident.dayData.Frequency().DishWasher()
+		freqDishWasher += resident.dayData.Frequency().DishWasher()
 		freqTanque += resident.dayData.Frequency().Tanque()
 	}
 	dist, _ := dists.CreateDistribution("uniform", 0, 100)
 	p := dist.Sample(rng)
 	resident := h.residents[0]
+	freqWashMachine += h.wash_machineFreq
+	freqDishWasher += h.dish_washerFreq
+	freqTanque += h.tanqueFreq
 	if p >= 66.66 {
 		resident.GenerateWashMachineLogs(freqWashMachine, day, rng)
+		h.wash_machineFreq = 0
 	}
-	resident.GenerateDishWasherLogs(freqWashDishWasher, day, rng)
+	resident.GenerateDishWasherLogs(freqDishWasher, day, rng)
+	h.dish_washerFreq = 0
 	resident.GenerateTanqueLogs(freqTanque, day, rng)
+	h.tanqueFreq = 0
 
 	return nil
 	

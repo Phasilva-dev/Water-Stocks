@@ -9,6 +9,9 @@ Inclui scripts de testes simples e mistos para validar a carga do sistema.
 
 * `cmd/` → Contém o código-fonte principal (cliente e servidor).
 * `internal/` → Implementação dos módulos internos (rede, lógica do jogo, etc.).
+* `network/` → Pacote que implementa a logica de comunicação do servidor.
+* `session/` → Pacote que implementa a logica do servidor, como criamos partida, como lidamos com a fila e etc.
+* `game/` → Pacote que implementa a logica do game.
 * `docker-compose.yml` → Configuração principal de containers.
 * `docker-compose.simple-test.yml` → Compose para teste simples.
 * `docker-compose.mixed-test.yml` → Compose para teste de carga mista.
@@ -56,7 +59,7 @@ Antes de rodar o projeto, certifique-se de ter instalado:
    go run cmd/client/main.go
    ```
 
-> O cliente pedirá o IP do servidor. Se for local, use `127.0.0.1`.
+> O cliente pedirá o IP do servidor. Se o servidor estiver em outra maquina, insira o ip dela dentro do cmd/client/main.go.
 
 ---
 
@@ -97,11 +100,7 @@ docker compose run client
 ## 📖 Como Jogar
 
 1. O cliente conecta ao servidor via **TCP**.
-2. O jogador escolhe:
-
-   * `0` = Pedra ✊
-   * `1` = Papel ✋
-   * `2` = Tesoura ✌️
+2. O jogador escolhe uma das inúmeras opções que o menu exibe
 3. O servidor processa a jogada e retorna o resultado.
 
 ---
@@ -112,4 +111,3 @@ Este projeto é distribuído sob a licença MIT. Consulte o arquivo [LICENSE](LI
 
 ---
 
-👉 Quer que eu monte esse `README.md` direto no projeto (substituindo o atual), ou prefere que eu apenas te entregue o texto aqui para você salvar manualmente?

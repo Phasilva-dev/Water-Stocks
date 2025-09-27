@@ -1,2 +1,4 @@
 Prog/
 antigo
+backend/cmd/simulation/consumo_diario.xlsx
+backend/cmd/simulation/pulsos_retangulares.csv

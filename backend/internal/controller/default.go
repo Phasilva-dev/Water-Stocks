@@ -36,7 +36,7 @@ func setHouses(profile *house.HouseProfile, houses []*entities.House, size int, 
 func defaultResidentProfiles()  map[uint32]*resident.ResidentProfile{
 
 freqProfile := frequency.NewFrequencyProfileDay(map[string]*frequency.FrequencyProfile{
-	"toilet":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 2.75)), 0)),
+	"toilet":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 5.75)), 0)), //2.75
 	"shower":      must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 1.08)), 0)),
 	"washBassin":  must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 5.93)), 0)),
 	"washMachine": must(frequency.NewFrequencyProfile(must(dists.CreateDistribution("poisson", 0.37)), 0)),
@@ -232,8 +232,8 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os toilets
 	toilet1 := must(sanitarydevice.NewToilet(0.4, 5, 1))
-	toilet2 := must(sanitarydevice.NewToilet(0.042, 1.8*60, 2))
-	toilet3 := must(sanitarydevice.NewToilet(0.25, 60, 3))
+	toilet2 := must(sanitarydevice.NewToilet(0.042, 1.8*60, 2)) // Mais comum
+	toilet3 := must(sanitarydevice.NewToilet(0.25, 60, 3)) // Mais comum
 	toilet4 := must(sanitarydevice.NewToilet(0.042, 1.2*60, 4))
 
 	// Selecionar o toilet com base no tipo
@@ -254,8 +254,9 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os showers
 	shower1 := must(sanitarydevice.NewShower(
-		must(dists.CreateDistribution("triangle", 0.05, 0.06666, 0.08333)), //3.0 / 60, 4.0 / 60, 5.0 / 60
-		must(dists.CreateDistribution("triangle", 2 * 60, 3.5 * 60, 5 * 60)),
+		must(dists.CreateDistribution("triangle", 0.05, 0.083, 0.15 )), //3.0 / 60, 4.0 / 60, 5.0 / 60
+		//0.05, 0.06666, 0.08333
+		must(dists.CreateDistribution("triangle", 3 * 60, 5.5 * 60, 10 * 60)), //2 * 60, 3.5 * 60, 5 * 60
 		1,
 	))
 
@@ -279,7 +280,7 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	// Criar os outros dispositivos (sem múltiplas opções)
 	devices["wash_bassin"] = must(sanitarydevice.NewWashBassin(
-		must(dists.CreateDistribution("lognormal", -2.6677, 0.3275)), 
+		must(dists.CreateDistribution("lognormal", -3.0493, 0.3275 )), //-2.6677, 0.3275	
 		must(dists.CreateDistribution("lognormal", 3.3551, 0.8449)),
 		1,
 	))
@@ -292,7 +293,7 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	//("exponential", 0.07534)),
 	devices["dish_washer"] = must(sanitarydevice.NewDishWasher(
-		must(dists.CreateDistribution("weibull", 1.5871, 0.0569)),  
+		must(dists.CreateDistribution("weibull", 1.5871, 0.0269)),   //("weibull", 1.5871, 0.0569)
 		must(dists.CreateDistribution("lognormal", 3.1763, 0.785)),
 		1,
 	))

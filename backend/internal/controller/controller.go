@@ -31,7 +31,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),accumulator.OrderedDeviceKeys())
 		dailyPulseDataWindow[uint8(i)] = accumulator.NewPulseHouse(uint8(i),accumulator.OrderedDeviceKeys())
 	}
-
+	
 	for i := uint8(0); i < uint8(day); i++ { // i = day
 		for j := 0; j < size; j++ { // j = house
 			if err := houses[j].GenerateLogs(i+1, rng); err != nil {
@@ -53,7 +53,8 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	for k := uint8(1); k < uint8(day+2); k++ {
 		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()
 		fmt.Println("Consumo do dia ",k)
-		dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
+		dailyUsagesDataWindow[uint8(k)].PrintDailyTotals()
+		//dailyUsagesDataWindow[uint8(k)].PrintHourlyWaterConsumption()
 	}
 
 	err := dailyUsagesDataWindow[1].ExportToExcel("consumo_diario.xlsx")

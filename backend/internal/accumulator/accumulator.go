@@ -6,6 +6,7 @@ import (
 	logData "simulation/internal/log"
 	"fmt"
 	"math"
+	"strings"
 )
 
 type AccumulatorInterface interface {
@@ -312,4 +313,32 @@ func (a *AccumulatorDay) PrintHourlyWaterConsumption() {
 
 	// Total geral
 	fmt.Printf("\nTotal completo do dia: %.2f Litros\n", grandTotal)
+}
+
+func (a *AccumulatorDay) PrintDailyTotals() {
+	fmt.Printf("\n--- Resumo do Consumo Total do Dia %d ---\n", a.day)
+
+	// Obtém a lista ordenada de dispositivos para uma impressão consistente
+	deviceTypes := OrderedDeviceKeys()
+
+	var grandTotal float64
+	
+	// Itera sobre cada tipo de dispositivo e calcula seu total diário
+	for _, deviceType := range deviceTypes {
+		var deviceTotal float64
+		// Soma o consumo do dispositivo em cada uma das 24 horas
+		for _, hourAccumulator := range a.accumulatorHour {
+			deviceTotal += hourAccumulator.IndividualDeviceTotal(deviceType)
+		}
+		
+		// Imprime o resultado para o dispositivo atual
+		fmt.Printf("%-15s: %.2f Litros\n", deviceType, deviceTotal)
+		
+		// Acumula o total geral
+		grandTotal += deviceTotal
+	}
+	
+	// Imprime uma linha divisória e o total geral do dia
+	fmt.Println(strings.Repeat("-", 30))
+	fmt.Printf("%-15s: %.2f Litros\n", "Total do Dia", grandTotal)
 }

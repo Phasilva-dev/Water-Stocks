@@ -1,60 +1,58 @@
-CREATE TABLE TiposResidencia (
-    id INT UNSIGNED PRIMARY KEY,    -- Seu HouseID original. Não precisa de AUTO_INCREMENT se os IDs são pré-definidos.
-    descricao VARCHAR(255) NOT NULL -- Ex: "Casa Popular", "Apartamento 2 quartos", "Kitnet"
+-- Habilita a verificação de chaves estrangeiras para garantir a integridade dos dados.
+PRAGMA foreign_keys = ON;
+
+-- =================================================================================
+-- ESTRUTURA DAS TABELAS (FASE 1)
+-- =================================================================================
+
+-- Tabela 1
+-- A tabela mais alta da nossa aplicação. É através dela que chegamos em qualquer dado.
+CREATE TABLE simulation_runs (
+    id INTEGER NOT NULL PRIMARY KEY,
+    run_name TEXT,
+    number_of_houses INTEGER NOT NULL,
+    number_of_days INTEGER NOT NULL,
+    number_of_residents INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    -- No futuro, você pode adicionar uma coluna aqui:
+    -- simulation_profile_id INTEGER
 );
 
-CREATE TABLE Ocupacoes (
-    id INT UNSIGNED PRIMARY KEY,   -- Seu ResidentOccupationID original.
-    nome VARCHAR(100) NOT NULL UNIQUE -- Ex: "Estudante", "Trabalhador", "Aposentado"
+-- NOVA TABELA: Armazena os participantes estáticos de uma simulação
+CREATE TABLE run_participants (
+    id INTEGER NOT NULL PRIMARY KEY,                -- O RG único do registro no DB
+    run_id INTEGER NOT NULL,                        -- A qual simulação pertence
+    resident_id_in_run INTEGER NOT NULL,         -- O ID GLOBAL do participante (1 até N total)
+    house_id INTEGER NOT NULL,                      -- A qual casa o participante pertence
+    resident_id_in_house INTEGER NOT NULL,          -- O ID LOCAL do participante DENTRO da casa (1 até M)
+    house_profile_id INTEGER,
+    resident_profile_id INTEGER,
+    age INTEGER,
+    FOREIGN KEY (run_id) REFERENCES simulation_runs(id) ON DELETE CASCADE
 );
 
-CREATE TABLE PerfisDeMorador (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tipo_residencia_id INT UNSIGNED NOT NULL,
-    ocupacao_id INT UNSIGNED NOT NULL,
-    idade TINYINT UNSIGNED NOT NULL,
 
-    -- Garante que não existam perfis duplicados. Essencial para a integridade!
-    UNIQUE KEY uk_perfil (tipo_residencia_id, ocupacao_id, idade),
 
-    FOREIGN KEY (tipo_residencia_id) REFERENCES TiposResidencia(id),
-    FOREIGN KEY (ocupacao_id) REFERENCES Ocupacoes(id)
+-- Tabela de logs diários agora é muito mais simples
+CREATE TABLE daily_logs (
+    id INTEGER NOT NULL PRIMARY KEY,
+    participant_id INTEGER NOT NULL, -- Liga ao participante na tabela acima
+    day INTEGER NOT NULL,
+    FOREIGN KEY (participant_id) REFERENCES run_participants(id) ON DELETE CASCADE
 );
 
-CREATE TABLE CategoriasDispositivos (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL UNIQUE -- "Chuveiro", "Vaso Sanitário", "Pia de Cozinha"
+-- Tabela 2b: Eventos de Uso Sanitário
+-- Esta é a tabela mais detalhada. Cada linha é um único evento de uso.
+-- Ela armazena as informações dos seus structs `Sanitary` e `Usage`.
+CREATE TABLE usage_events (
+    id INTEGER NOT NULL PRIMARY KEY,
+    daily_log_id INTEGER NOT NULL,                -- Liga este evento ao residente/dia específico na tabela acima
+    sanitary_type TEXT NOT NULL,                  -- "toilet", "shower", "washBassin", etc.
+    sanitary_device_id INTEGER,               -- Corresponde a `sanitaryDeviceID`
+    start_usage INTEGER NOT NULL,                 -- Corresponde a `startUsage` (segundo do dia)
+    end_usage INTEGER NOT NULL,                   -- Corresponde a `endUsage` (segundo do dia)
+    flow_rate REAL NOT NULL,                      -- Corresponde a `flowRate`
+
+    FOREIGN KEY (daily_log_id) REFERENCES daily_logs(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ModelosDispositivos (
-    id INT UNSIGNED PRIMARY KEY,              -- Seu SanitaryDeviceID original.
-    categoria_id INT UNSIGNED NOT NULL,       -- Chave estrangeira para a categoria geral.
-    descricao VARCHAR(255),                   -- Ex: "Chuveiro Elétrico 5500W", "Vaso com Caixa Acoplada 6L"
-
-    FOREIGN KEY (categoria_id) REFERENCES CategoriasDispositivos(id)
-);
-
-CREATE TABLE Simulacoes (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    -- Você pode adicionar outros metadados aqui, como:
-    -- parametros_json TEXT     -- Para guardar os parâmetros de entrada da simulação
-    UNIQUE KEY uk_nome (nome) -- Garante que cada simulação tenha um nome único
-);
-
-CREATE TABLE LogsDeUso (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    simulacao_id INT UNSIGNED NOT NULL,            -- <-- A NOVA COLUNA!
-    dia SMALLINT UNSIGNED NOT NULL,
-    perfil_morador_id INT UNSIGNED NOT NULL,
-    modelo_dispositivo_id INT UNSIGNED NOT NULL,
-    inicio_uso_segundos INT NOT NULL,
-    fim_uso_segundos INT NOT NULL,
-    vazao_ls DOUBLE PRECISION NOT NULL,
-
-    FOREIGN KEY (simulacao_id) REFERENCES Simulacoes(id) ON DELETE CASCADE,
-    FOREIGN KEY (perfil_morador_id) REFERENCES PerfisDeMorador(id),
-    FOREIGN KEY (modelo_dispositivo_id) REFERENCES ModelosDispositivos(id)
-);

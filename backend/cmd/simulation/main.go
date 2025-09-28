@@ -23,7 +23,7 @@ func main() {
 
 	start := time.Now()
 	// Executar a simulação
-	controller.RunSimulation(*size, *day, *toiletType, *showerType)
+	controller.RunSimulation(*size, *day, *toiletType, *showerType, "")
 
 	// Calcular duração
 	elapsed := time.Since(start)

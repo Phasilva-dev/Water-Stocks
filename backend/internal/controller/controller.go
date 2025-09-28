@@ -1,17 +1,29 @@
 package controller
 
 import (
+	"fmt"
 	"log"
-	"simulation/internal/entities"
 	"math/rand/v2"
+	"simulation/internal/analysis"
+	"simulation/internal/entities"
 	"time"
-	"simulation/internal/accumulator"
 )
 
 
-func RunSimulation(size, day, toiletType, showerType int) {
+func RunSimulation(size, day, toiletType, showerType int, filename string) {
 
 	
+	// NOVO: Adiciona robustez. Se o nome do arquivo estiver vazio, usa um padrão.
+	if filename == "" {
+		log.Println("Aviso: Nome do arquivo não fornecido, usando 'default_simulation'")
+		filename = "default_simulation"
+	}
+
+	// NOVO: Constrói os nomes dos arquivos de saída dinamicamente.
+	//pulseCsvFilename := fmt.Sprintf("%s_pulses.csv", filename)
+	analysisCsvFilename := fmt.Sprintf("%s_analysis.csv", filename)
+
+	log.Printf("Iniciando simulação. O arquivo de saída será: %s ", analysisCsvFilename)
 	
 	//Iniciando Simulação
 	rng := rand.New(rand.NewPCG(uint64(time.Now().UnixNano()), 0))
@@ -23,17 +35,18 @@ func RunSimulation(size, day, toiletType, showerType int) {
 
 	
 	//Variaveis de dados
-	populationData := accumulator.NewPopulationData(houses)
-	pulseData := accumulator.NewPulseHouse(0,accumulator.OrderedDeviceKeys())
+	populationData := analysis.NewPopulationData(houses)
+	pulseData := analysis.NewPulseHouse(0,analysis.OrderedDeviceKeys())
+	simulationAnalysis := analysis.NewSimulationAnalysis(pulseData,populationData,day)
 
 	/*
-	dailyUsagesDataWindow := make(map[uint8]*accumulator.AccumulatorDay)
-	dailyPulseDataWindow := make(map[uint8]*accumulator.PulseHouse)
+	dailyUsagesDataWindow := make(map[uint8]*analysis.AccumulatorDay)
+	dailyPulseDataWindow := make(map[uint8]*analysis.PulseHouse)
 
 
 	for i := uint8(0); i < uint8(day+2); i++ {
-		dailyUsagesDataWindow[uint8(i)] = accumulator.NewAccumulatorDay(uint8(i),accumulator.OrderedDeviceKeys())
-		dailyPulseDataWindow[uint8(i)] = accumulator.NewPulseHouse(uint8(i),accumulator.OrderedDeviceKeys())
+		dailyUsagesDataWindow[uint8(i)] = analysis.NewAccumulatorDay(uint8(i),analysis.OrderedDeviceKeys())
+		dailyPulseDataWindow[uint8(i)] = analysis.NewPulseHouse(uint8(i),analysis.OrderedDeviceKeys())
 	}*/
 	
 	for i := uint8(0); i < uint8(day); i++ { // i = day
@@ -52,7 +65,7 @@ func RunSimulation(size, day, toiletType, showerType int) {
 	pulseData.PrintUsageStatistics()
 
 	/*
-	accumulator.PrintUsagesOverview(dailyUsagesDataWindow, accumulator.OrderedDeviceKeys())
+	analysis.PrintUsagesOverview(dailyUsagesDataWindow, analysis.OrderedDeviceKeys())
 	for k := uint8(1); k < uint8(day+2); k++ {
 		dailyUsagesDataWindow[uint8(k)].RoundAccumulatorDayValues()
 		fmt.Println("Consumo do dia ",k)
@@ -68,8 +81,14 @@ func RunSimulation(size, day, toiletType, showerType int) {
 		log.Fatalf("Erro exportando Excel: %v", err)
 	}*/
 
-	err = pulseData.ExportPulsesToCSV("pulsos_retangulares.csv")
+	/*
+	err = pulseData.ExportPulsesToCSV(pulseCsvFilename)
 		if err != nil {
+		log.Fatalf("Erro exportando csv: %v", err)
+	}*/
+	
+	err = simulationAnalysis.ExportAllDataToCSV(analysisCsvFilename)
+	if err != nil {
 		log.Fatalf("Erro exportando csv: %v", err)
 	}
 

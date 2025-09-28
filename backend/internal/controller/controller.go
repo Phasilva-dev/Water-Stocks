@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand/v2"
+	"os"
+	"path/filepath"
 	"simulation/internal/analysis"
 	"simulation/internal/entities"
 	"time"
@@ -19,9 +21,20 @@ func RunSimulation(size, day, toiletType, showerType int, filename string) {
 		filename = "default_simulation"
 	}
 
-	// NOVO: Constrói os nomes dos arquivos de saída dinamicamente.
+	// 1. Defina o nome da pasta de saída.
+	const outputDir = "simulations_output" // Você pode mudar este nome se quiser
+
+	// 2. Crie a pasta de saída. os.MkdirAll é seguro e não fará nada se a pasta já existir.
+	//    0755 são as permissões padrão para um diretório.
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		log.Fatalf("Erro ao criar o diretório de saída '%s': %v", outputDir, err)
+	}
+
+	// 3. Construa o caminho completo do arquivo usando filepath.Join para segurança entre sistemas.
+	analysisCsvFilename := filepath.Join(outputDir, fmt.Sprintf("%s_analysis.csv", filename))
+
 	//pulseCsvFilename := fmt.Sprintf("%s_pulses.csv", filename)
-	analysisCsvFilename := fmt.Sprintf("%s_analysis.csv", filename)
+	//analysisCsvFilename := fmt.Sprintf("%s_analysis.csv", filename)
 
 	log.Printf("Iniciando simulação. O arquivo de saída será: %s ", analysisCsvFilename)
 	

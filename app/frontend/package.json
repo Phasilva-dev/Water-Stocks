@@ -9,11 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "plotly.js-dist-min": "^3.0.1",
-    "vue": "^3.2.37"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.1",
-    "vite": "^6.2.2"
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.0.1",
+    "vite": "^3.0.7"
   }
 }

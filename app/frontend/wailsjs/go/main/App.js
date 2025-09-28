@@ -6,6 +6,6 @@ export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
 
-export function SimularRotina(arg1, arg2, arg3) {
-  return window['go']['main']['App']['SimularRotina'](arg1, arg2, arg3);
+export function RunSimulation(arg1, arg2, arg3, arg4, arg5) {
+  return window['go']['main']['App']['RunSimulation'](arg1, arg2, arg3, arg4, arg5);
 }

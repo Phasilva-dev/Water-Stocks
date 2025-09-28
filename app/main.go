@@ -13,7 +13,6 @@ var assets embed.FS
 
 func main() {
 	// Create an instance of the app structure
-	
 	app := NewApp()
 
 	// Create application with options
@@ -27,7 +26,7 @@ func main() {
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup:        app.startup,
 		Bind: []interface{}{
-			app,	
+			app,
 		},
 	})
 

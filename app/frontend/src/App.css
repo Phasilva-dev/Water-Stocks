@@ -1,4 +1,4 @@
-/* frontend/src/App.css */
+/* frontend/src/App.css - Arquivo de Estilo Completo */
 
 /* Define a paleta de cores e fontes para o tema */
 :root {
@@ -102,6 +102,8 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: left;
+  width: 100%;
+  box-sizing: border-box;
 }
 .page-container h3 {
   margin-top: 0;
@@ -153,7 +155,7 @@ body {
   max-width: 300px;
 }
 
-/* Estilos para validação de erro */
+/* Validação e Feedback */
 .input.invalid {
   border-color: var(--error-red);
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
@@ -163,6 +165,22 @@ body {
   color: var(--error-red);
   font-size: 0.8rem;
   margin-top: 4px;
+}
+
+.result {
+  margin-top: 1.5rem;
+  padding: 15px;
+  background-color: var(--light-blue);
+  border-left: 4px solid var(--primary-blue);
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+}
+
+.result.error {
+  background-color: var(--error-light-red);
+  border-left-color: var(--error-red);
+  color: var(--error-dark-red);
 }
 
 /* Botões */
@@ -186,23 +204,6 @@ body {
   opacity: 0.65;
 }
 
-/* Caixa de Resultados / Status */
-.result {
-  margin-top: 1.5rem;
-  padding: 15px;
-  background-color: var(--light-blue);
-  border-left: 4px solid var(--primary-blue);
-  border-radius: 4px;
-  font-family: 'Courier New', Courier, monospace;
-  text-align: left;
-}
-
-.result.error {
-  background-color: var(--error-light-red);
-  border-left-color: var(--error-red);
-  color: var(--error-dark-red);
-}
-
 /* Página "Sobre" */
 .about-page ul {
   padding-left: 20px;
@@ -210,8 +211,42 @@ body {
 .about-page li {
   margin-bottom: 10px;
 }
+.about-page a {
+  color: var(--primary-blue);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+.about-page a:hover {
+  text-decoration: underline;
+}
 
-/* Placeholder do Gráfico */
+/* Visualizador de Resultados e Drag-and-Drop */
+.drop-zone {
+  margin-top: 2rem;
+  padding: 3rem 2rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  text-align: center;
+  color: #888;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.drop-zone.drag-over {
+  background-color: var(--light-blue);
+  border-color: var(--primary-blue);
+}
+
+.drop-zone-error {
+  color: var(--error-red);
+  font-weight: bold;
+}
+
+.drop-zone-success {
+  color: #155724; /* Verde sucesso */
+  font-weight: normal;
+}
+
 .chart-placeholder {
   margin-top: 2rem;
   padding: 4rem 2rem;

@@ -9,3 +9,7 @@ export function Greet(arg1) {
 export function RunSimulation(arg1, arg2, arg3, arg4, arg5) {
   return window['go']['main']['App']['RunSimulation'](arg1, arg2, arg3, arg4, arg5);
 }
+
+export function SelectFile() {
+  return window['go']['main']['App']['SelectFile']();
+}

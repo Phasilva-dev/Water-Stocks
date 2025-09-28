@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"simulation/cmd/simulation"
-
 )
 
 // App struct
@@ -31,4 +31,21 @@ func (a *App) Greet(name string) string {
 
 func (a *App) RunSimulation(size, day, toiletType, showerType int, filename string) {
 	simulation.RunSimulation(size, day, toiletType, showerType, filename)
+}
+
+func (a *App) SelectFile() (string, error) {
+    selection, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{
+        Title: "Selecione um arquivo de análise",
+        Filters: []runtime.FileFilter{
+            {
+                DisplayName: "Arquivos CSV (*.csv)",
+                Pattern:     "*.csv",
+            },
+        },
+    })
+    if err != nil {
+        return "", err
+    }
+    // Se o usuário cancelar, a string será vazia, o que é o comportamento desejado.
+    return selection, nil
 }

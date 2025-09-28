@@ -1,91 +1,71 @@
-import { useState, useEffect } from 'react';
-import logo from './assets/images/logo-universal.png';
+// frontend/src/App.jsx
+
+import { useState } from 'react';
 import './App.css';
-// Importe a sua nova função do backend Go
-import { RunSimulation } from "../wailsjs/go/main/App";
+import SimulationForm from './pages/SimulationForm';
+import ResultsViewer from './pages/ResultsViewer';
+import AboutPage from './pages/AboutPage';
+
+// Um ícone simples de gota d'água usando SVG
+const WaterDropIcon = () => (
+  <svg viewBox="0 0 384 512" width="40" height="50" fill="currentColor">
+    <path d="M192 512C86 512 0 426 0 320C0 228.8 130.2 57.7 166.6 11.7C172.6 4.2 181.5 0 191.1 0C201.5 0 210.4 4.2 216.4 11.7C252.8 57.7 384 228.8 384 320C384 426 298 512 192 512z"/>
+  </svg>
+);
+
 
 function App() {
-    // State para exibir mensagens na UI
-    const [resultText, setResultText] = useState("Configure os parâmetros e inicie a simulação.");
+  // State para controlar qual página está visível
+  const [currentPage, setCurrentPage] = useState('home');
 
-    // States para cada parâmetro da simulação, com valores padrão
-    const [size, setSize] = useState(10000);
-    const [day, setDay] = useState(7);
-    const [toiletType, setToiletType] = useState(1);
-    const [showerType, setShowerType] = useState(1);
-    const [filename, setFilename] = useState("simulacao-react");
-
-    // Hook para escutar eventos do Go.
-    // Isso é executado apenas uma vez quando o componente é montado.
-    useEffect(() => {
-        // Escuta pelo evento 'simulationComplete' que definimos no backend
-        window.runtime.EventsOn('simulationComplete', (message) => {
-            console.log("Evento recebido do Go:", message);
-            // Atualiza a UI com a mensagem final da simulação
-            setResultText(message);
-        });
-
-        // Função de limpeza: remove o listener quando o componente é desmontado
-        return () => {
-            window.runtime.EventsOff('simulationComplete');
-        };
-    }, []); // O array vazio [] garante que isso rode apenas uma vez
-
-    // Função que será chamada pelo botão "Iniciar Simulação"
-    function startSimulation() {
-        // Atualiza a UI para dar feedback imediato ao usuário
-        setResultText(`Iniciando simulação '${filename}' com ${size} casas...`);
-
-        // Chama a função do backend Go com os valores atuais do estado
-        RunSimulation(size, day, toiletType, showerType, filename)
-            .then((immediateResponse) => {
-                // A resposta imediata do Go ("Simulação iniciada...") vem aqui
-                console.log(immediateResponse);
-                setResultText(immediateResponse);
-            })
-            .catch((err) => {
-                // Caso ocorra algum erro ao tentar chamar a função
-                console.error("Erro ao chamar RunSimulation:", err);
-                setResultText(`Erro: ${err}`);
-            });
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'new_simulation':
+        return <SimulationForm />;
+      case 'view_results':
+        return <ResultsViewer />;
+      case 'about':
+        return <AboutPage />;
+      default:
+        // A página inicial com os botões de navegação
+        return (
+          <div className="home-container">
+            <p>Selecione uma opção para começar</p>
+            <nav className="main-nav">
+              <button className="nav-button" onClick={() => setCurrentPage('new_simulation')}>
+                Nova Simulação
+              </button>
+              <button className="nav-button" onClick={() => setCurrentPage('view_results')}>
+                Visualizar Resultados
+              </button>
+              <button className="nav-button" onClick={() => setCurrentPage('about')}>
+                Sobre o Projeto
+              </button>
+            </nav>
+          </div>
+        );
     }
+  };
 
-    return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <h1>Simulador Hidrológico</h1>
-            <div id="result" className="result">{resultText}</div>
-            
-            {/* Seção com os inputs para os parâmetros da simulação */}
-            <div className="simulation-form">
-                <div className="input-box">
-                    <label htmlFor="filename">Nome do Arquivo:</label>
-                    <input id="filename" className="input" value={filename} onChange={(e) => setFilename(e.target.value)} type="text"/>
-                </div>
-                <div className="input-box">
-                    <label htmlFor="size">Número de Casas:</label>
-                    <input id="size" className="input" value={size} onChange={(e) => setSize(parseInt(e.target.value))} type="number"/>
-                </div>
-                <div className="input-box">
-                    <label htmlFor="day">Dias de Simulação:</label>
-                    <input id="day" className="input" value={day} onChange={(e) => setDay(parseInt(e.target.value))} type="number"/>
-                </div>
-                <div className="input-box">
-                    <label htmlFor="toiletType">Tipo de Vaso (1-4):</label>
-                    <input id="toiletType" className="input" value={toiletType} onChange={(e) => setToiletType(parseInt(e.target.value))} type="number"/>
-                </div>
-                <div className="input-box">
-                    <label htmlFor="showerType">Tipo de Chuveiro (1-2):</label>
-                    <input id="showerType" className="input" value={showerType} onChange={(e) => setShowerType(parseInt(e.target.value))} type="number"/>
-                </div>
-
-                {/* Botão que dispara a simulação */}
-                <button className="btn" onClick={startSimulation}>
-                    Iniciar Simulação
-                </button>
-            </div>
-        </div>
-    )
+  return (
+    <div id="App">
+      <header className="app-header">
+        <WaterDropIcon />
+        <h1>HydroSim</h1>
+        <h2>Simulador de Demanda Hídrica</h2>
+      </header>
+      
+      <main className="content">
+        {/* Renderiza um botão "Voltar" se não estivermos na página inicial */}
+        {currentPage !== 'home' && (
+          <button className="back-button" onClick={() => setCurrentPage('home')}>
+            &larr; Voltar ao Início
+          </button>
+        )}
+        {renderPage()}
+      </main>
+    </div>
+  );
 }
 
 export default App;

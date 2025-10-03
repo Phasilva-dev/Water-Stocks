@@ -1,3 +1,4 @@
+<!-- --- START OF FILE chart_template.html --- -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,6 +20,7 @@
         .metric-card .value { font-size: 2.2em; font-weight: bold; color: #007bff; }
         .metric-card .label { font-size: 1em; color: #666; margin-top: 5px; }
         .chart { width: 100%; min-height: 450px; }
+        .chart-note { font-style: italic; color: #666; text-align: center; margin-top: -10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -28,7 +30,7 @@
             <p>Análise do arquivo: <strong>{{.FileName}}</strong></p>
         </div>
 
-        <!-- ANÁLISE 2 (PARTE) E 3 -->
+        <!-- Métricas Principais -->
         <div class="analysis-section">
             <h2>Métricas Principais</h2>
             <div class="metrics-grid">
@@ -43,25 +45,27 @@
             </div>
         </div>
         
-        <!-- ANÁLISE 1 -->
+        <!-- Análise 1: Consumo Horário por Aparelho (Gráfico de Barras Empilhadas) -->
         <div class="analysis-section">
-            <h2>Análise 1: Média de Consumo Horário</h2>
-            <p>Consumo médio total (todas as residências) para cada hora do dia, ao longo de toda a simulação.</p>
+            <h2>Análise 1: Consumo Horário por Aparelho</h2>
+            <p>Consumo médio total (todas as residências) para cada hora do dia, detalhado por tipo de aparelho. O valor na legenda representa a porcentagem do consumo total do aparelho.</p>
             <div id="hourly-chart" class="chart"></div>
+            <p class="chart-note">Dica: Clique nos itens da legenda para ocultar ou exibir os dados de um aparelho.</p>
         </div>
 
-        <!-- ANÁLISE 2 (PARTE) -->
+        <!-- Análise 2: Consumo Total por Aparelho (Gráfico de Barras) -->
         <div class="analysis-section">
             <h2>Análise 2: Consumo Total por Aparelho</h2>
             <p>Volume total consumido por cada tipo de aparelho durante toda a simulação.</p>
             <div id="device-summary-chart" class="chart"></div>
         </div>
 
-        <!-- ANÁLISE 4 -->
+        <!-- Análise 4: Gráfico de Pulso (Segundo a Segundo) -->
         <div class="analysis-section">
-            <h2>Análise 4: Gráfico de Pulso (Segundo a Segundo)</h2>
-            <p>Variação do consumo em litros por segundo para cada aparelho e o total geral. (Exibindo as primeiras 2 horas para melhor visualização)</p>
+            <h2>Análise 4: Gráfico de Pulso (24 Horas)</h2>
+            <p>Variação do consumo em litros por segundo para cada aparelho e o total geral ao longo do primeiro dia da simulação.</p>
             <div id="pulse-chart" class="chart"></div>
+            <p class="chart-note">Dica: Clique nos itens da legenda para ocultar ou exibir os dados de um aparelho. Você também pode clicar e arrastar no gráfico para dar zoom.</p>
         </div>
     </div>
 
@@ -72,20 +76,21 @@
 
         // Use um bloco try-catch para segurança, caso os dados estejam incompletos.
         try {
-            // CORREÇÃO: Usando camelCase (consumptionPerPerson, peakCoefficient, etc.)
+            // Preenche as Métricas Principais
             document.getElementById('consumption-per-person').innerText = analysisData.consumptionPerPerson.toFixed(2);
             document.getElementById('peak-coefficient').innerText = analysisData.peakCoefficient.toFixed(2);
             
-            // ANÁLISE 1: Gráfico de consumo horário
+            // ANÁLISE 1: Gráfico de consumo horário (Stacked Bar)
             const hourlyLayout = {
-                title: 'Média de Consumo por Hora do Dia',
+                title: 'Consumo Médio por Hora do Dia (Empilhado)',
                 xaxis: { title: 'Hora do Dia (0-23h)', tickmode: 'linear' },
                 yaxis: { title: 'Consumo Médio (Litros)' },
-                bargap: 0.05
+                barmode: 'stack', // <-- Chave para criar o gráfico empilhado
+                legend: { "orientation": "h", y: -0.2 }
             };
-            Plotly.newPlot('hourly-chart', [{ x: analysisData.hourlyAnalysis.hours, y: analysisData.hourlyAnalysis.consumption, type: 'bar' }], hourlyLayout, {responsive: true});
+            Plotly.newPlot('hourly-chart', analysisData.hourlyAnalysis, hourlyLayout, {responsive: true});
 
-            // ANÁLISE 2: Gráfico de consumo por aparelho
+            // ANÁLISE 2: Gráfico de consumo total por aparelho (Bar Chart)
             const deviceLayout = {
                 title: 'Consumo Total por Aparelho',
                 xaxis: { title: 'Aparelho' },
@@ -93,14 +98,34 @@
             };
             Plotly.newPlot('device-summary-chart', [{ x: analysisData.deviceSummaryAnalysis.devices, y: analysisData.deviceSummaryAnalysis.liters, type: 'bar' }], deviceLayout, {responsive: true});
             
-            // ANÁLISE 4: Gráfico de pulso
+            // ANÁLISE 4: Gráfico de pulso para 24 horas (86400 segundos)
             const pulseLayout = {
-                title: 'Consumo Segundo a Segundo (Primeiras 2 Horas)',
-                xaxis: { title: 'Tempo (Segundos)' },
+                title: 'Consumo Segundo a Segundo (24 Horas)',
+                xaxis: { 
+                    title: 'Hora do Dia',
+                    tickmode: 'array',
+                    // Gera ticks para cada 2 horas (7200 segundos)
+                    tickvals: Array.from({length: 13}, (_, i) => i * 7200),
+                    // Formata os ticks como HH:00
+                    ticktext: Array.from({length: 13}, (_, i) => `${String(i * 2).padStart(2, '0')}:00`),
+                    range: [0, 86400] // Garante que o eixo X cubra 24 horas
+                },
                 yaxis: { title: 'Consumo (Litros/Segundo)' },
                 legend: { "orientation": "h", y: -0.2 }
             };
-            Plotly.newPlot('pulse-chart', analysisData.pulseAnalysis, pulseLayout, {responsive: true});
+            // Limita os dados do gráfico de pulso para os primeiros 86400 segundos (1 dia) para visualização
+            const pulseTracesForOneDay = analysisData.pulseAnalysis.map(trace => {
+                const limit = 86400;
+                // Encontra o índice onde o tempo excede o limite de um dia
+                const endIndex = trace.x.findIndex(time => time >= limit);
+                
+                return {
+                    ...trace,
+                    x: endIndex !== -1 ? trace.x.slice(0, endIndex) : trace.x,
+                    y: endIndex !== -1 ? trace.y.slice(0, endIndex) : trace.y,
+                };
+            });
+            Plotly.newPlot('pulse-chart', pulseTracesForOneDay, pulseLayout, {responsive: true});
 
         } catch (e) {
             console.error("Erro ao renderizar gráficos:", e);
@@ -109,3 +134,4 @@
     </script>
 </body>
 </html>
+<!-- --- END OF FILE chart_template.html --- -->

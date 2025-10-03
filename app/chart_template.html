@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Análise - {{.FileName}}</title>
+    <!-- Usando uma versão mais recente e específica do Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f4f8; color: #333; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: #fff; box-shadow: 0 0 15px rgba(0,0,0,0.1); border-radius: 8px; }
+        .header { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 20px; margin-bottom: 30px; }
+        .header h1 { margin: 0; color: #0056b3; }
+        .header p { margin: 5px 0 0; font-size: 1.2em; color: #555; }
+        .analysis-section { margin-bottom: 50px; }
+        .analysis-section h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; color: #333; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: center; margin-bottom: 30px; }
+        .metric-card { background-color: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .metric-card .value { font-size: 2.2em; font-weight: bold; color: #007bff; }
+        .metric-card .label { font-size: 1em; color: #666; margin-top: 5px; }
+        .chart { width: 100%; min-height: 450px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Relatório de Simulação Hidrológica</h1>
+            <p>Análise do arquivo: <strong>{{.FileName}}</strong></p>
+        </div>
+
+        <!-- ANÁLISE 2 (PARTE) E 3 -->
+        <div class="analysis-section">
+            <h2>Métricas Principais</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div id="consumption-per-person" class="value">--</div>
+                    <div class="label">Consumo Médio Diário por Pessoa (Litros)</div>
+                </div>
+                <div class="metric-card">
+                    <div id="peak-coefficient" class="value">--</div>
+                    <div class="label">Coeficiente de Pico (Relação Máximo/Médio)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ANÁLISE 1 -->
+        <div class="analysis-section">
+            <h2>Análise 1: Média de Consumo Horário</h2>
+            <p>Consumo médio total (todas as residências) para cada hora do dia, ao longo de toda a simulação.</p>
+            <div id="hourly-chart" class="chart"></div>
+        </div>
+
+        <!-- ANÁLISE 2 (PARTE) -->
+        <div class="analysis-section">
+            <h2>Análise 2: Consumo Total por Aparelho</h2>
+            <p>Volume total consumido por cada tipo de aparelho durante toda a simulação.</p>
+            <div id="device-summary-chart" class="chart"></div>
+        </div>
+
+        <!-- ANÁLISE 4 -->
+        <div class="analysis-section">
+            <h2>Análise 4: Gráfico de Pulso (Segundo a Segundo)</h2>
+            <p>Variação do consumo em litros por segundo para cada aparelho e o total geral. (Exibindo as primeiras 2 horas para melhor visualização)</p>
+            <div id="pulse-chart" class="chart"></div>
+        </div>
+    </div>
+
+    <script>
+        // ATENÇÃO: Seu editor de código PODE mostrar um erro de sintaxe nesta linha,
+        // mas ela está CORRETA. O Go irá substituir {{.AnalysisJSON}} pelo objeto JSON.
+        const analysisData = {{.AnalysisJSON}};
+
+        // Use um bloco try-catch para segurança, caso os dados estejam incompletos.
+        try {
+            // CORREÇÃO: Usando camelCase (consumptionPerPerson, peakCoefficient, etc.)
+            document.getElementById('consumption-per-person').innerText = analysisData.consumptionPerPerson.toFixed(2);
+            document.getElementById('peak-coefficient').innerText = analysisData.peakCoefficient.toFixed(2);
+            
+            // ANÁLISE 1: Gráfico de consumo horário
+            const hourlyLayout = {
+                title: 'Média de Consumo por Hora do Dia',
+                xaxis: { title: 'Hora do Dia (0-23h)', tickmode: 'linear' },
+                yaxis: { title: 'Consumo Médio (Litros)' },
+                bargap: 0.05
+            };
+            Plotly.newPlot('hourly-chart', [{ x: analysisData.hourlyAnalysis.hours, y: analysisData.hourlyAnalysis.consumption, type: 'bar' }], hourlyLayout, {responsive: true});
+
+            // ANÁLISE 2: Gráfico de consumo por aparelho
+            const deviceLayout = {
+                title: 'Consumo Total por Aparelho',
+                xaxis: { title: 'Aparelho' },
+                yaxis: { title: 'Total Consumido (Litros)' }
+            };
+            Plotly.newPlot('device-summary-chart', [{ x: analysisData.deviceSummaryAnalysis.devices, y: analysisData.deviceSummaryAnalysis.liters, type: 'bar' }], deviceLayout, {responsive: true});
+            
+            // ANÁLISE 4: Gráfico de pulso
+            const pulseLayout = {
+                title: 'Consumo Segundo a Segundo (Primeiras 2 Horas)',
+                xaxis: { title: 'Tempo (Segundos)' },
+                yaxis: { title: 'Consumo (Litros/Segundo)' },
+                legend: { "orientation": "h", y: -0.2 }
+            };
+            Plotly.newPlot('pulse-chart', analysisData.pulseAnalysis, pulseLayout, {responsive: true});
+
+        } catch (e) {
+            console.error("Erro ao renderizar gráficos:", e);
+            document.body.innerHTML = `<h1>Erro ao processar dados</h1><p>Verifique o console do navegador para mais detalhes.</p><pre>${e.stack}</pre>`;
+        }
+    </script>
+</body>
+</html>

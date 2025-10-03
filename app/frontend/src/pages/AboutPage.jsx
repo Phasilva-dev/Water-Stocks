@@ -20,15 +20,41 @@ function AboutPage() {
         <li><strong>Biblioteca Estatística:</strong> Gonum, utilizada para operações matemáticas e estatísticas avançadas.</li>
       </ul>
 
+      <h4>Licenças</h4>
+      <p>
+        Este software utiliza bibliotecas de código aberto. Agradecemos aos autores e comunidades responsáveis:
+      </p>
+      <ul>
+        <li>
+          <strong>Wails</strong> — Licença{" "}
+          <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a><br />
+          Copyright (c) 2018–Presente, Lea Anthony
+        </li>
+        <li>
+          <strong>Plotly.js</strong> — Licença{" "}
+          <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a><br />
+          Copyright (c) 2016–2024, Plotly Technologies Inc.
+        </li>
+        <li>
+          <strong>Gonum</strong> — Licença{" "}
+          <a href="https://opensource.org/licenses/BSD-3-Clause" target="_blank" rel="noopener noreferrer">BSD 3-Clause</a><br />
+          Copyright ©2013, The Gonum Authors
+        </li>
+      </ul>
+      <p>
+        As licenças completas estão incluídas neste projeto.
+      </p>
+
+      <h4>Créditos</h4>
       <p>
         Produzido como projeto de Iniciação Científica pela Universidade Estadual de Feira de Santana.<br />
         Desenvolvido por <strong>Pedro Henrique de Araújo Silva</strong>.<br />
         Idealizado por{" "}
-        <a href="http://lattes.cnpq.br/123456" target="_blank" rel="noopener noreferrer"> {/* Exemplo de link real */}
+        <a href="http://lattes.cnpq.br/123456" target="_blank" rel="noopener noreferrer">
           Prof. Eduardo Henrique Borges Cohim Silva
         </a>{" "}
         e{" "}
-        <a href="http://lattes.cnpq.br/654321" target="_blank" rel="noopener noreferrer"> {/* Exemplo de link real */}
+        <a href="http://lattes.cnpq.br/654321" target="_blank" rel="noopener noreferrer">
           Prof. Anderson de Souza Matos Gadea
         </a>.
       </p>

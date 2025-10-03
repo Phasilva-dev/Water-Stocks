@@ -262,7 +262,7 @@ func defaultHouseSanitaryDevice(toiletType, showerType int) map[string]sanitaryd
 
 	shower2 := must(sanitarydevice.NewShower(
 		must(dists.CreateDistribution("lognormal", -2.4205, 0.2014)),
-		must(dists.CreateDistribution("gamma", 391.296, 36.008 )), //6.5216 * 60, 0.7668 * 60
+		must(dists.CreateDistribution("gamma", 72.33427078, 5.4095520118)), //6.5216 * 60, 0.7668 * 60 //"gamma", 391.296, 36.008
 		2,
 	))
 

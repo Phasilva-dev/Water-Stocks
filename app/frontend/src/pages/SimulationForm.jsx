@@ -17,6 +17,7 @@ function SimulationForm() {
     const [errors, setErrors] = useState({});
     const [statusMessage, setStatusMessage] = useState("Configure os parâmetros e inicie a simulação.");
     const [isSimulating, setIsSimulating] = useState(false);
+    const [isError, setIsError] = useState(false); // Novo state para controlar a cor da mensagem
 
     // --- HANDLER PARA ATUALIZAR O ESTADO DOS PARÂMETROS ---
     const handleInputChange = (e) => {
@@ -32,7 +33,7 @@ function SimulationForm() {
     // --- FUNÇÃO DE VALIDAÇÃO ---
     const validateParams = () => {
         const newErrors = {};
-        if (!params.filename) newErrors.filename = "Nome do arquivo é obrigatório.";
+        if (!params.filename.trim()) newErrors.filename = "Nome do arquivo é obrigatório.";
         if (params.size <= 0) newErrors.size = "Deve ser um valor positivo.";
         if (params.day <= 0) newErrors.day = "Deve ser um valor positivo.";
         if (params.toiletType < 1 || params.toiletType > 4) newErrors.toiletType = "Opção inválida.";
@@ -47,25 +48,46 @@ function SimulationForm() {
     const startSimulation = () => {
         if (!validateParams()) {
             setStatusMessage("Por favor, corrija os erros no formulário.");
+            setIsError(true); // Define como erro para estilização
             return;
         }
 
         setIsSimulating(true);
+        setIsError(false); // Reseta o estado de erro
         setStatusMessage(`Iniciando simulação '${params.filename}'...`);
         
         RunSimulation(params.size, params.day, params.toiletType, params.showerType, params.filename)
-            .then(response => setStatusMessage(response))
-            .catch(err => setStatusMessage(`Erro: ${err}`));
+            .then(response => {
+                // O backend retorna uma mensagem de sucesso
+                setStatusMessage(response);
+                setIsError(false); // Garante que não é um erro
+            })
+            .catch(err => {
+                // O backend retorna um erro
+                setStatusMessage(`Erro: ${err}`);
+                setIsError(true); // Marca como erro
+            })
+            .finally(() => {
+                // Isso será executado tanto em caso de sucesso quanto de erro
+                setIsSimulating(false); // Libera o botão e os inputs
+            });
     };
 
-    // --- EFEITO PARA OUVIR EVENTOS DO BACKEND (WAILS) ---
+    // --- EFEITO PARA OUVIR EVENTOS DE STATUS DO BACKEND (WAILS) ---
     useEffect(() => {
-        const cleanup = window.runtime.EventsOn('simulationComplete', (message) => {
-            setStatusMessage(message);
-            setIsSimulating(false); // Libera o botão
+        // Este evento é para mostrar o progresso durante a simulação
+        const cleanupStatus = window.runtime.EventsOn('simulationStatus', (message) => {
+            // Só atualiza a mensagem se a simulação estiver em andamento
+            if (isSimulating) {
+                setStatusMessage(message);
+            }
         });
-        return cleanup;
-    }, []);
+
+        // A função de limpeza é chamada quando o componente é desmontado
+        return () => {
+            cleanupStatus();
+        };
+    }, [isSimulating]); // A dependência garante que o listener seja gerenciado corretamente
 
     return (
         <div className="page-container">
@@ -104,10 +126,10 @@ function SimulationForm() {
                         onChange={handleInputChange} 
                         disabled={isSimulating}
                     >
-                        <option value={1}>Vaso Padrão (6 Lpf)</option>
-                        <option value={2}>Vaso com Caixa Acoplada (3/6 Lpf)</option>
-                        <option value={3}>Vaso a Vácuo (1.2 Lpf)</option>
-                        <option value={4}>Vaso Ecológico (4.8 Lpf)</option>
+                        <option value={1}>Vaso 1 (2 Lpf)</option>
+                        <option value={2}>Vaso 2 (4.5 Lpf)</option>
+                        <option value={3}>Vaso 3 (15 Lpf)</option>
+                        <option value={4}>Vaso 4 (3 Lpf)</option>
                     </select>
                     {errors.toiletType && <small className="error-text">{errors.toiletType}</small>}
                 </div>
@@ -121,8 +143,8 @@ function SimulationForm() {
                         onChange={handleInputChange} 
                         disabled={isSimulating}
                     >
-                        <option value={1}>Chuveiro Comum (12 L/min)</option>
-                        <option value={2}>Chuveiro Econômico (8 L/min)</option>
+                        <option value={1}>Chuveiro 1 (5.66 L/min)(6.17 min)</option>
+                        <option value={2}>Chuveiro 2 (5.45 L/min)(6.52 min)</option>
                     </select>
                     {errors.showerType && <small className="error-text">{errors.showerType}</small>}
                 </div>
@@ -134,7 +156,7 @@ function SimulationForm() {
             </div>
             
             {/* --- CAIXA DE STATUS --- */}
-            <div className={`result ${Object.keys(errors).length > 0 ? 'error' : ''}`}>
+            <div className={`result ${isError ? 'error' : ''}`}>
                 {statusMessage}
             </div>
         </div>

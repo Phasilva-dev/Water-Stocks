@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatório de Análise - {{.FileName}}</title>
-    <!-- Usando uma versão mais recente e específica do Plotly.js -->
     <script src="https://cdn.plot.ly/plotly-2.12.1.min.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: #f0f4f8; color: #333; }
@@ -20,7 +19,8 @@
         .metric-card .value { font-size: 2.2em; font-weight: bold; color: #007bff; }
         .metric-card .label { font-size: 1em; color: #666; margin-top: 5px; }
         .chart { width: 100%; min-height: 450px; }
-        .chart-note { font-style: italic; color: #666; text-align: center; margin-top: -10px; margin-bottom: 20px; }
+        /* Ajuste para que a nota fique mais próxima do gráfico, mas sem sobreposição */
+        .chart-note { font-style: italic; color: #666; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -32,7 +32,7 @@
 
         <!-- Métricas Principais -->
         <div class="analysis-section">
-            <h2>Métricas Principais</h2>
+            <h2>Métricas Diárias Médias</h2>
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div id="consumption-per-person" class="value">--</div>
@@ -40,15 +40,15 @@
                 </div>
                 <div class="metric-card">
                     <div id="peak-coefficient" class="value">--</div>
-                    <div class="label">Coeficiente de Pico (Relação Máximo/Médio)</div>
+                    <div class="label">Coeficiente de Pico Horário (K1)</div>
                 </div>
             </div>
         </div>
         
         <!-- Análise 1: Consumo Horário por Aparelho (Gráfico de Barras Empilhadas) -->
         <div class="analysis-section">
-            <h2>Análise 1: Consumo Horário por Aparelho</h2>
-            <p>Consumo médio total (todas as residências) para cada hora do dia, detalhado por tipo de aparelho. O valor na legenda representa a porcentagem do consumo total do aparelho.</p>
+            <h2>Análise 1: Média de Consumo Horário por Aparelho</h2>
+            <p>Este gráfico mostra o consumo médio para cada hora de um dia típico, empilhado por aparelho. O valor na legenda representa a porcentagem do consumo total do aparelho durante toda a simulação.</p>
             <div id="hourly-chart" class="chart"></div>
             <p class="chart-note">Dica: Clique nos itens da legenda para ocultar ou exibir os dados de um aparelho.</p>
         </div>
@@ -56,27 +56,23 @@
         <!-- Análise 2: Consumo Total por Aparelho (Gráfico de Barras) -->
         <div class="analysis-section">
             <h2>Análise 2: Consumo Total por Aparelho</h2>
-            <p>Volume total consumido por cada tipo de aparelho durante toda a simulação.</p>
+            <p>Volume total consumido por cada tipo de aparelho durante o período completo da simulação.</p>
             <div id="device-summary-chart" class="chart"></div>
         </div>
 
         <!-- Análise 4: Gráfico de Pulso (Segundo a Segundo) -->
         <div class="analysis-section">
-            <h2>Análise 4: Gráfico de Pulso (24 Horas)</h2>
-            <p>Variação do consumo em litros por segundo para cada aparelho e o total geral ao longo do primeiro dia da simulação.</p>
+            <h2>Análise 4: Hidrograma de Consumo Médio Diário</h2>
+            <p>Variação do consumo médio em litros por segundo (L/s) para cada aparelho ao longo de um dia típico de 24 horas, calculado a partir da média de todos os dias simulados.</p>
             <div id="pulse-chart" class="chart"></div>
             <p class="chart-note">Dica: Clique nos itens da legenda para ocultar ou exibir os dados de um aparelho. Você também pode clicar e arrastar no gráfico para dar zoom.</p>
         </div>
     </div>
 
     <script>
-        // ATENÇÃO: Seu editor de código PODE mostrar um erro de sintaxe nesta linha,
-        // mas ela está CORRETA. O Go irá substituir {{.AnalysisJSON}} pelo objeto JSON.
         const analysisData = {{.AnalysisJSON}};
 
-        // Use um bloco try-catch para segurança, caso os dados estejam incompletos.
         try {
-            // Preenche as Métricas Principais
             document.getElementById('consumption-per-person').innerText = analysisData.consumptionPerPerson.toFixed(2);
             document.getElementById('peak-coefficient').innerText = analysisData.peakCoefficient.toFixed(2);
             
@@ -85,47 +81,35 @@
                 title: 'Consumo Médio por Hora do Dia (Empilhado)',
                 xaxis: { title: 'Hora do Dia (0-23h)', tickmode: 'linear' },
                 yaxis: { title: 'Consumo Médio (Litros)' },
-                barmode: 'stack', // <-- Chave para criar o gráfico empilhado
-                legend: { "orientation": "h", y: -0.2 }
+                barmode: 'stack', // Cria o gráfico empilhado
+                margin: { b: 120 }, // <-- ADICIONADO: Reserva 120px de espaço na parte inferior para a legenda
+                legend: { "orientation": "h", y: -0.3 } // Ajustado para se encaixar melhor com a margem
             };
             Plotly.newPlot('hourly-chart', analysisData.hourlyAnalysis, hourlyLayout, {responsive: true});
 
             // ANÁLISE 2: Gráfico de consumo total por aparelho (Bar Chart)
             const deviceLayout = {
-                title: 'Consumo Total por Aparelho',
+                title: 'Consumo Total por Aparelho (Período Completo)',
                 xaxis: { title: 'Aparelho' },
                 yaxis: { title: 'Total Consumido (Litros)' }
             };
             Plotly.newPlot('device-summary-chart', [{ x: analysisData.deviceSummaryAnalysis.devices, y: analysisData.deviceSummaryAnalysis.liters, type: 'bar' }], deviceLayout, {responsive: true});
             
-            // ANÁLISE 4: Gráfico de pulso para 24 horas (86400 segundos)
+            // ANÁLISE 4: Gráfico de pulso médio diário
             const pulseLayout = {
-                title: 'Consumo Segundo a Segundo (24 Horas)',
+                title: 'Consumo Médio Segundo a Segundo (Hidrograma de 24h)',
                 xaxis: { 
                     title: 'Hora do Dia',
                     tickmode: 'array',
-                    // Gera ticks para cada 2 horas (7200 segundos)
                     tickvals: Array.from({length: 13}, (_, i) => i * 7200),
-                    // Formata os ticks como HH:00
                     ticktext: Array.from({length: 13}, (_, i) => `${String(i * 2).padStart(2, '0')}:00`),
-                    range: [0, 86400] // Garante que o eixo X cubra 24 horas
+                    range: [0, 86400]
                 },
-                yaxis: { title: 'Consumo (Litros/Segundo)' },
-                legend: { "orientation": "h", y: -0.2 }
+                yaxis: { title: 'Consumo Médio (Litros/Segundo)' },
+                margin: { b: 120 }, // <-- ADICIONADO: Reserva 120px de espaço na parte inferior para a legenda
+                legend: { "orientation": "h", y: -0.3 } // Ajustado para se encaixar melhor com a margem
             };
-            // Limita os dados do gráfico de pulso para os primeiros 86400 segundos (1 dia) para visualização
-            const pulseTracesForOneDay = analysisData.pulseAnalysis.map(trace => {
-                const limit = 86400;
-                // Encontra o índice onde o tempo excede o limite de um dia
-                const endIndex = trace.x.findIndex(time => time >= limit);
-                
-                return {
-                    ...trace,
-                    x: endIndex !== -1 ? trace.x.slice(0, endIndex) : trace.x,
-                    y: endIndex !== -1 ? trace.y.slice(0, endIndex) : trace.y,
-                };
-            });
-            Plotly.newPlot('pulse-chart', pulseTracesForOneDay, pulseLayout, {responsive: true});
+            Plotly.newPlot('pulse-chart', analysisData.pulseAnalysis, pulseLayout, {responsive: true});
 
         } catch (e) {
             console.error("Erro ao renderizar gráficos:", e);

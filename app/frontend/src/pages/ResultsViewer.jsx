@@ -1,6 +1,8 @@
+// --- START OF FILE ResultsViewer.jsx ---
 import { useState } from 'react';
 // Importe as funções do Go
 import { SelectFile, GenerateAnalysisAndOpenBrowser } from '../../wailsjs/go/main/App';
+import Spinner from '../components/Spinner'; // Importe o novo componente
 
 function ResultsViewer() {
     const [fileName, setFileName] = useState(null);
@@ -19,6 +21,7 @@ function ResultsViewer() {
         GenerateAnalysisAndOpenBrowser(filePath)
             .then(successMessage => {
                 console.log(successMessage);
+                // A mensagem de sucesso ou erro é tratada no Go, aqui apenas resetamos o estado
                 setIsProcessing(false);
             })
             .catch(err => {
@@ -32,11 +35,17 @@ function ResultsViewer() {
         setError(null);
         SelectFile()
             .then(filePath => {
-                processAndGenerateReport(filePath);
+                // Se o usuário cancelar, filePath será uma string vazia
+                if (filePath) {
+                    processAndGenerateReport(filePath);
+                }
             })
             .catch(err => {
-                if (err && err.toLowerCase().includes('cancelled')) return;
-                setError(`Erro ao abrir diálogo: ${err}`);
+                // Wails retorna um erro quando o diálogo é cancelado, vamos ignorá-lo.
+                // Mensagens comuns de cancelamento incluem "No file selected" ou "cancelled".
+                if (err && !err.toLowerCase().includes('cancel')) {
+                    setError(`Erro ao abrir diálogo: ${err}`);
+                }
             });
     };
 
@@ -53,6 +62,7 @@ function ResultsViewer() {
             setFileName(null);
             return;
         }
+        // Wails usa `file.path` para acessar o caminho completo do arquivo.
         processAndGenerateReport(file.path);
     };
 
@@ -62,7 +72,7 @@ function ResultsViewer() {
             <p>Selecione um arquivo de análise (.csv) ou arraste e solte na área abaixo para gerar um relatório completo em uma nova página do navegador.</p>
             
             <button className="btn" onClick={handleFileSelectClick} disabled={isProcessing}>
-                {isProcessing ? 'Processando Análise...' : 'Selecionar Arquivo de Análise'}
+                {isProcessing ? 'Processando...' : 'Selecionar Arquivo de Análise'}
             </button>
             
             <div 
@@ -72,7 +82,10 @@ function ResultsViewer() {
                 onDrop={handleDrop}
             >
                 {isProcessing ? (
-                    <p>Analisando dados, por favor aguarde...</p>
+                    <div>
+                        <p>Analisando dados, por favor aguarde...</p>
+                        <Spinner />
+                    </div>
                 ) : error ? (
                     <p className="drop-zone-error">{error}</p>
                 ) : fileName ? (
@@ -86,3 +99,4 @@ function ResultsViewer() {
 }
 
 export default ResultsViewer;
+// --- END OF FILE ResultsViewer.jsx ---

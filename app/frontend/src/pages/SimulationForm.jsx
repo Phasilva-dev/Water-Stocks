@@ -1,3 +1,4 @@
+// --- START OF FILE SimulationForm.jsx ---
 import { useState, useEffect } from 'react';
 // Importe a função real do seu backend Go gerado pelo Wails
 import { RunSimulation } from "../../wailsjs/go/main/App";
@@ -20,8 +21,8 @@ function SimulationForm() {
     // --- HANDLER PARA ATUALIZAR O ESTADO DOS PARÂMETROS ---
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // Permite apenas números para campos numéricos
-        const processedValue = e.target.type === 'number' ? parseInt(value) || 0 : value;
+        // Permite apenas números para campos numéricos, exceto o nome do arquivo
+        const processedValue = (e.target.type === 'number' || e.target.tagName === 'SELECT') ? parseInt(value) || 0 : value;
         setParams(prevParams => ({
             ...prevParams,
             [name]: processedValue,
@@ -34,8 +35,8 @@ function SimulationForm() {
         if (!params.filename) newErrors.filename = "Nome do arquivo é obrigatório.";
         if (params.size <= 0) newErrors.size = "Deve ser um valor positivo.";
         if (params.day <= 0) newErrors.day = "Deve ser um valor positivo.";
-        if (params.toiletType < 1 || params.toiletType > 4) newErrors.toiletType = "Deve ser entre 1 e 4.";
-        if (params.showerType < 1 || params.showerType > 2) newErrors.showerType = "Deve ser 1 ou 2.";
+        if (params.toiletType < 1 || params.toiletType > 4) newErrors.toiletType = "Opção inválida.";
+        if (params.showerType < 1 || params.showerType > 2) newErrors.showerType = "Opção inválida.";
 
         setErrors(newErrors);
         // Retorna true se não houver erros
@@ -96,15 +97,33 @@ function SimulationForm() {
                 
                 <div className="input-box">
                     <label htmlFor="toiletType">Tipo de Vaso</label>
-                    <input name="toiletType" type="number" className={`input ${errors.toiletType ? 'invalid' : ''}`}
-                        placeholder="Valores: 1-4" value={params.toiletType} onChange={handleInputChange} disabled={isSimulating} />
+                    <select 
+                        name="toiletType" 
+                        className={`input ${errors.toiletType ? 'invalid' : ''}`}
+                        value={params.toiletType} 
+                        onChange={handleInputChange} 
+                        disabled={isSimulating}
+                    >
+                        <option value={1}>Vaso Padrão (6 Lpf)</option>
+                        <option value={2}>Vaso com Caixa Acoplada (3/6 Lpf)</option>
+                        <option value={3}>Vaso a Vácuo (1.2 Lpf)</option>
+                        <option value={4}>Vaso Ecológico (4.8 Lpf)</option>
+                    </select>
                     {errors.toiletType && <small className="error-text">{errors.toiletType}</small>}
                 </div>
 
                 <div className="input-box">
                     <label htmlFor="showerType">Tipo de Chuveiro</label>
-                    <input name="showerType" type="number" className={`input ${errors.showerType ? 'invalid' : ''}`}
-                        placeholder="Valores: 1-2" value={params.showerType} onChange={handleInputChange} disabled={isSimulating} />
+                    <select 
+                        name="showerType" 
+                        className={`input ${errors.showerType ? 'invalid' : ''}`}
+                        value={params.showerType} 
+                        onChange={handleInputChange} 
+                        disabled={isSimulating}
+                    >
+                        <option value={1}>Chuveiro Comum (12 L/min)</option>
+                        <option value={2}>Chuveiro Econômico (8 L/min)</option>
+                    </select>
                     {errors.showerType && <small className="error-text">{errors.showerType}</small>}
                 </div>
 
@@ -123,3 +142,4 @@ function SimulationForm() {
 }
 
 export default SimulationForm;
+// --- END OF FILE SimulationForm.jsx ---

@@ -1,3 +1,5 @@
+
+// --- START OF FILE app.go ---
 package main
 
 import (
@@ -13,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"simulation/cmd/simulation" // Seu import original
 )
 
@@ -174,23 +175,9 @@ func (a *App) GenerateAnalysisAndOpenBrowser(csvFilePath string) (string, error)
 func (a *App) performAllAnalyses(data *ParsedCSV) FullAnalysisReport {
 	// Análise 1: Consumo Horário
 	hourlyTotals := make([]float64, 24)
-	if len(data.PulseData) > 0 {
-		for _, p := range data.PulseData {
-			hour := (p.HorarioSegundos / 3600) % 24
-			if total, ok := p.Consumptions["total"]; ok {
-				hourlyTotals[hour] += total
-			}
-		}
-	}
 	hourlyResult := HourlyResult{Hours: make([]int, 24), Consumption: make([]float64, 24)}
-	for i := 0; i < 24; i++ {
-		hourlyResult.Hours[i] = i
-		if data.Metadata.TotalSimulationDays > 0 {
-			hourlyResult.Consumption[i] = hourlyTotals[i] / float64(data.Metadata.TotalSimulationDays)
-		}
-	}
 
-	// Análise 2: Consumo médio total diária por pessoa e por aparelho.
+	// Análise 2: Consumo por aparelho
 	var totalLitersConsumed float64
 	deviceSummaryResult := DeviceSummaryResult{Devices: make([]string, len(data.DeviceSummary)), Liters: make([]float64, len(data.DeviceSummary))}
 	for i, d := range data.DeviceSummary {
@@ -198,39 +185,39 @@ func (a *App) performAllAnalyses(data *ParsedCSV) FullAnalysisReport {
 		deviceSummaryResult.Devices[i] = d.Device
 		deviceSummaryResult.Liters[i] = d.TotalLitersConsumed
 	}
-	var consumptionPerPerson float64
-	if data.Metadata.TotalPopulation > 0 && data.Metadata.TotalSimulationDays > 0 {
-		consumptionPerPerson = totalLitersConsumed / float64(data.Metadata.TotalPopulation) / float64(data.Metadata.TotalSimulationDays)
+
+	// Análise 3 & 4 combinadas em um único loop
+	var maxTotal, sumTotal float64
+	var pulseAnalysis []PlotlyTrace
+
+	pulseDataLimit := 7200
+	if len(data.PulseData) < pulseDataLimit {
+		pulseDataLimit = len(data.PulseData)
 	}
 
-	// Análise 3: Relação entre o valor máximo e o valor médio (Coeficiente de pico).
-	var maxTotal, sumTotal float64
-	if len(data.PulseData) > 0 {
-		for _, p := range data.PulseData {
-			if total, ok := p.Consumptions["total"]; ok {
-				sumTotal += total
-				if total > maxTotal { maxTotal = total }
+	timeAxis := make([]int, pulseDataLimit)
+	deviceData := make(map[string][]float64)
+	for _, h := range data.PulseHeaders {
+		deviceData[h] = make([]float64, pulseDataLimit)
+	}
+
+	for i, p := range data.PulseData {
+		// Análise 1: Soma dos totais horários
+		hour := (p.HorarioSegundos / 3600) % 24
+		if total, ok := p.Consumptions["total"]; ok {
+			hourlyTotals[hour] += total
+		}
+		
+		// Análise 3: Encontra o pico e soma total
+		if total, ok := p.Consumptions["total"]; ok {
+			sumTotal += total
+			if total > maxTotal {
+				maxTotal = total
 			}
 		}
-	}
-	var peakCoefficient float64
-	if len(data.PulseData) > 0 {
-		avgTotal := sumTotal / float64(len(data.PulseData))
-		if avgTotal > 0 { peakCoefficient = maxTotal / avgTotal }
-	}
 
-	// Análise 4: Gráfico de pulso.
-	var pulseAnalysis []PlotlyTrace
-	if len(data.PulseData) > 0 {
-		pulseDataLimit := 7200
-		if len(data.PulseData) < pulseDataLimit { pulseDataLimit = len(data.PulseData) }
-
-		timeAxis := make([]int, pulseDataLimit)
-		deviceData := make(map[string][]float64)
-		for _, h := range data.PulseHeaders { deviceData[h] = make([]float64, pulseDataLimit) }
-
-		for i := 0; i < pulseDataLimit; i++ {
-			p := data.PulseData[i]
+		// Análise 4: Prepara os dados do gráfico de pulso (limitado a 'pulseDataLimit')
+		if i < pulseDataLimit {
 			timeAxis[i] = p.HorarioSegundos
 			for _, h := range data.PulseHeaders {
 				if val, ok := p.Consumptions[h]; ok {
@@ -238,10 +225,34 @@ func (a *App) performAllAnalyses(data *ParsedCSV) FullAnalysisReport {
 				}
 			}
 		}
-
-		for _, h := range data.PulseHeaders {
-			pulseAnalysis = append(pulseAnalysis, PlotlyTrace{X: timeAxis, Y: deviceData[h], Mode: "lines", Type: "scatter", Name: h})
+	}
+	
+	// Finaliza a Análise 1 (cálculo da média)
+	for i := 0; i < 24; i++ {
+		hourlyResult.Hours[i] = i
+		if data.Metadata.TotalSimulationDays > 0 {
+			hourlyResult.Consumption[i] = hourlyTotals[i] / float64(data.Metadata.TotalSimulationDays)
 		}
+	}
+
+	// Finaliza a Análise 3 (cálculo do coeficiente de pico)
+	var peakCoefficient float64
+	if len(data.PulseData) > 0 {
+		avgTotal := sumTotal / float64(len(data.PulseData))
+		if avgTotal > 0 {
+			peakCoefficient = maxTotal / avgTotal
+		}
+	}
+	
+	// Finaliza a Análise 4 (monta a estrutura para Plotly)
+	for _, h := range data.PulseHeaders {
+		pulseAnalysis = append(pulseAnalysis, PlotlyTrace{X: timeAxis, Y: deviceData[h], Mode: "lines", Type: "scatter", Name: h})
+	}
+	
+	// Análise 2 (continuação)
+	var consumptionPerPerson float64
+	if data.Metadata.TotalPopulation > 0 && data.Metadata.TotalSimulationDays > 0 {
+		consumptionPerPerson = totalLitersConsumed / float64(data.Metadata.TotalPopulation) / float64(data.Metadata.TotalSimulationDays)
 	}
 
 	// Monta o relatório final
@@ -254,6 +265,7 @@ func (a *App) performAllAnalyses(data *ParsedCSV) FullAnalysisReport {
 	}
 }
 
+
 // parseCustomCSV lê o arquivo CSV estruturado em seções.
 func (a *App) parseCustomCSV(filePath string) (*ParsedCSV, error) {
 	file, err := os.Open(filePath)
@@ -263,6 +275,7 @@ func (a *App) parseCustomCSV(filePath string) (*ParsedCSV, error) {
 	scanner := bufio.NewScanner(file)
 	parsed := &ParsedCSV{}
 	var currentSection string
+	isPulseDataHeader := false // Flag para identificar a linha de cabeçalho
 
 	log.Println("--- INICIANDO PARSING (VERSÃO FINAL E ROBUSTA) ---")
 
@@ -276,10 +289,10 @@ func (a *App) parseCustomCSV(filePath string) (*ParsedCSV, error) {
 			currentSection = strings.Trim(line, "[]")
 			log.Printf("MUDANDO PARA A SEÇÃO: [%s]", currentSection)
 			
-			if !scanner.Scan() {
-				break
+			if currentSection == "PULSE_DATA" {
+				isPulseDataHeader = true // A próxima linha será o cabeçalho
 			}
-			continue
+			continue // Pula para a próxima linha após identificar a seção
 		}
 		
 		parts := strings.Split(line, ",")
@@ -302,16 +315,30 @@ func (a *App) parseCustomCSV(filePath string) (*ParsedCSV, error) {
 				parsed.DeviceSummary = append(parsed.DeviceSummary, DeviceSummary{Device: parts[0], TotalLitersConsumed: liters, TotalUses: uses})
 			}
 		case "PULSE_DATA":
-			if parsed.PulseHeaders == nil {
-				parsed.PulseHeaders = []string{"toilet", "shower", "wash_bassin", "wash_machine", "dish_washer", "tanque", "total"}
-				log.Printf("  Cabeçalhos de Pulso Definidos (fixos): %v", parsed.PulseHeaders)
+			if isPulseDataHeader {
+				// A primeira linha são os cabeçalhos. Nós só precisamos dos cabeçalhos de consumo.
+				// O primeiro é "horario_segundos", então pulamos ele.
+				parsed.PulseHeaders = parts[1:]
+				log.Printf("  Cabeçalhos de Pulso lidos do CSV: %v", parsed.PulseHeaders)
+				isPulseDataHeader = false // Desativa a flag
+				continue // Pula para a próxima linha que conterá dados
 			}
+			
+			// Processamento normal das linhas de dados
+			if parsed.PulseHeaders != nil && len(parts) == len(parsed.PulseHeaders)+1 {
+				horario, err := strconv.Atoi(parts[0])
+				if err != nil {
+					log.Printf("AVISO: Pulando linha de dados de pulso mal formatada (horário): %s", line)
+					continue
+				}
 
-			if len(parts) >= len(parsed.PulseHeaders) + 1 {
-				horario, _ := strconv.Atoi(parts[0])
 				consumptions := make(map[string]float64)
 				for i, headerName := range parsed.PulseHeaders {
-					val, _ := strconv.ParseFloat(parts[i+1], 64)
+					val, err := strconv.ParseFloat(parts[i+1], 64)
+					if err != nil {
+						log.Printf("AVISO: Pulando valor mal formatado para '%s' na linha: %s", headerName, line)
+						val = 0.0 // Define um valor padrão em caso de erro
+					}
 					consumptions[headerName] = val
 				}
 				parsed.PulseData = append(parsed.PulseData, PulseData{HorarioSegundos: horario, Consumptions: consumptions})
@@ -326,3 +353,4 @@ func (a *App) parseCustomCSV(filePath string) (*ParsedCSV, error) {
 
 	return parsed, scanner.Err()
 }
+// --- END OF FILE app.go ---
